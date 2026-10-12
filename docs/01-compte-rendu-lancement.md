@@ -118,16 +118,16 @@ Les articles sont rangés selon une hiérarchie : **Logement > Pièce > Stockage
 
 > Ces points sont **mes interprétations**, pas des paroles du client. Chacun devient une **hypothèse** tant que le client ne l'a pas confirmé.
 
-| # | Déduction | Pourquoi |
-|---|---|---|
-| H1 | L'application doit être **multi-utilisateurs dès le départ**, même si la première utilisatrice est la cliente. | L'objectif annoncé est d'ouvrir à tout le monde. |
-| H2 | Le **rôle dépend du logement**, pas du compte : un même compte peut être propriétaire d'un logement et co-propriétaire d'un autre. | Plusieurs logements par utilisateur, et co-propriété de plusieurs logements. |
-| H3 | Le « propriétaire » d'un logement est **son créateur**, et il n'y en a qu'un. | Seul le créateur peut le supprimer. |
-| H4 | Un article prêté **n'est pas supprimé** : il change d'état et devient invisible. À son retour, il réapparaît. | Le journal des prêts suit le rendu, donc l'article doit continuer d'exister. |
-| H5 | Un non-inscrit voit **uniquement les logements publics**, jamais un logement privé. | Modèle Instagram cité par le client. |
-| H6 | Les **informations remplies automatiquement** par la photo doivent pouvoir être **corrigées** par l'utilisateur. | Les filtres du générateur reposent sur ces informations : une erreur exclurait le mauvais article. |
-| H7 | L'**âge** du compte doit être connu (date de naissance ou déclaration) pour appliquer les restrictions du compte mineur. | Restrictions spécifiques aux moins de 18 ans. |
-| H8 | Les **amis et abonnés sont liés à un compte** (comme sur Instagram), et s'appliquent à tous ses logements. | Le client parle d'abonnés « du propriétaire ». À confirmer, voir Q-03. |
+| # | Déduction | Pourquoi | Statut |
+|---|---|---|---|
+| H1 | L'application doit être **multi-utilisateurs dès le départ**, même si la première utilisatrice est la cliente. | L'objectif annoncé est d'ouvrir à tout le monde. La création de compte est une priorité (Q-01). | Confirmée (Q-01) |
+| H2 | Le **rôle dépend du logement**, pas du compte : un même compte peut être propriétaire d'un logement et co-propriétaire d'un autre. | Plusieurs logements par utilisateur, et co-propriété de plusieurs logements. | Hypothèse |
+| H3 | Le « propriétaire » d'un logement est **son créateur**, et il n'y en a qu'un. | Seul le créateur peut le supprimer. | Révisée : la propriété peut être **léguée** (Q-12). Il y a toujours un seul propriétaire, mais ce n'est plus forcément le créateur. |
+| H4 | Un article prêté **n'est pas supprimé** : il change d'état et devient invisible. À son retour, il réapparaît. | Le journal des prêts suit le rendu. | Confirmée (Q-10) : il revient à sa place d'origine. |
+| H5 | Un non-inscrit voit **uniquement les logements publics**, jamais un logement privé. | Modèle Instagram cité par le client. | Hypothèse, sauf accès par lien à usage unique (Q-05). |
+| H6 | Les **informations remplies automatiquement** par la photo doivent pouvoir être **corrigées** par l'utilisateur. | Le générateur filtre uniquement grâce à la famille (N-01) : une famille mal détectée fausse les tenues. | Hypothèse |
+| H7 | L'**âge** du compte doit être connu (date de naissance) pour appliquer les restrictions du compte mineur. | Le compte passe automatiquement en majeur à 18 ans (Q-11). | Hypothèse renforcée par Q-11 |
+| H8 | Les **amis** sont liés à un **compte** et voient tous ses logements. La **confidentialité** est réglée **par logement**. | — | Confirmée pour les amis (Q-03). Abonnés : à confirmer (Q-03b). |
 
 **Point de vigilance** : l'application stocke des données de mineurs. Le recueil du consentement et les données collectées sur ces comptes devront être justifiés (RGPD).
 
@@ -135,7 +135,7 @@ Les articles sont rangés selon une hiérarchie : **Logement > Pièce > Stockage
 
 ## 9. Questions restées sans réponse
 
-Résumé ci-dessous ; le détail et le suivi sont dans [02-echanges-client.md](02-echanges-client.md).
+> **Mise à jour du 12/10/2026** : la plupart de ces questions ont reçu une réponse. Le suivi à jour est dans [02-echanges-client.md](02-echanges-client.md).
 
 - **Priorités** : qu'est-ce qui est indispensable pour la version 1, et qu'est-ce qui peut attendre ?
 - **Vocabulaire** : quels mots la cliente utilise-t-elle (penderie, dressing, article, objet, look, tenue…) ?
