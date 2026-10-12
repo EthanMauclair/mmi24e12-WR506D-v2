@@ -6,7 +6,10 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 
 ## Questions ouvertes
 
-Aucune question bloquante en attente au 12/10/2026.
+| # | Question | Impact | Pourquoi c'est important | Statut |
+|---|---|---|---|---|
+| Q-20 | Quand le propriétaire supprime son logement et qu'il reste **plusieurs co-propriétaires**, lequel devient propriétaire ? Et s'il ne reste qu'un **co-propriétaire mineur** ? | Importante | Il faut toujours un propriétaire majeur, et un mineur ne peut pas posséder de logement. | À poser |
+| Q-21 | Une tenue contenant un article personnel est privée et « peut être mise publique » : l'article personnel devient-il alors visible **dans cette tenue uniquement** ? | Moyenne | Confirme l'interprétation H12. | À confirmer |
 
 ## Questions reportées
 

@@ -71,7 +71,7 @@ Personnages d'illustration, construits à partir des rôles décrits par la clie
 **Règles** :
 - Seuls ses **propres articles** sont proposés, pas ceux de Léo.
 - Jules, mineur, peut composer une tenue mais **ne peut ni la publier ni la partager**.
-- *Question ouverte* : un article **personnel** peut-il faire partie d'une tenue publiée ? (voir H12)
+- Une tenue qui contient un article **personnel** est **privée par défaut**. Camille peut la rendre publique : l'article est alors visible **dans cette tenue uniquement** (voir H12).
 
 **Fonctions** : F-04, F-23, F-24, F-25.
 
@@ -120,12 +120,14 @@ Personnages d'illustration, construits à partir des rôles décrits par la clie
 
 **Fonctions** : F-11, F-12, F-13.
 
-## P9 – Camille supprime son compte
+## P9 – Camille supprime son logement, puis son compte
 
 1. Camille demande la suppression de son compte.
-2. Elle possède encore un logement : l'application **refuse** et lui explique qu'elle doit d'abord **supprimer son logement** (le legs arrivera en V2).
-3. Elle supprime son logement, puis son compte. Le compte de Jules, rattaché au sien, est **supprimé avec ses articles**.
+2. Elle possède encore un logement : l'application **refuse** et lui explique qu'elle doit d'abord **supprimer son logement** (le legs volontaire arrivera en V2).
+3. Camille supprime son logement. **Seuls ses articles à elle sont supprimés.** Léo, co-propriétaire, **garde le logement**, ses pièces, ses stockages et **les articles qu'il a ajoutés**. Il en devient le propriétaire.
+4. Camille supprime son compte. Le compte de Jules, rattaché au sien, est **supprimé avec ses articles**.
 
+**Règles** : un logement sans aucun co-propriétaire est entièrement supprimé.
 **Fonctions** : F-03, F-05, F-14.
 
 ---
@@ -134,8 +136,9 @@ Personnages d'illustration, construits à partir des rôles décrits par la clie
 
 | # | Hypothèse | Pourquoi |
 |---|---|---|
-| H12 | Un article **personnel** ne peut pas faire partie d'une tenue **publiée**. | Sinon la tenue révèle un article caché. À confirmer avec la cliente. |
+| H12 | Une tenue contenant un article **personnel** est **privée par défaut** ; le propriétaire peut la rendre publique, ce qui montre l'article dans cette tenue uniquement. | Réponse « si, mais la tenue est privée et peut être rendue publique ». Interprétation à confirmer. |
 | H13 | On ajoute un co-propriétaire **par son nom d'utilisateur**, et il doit **accepter** l'invitation. | Personne ne doit se retrouver dans un logement sans l'avoir voulu. |
 | H14 | Le compte mineur a **ses propres identifiants**, créés par le compte majeur. | Jules doit pouvoir se connecter sur son téléphone. |
 | H15 | Quand Jules devient majeur, il **reste co-propriétaire** du logement de Camille. | Rien n'indique qu'il doive en sortir. |
-| H16 | Quand un logement est supprimé, **ses pièces, stockages et articles** le sont aussi, y compris ceux des co-propriétaires. | Un article n'existe que rangé dans un logement. À confirmer : Léo perd-il ses articles ? |
+| ~~H16~~ | ~~Quand un logement est supprimé, tous ses articles le sont aussi.~~ | **Infirmée** : seuls les articles du propriétaire sont supprimés ; un co-propriétaire garde le logement et ses articles (D-011). |
+| H17 | Chaque article a un **auteur** (celui qui l'a ajouté), distinct du propriétaire du logement. | Nécessaire pour savoir quels articles supprimer (D-011). |

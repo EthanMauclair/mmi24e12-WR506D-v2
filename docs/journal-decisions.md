@@ -115,3 +115,17 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Lien de partage : la personne sans compte voit **la fiche de l'article et une invitation à créer un compte**.
 - **Alternatives écartées** : profil vide après inscription ; choix du rangement avant la photo ; fiche seule sans invitation.
 - **IA** : l'assistant a proposé les options ; les choix sont les miens.
+
+## D-011 – Suppression d'un logement : seuls les articles du propriétaire disparaissent
+
+- **Date** : 12/10/2026
+- **Statut** : Validée (cas de plusieurs co-propriétaires à confirmer : Q-20)
+- **Contexte** : hypothèse H16 infirmée. Quand le propriétaire supprime son logement, les co-propriétaires ne doivent pas perdre leurs articles.
+- **Décision** : supprimer un logement **retire le propriétaire et ses articles**. Si des co-propriétaires restent, le logement subsiste avec ses pièces, ses stockages et leurs articles, et l'un d'eux en devient propriétaire. Sans co-propriétaire, le logement est entièrement supprimé.
+- **Conséquences** :
+  - Chaque article doit connaître son **auteur** (H17), indépendamment du propriétaire du logement.
+  - C'est un **transfert automatique** de propriété, alors que le legs volontaire est exclu de la V1 (E-04). Les deux devront partager la même règle en V2.
+- **Alternatives écartées** :
+  - Tout supprimer : les co-propriétaires perdraient des articles qui sont les leurs.
+  - Articles des co-propriétaires « à ranger », sans logement : le logement qu'ils partagent existe toujours pour eux.
+- **IA** : l'assistant avait supposé l'inverse (H16). Hypothèse corrigée par moi.
