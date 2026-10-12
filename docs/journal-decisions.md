@@ -104,3 +104,14 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Alternatives écartées** :
   - Filtres enregistrés en V1 : utiles sans le générateur, mais ajoutent une fonction à une V1 déjà large.
 - **IA** : l'assistant a relevé l'absence de recherche et la contradiction avec D-005. J'ai choisi de garder les filtres en V2.
+
+## D-010 – Choix d'expérience dans les parcours
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Décisions** :
+  - Après l'inscription, une **création guidée** (logement, pièce, stockage, premier article), plutôt qu'un profil vide : la valeur de l'application n'apparaît qu'une fois un article rangé.
+  - Ajout d'article : **photo d'abord, rangement ensuite**, avec un bouton photo accessible partout : on photographie un article quand on l'a en main, pas quand on est devant le bon meuble dans l'application.
+  - Lien de partage : la personne sans compte voit **la fiche de l'article et une invitation à créer un compte**.
+- **Alternatives écartées** : profil vide après inscription ; choix du rangement avant la photo ; fiche seule sans invitation.
+- **IA** : l'assistant a proposé les options ; les choix sont les miens.
