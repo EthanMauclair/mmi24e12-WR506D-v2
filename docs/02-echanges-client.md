@@ -8,12 +8,10 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 
 | # | Question | Impact | Pourquoi c'est important | Statut |
 |---|---|---|---|---|
-| Q-03b | Vous avez répondu « oui » à « les abonnés voient-ils tous les logements publics, ou seulement certains ? ». Je comprends **tous les logements publics** : est-ce bien ça ? | Bloquante | La réponse « oui » ne tranche pas entre les deux options. | À confirmer |
-| Q-05b | Le lien est « à usage unique » : il ne marche **qu'à la première ouverture** ? Combien de temps reste-t-il valable si personne ne l'ouvre ? Montre-t-il tout le logement ? | Importante | Définit précisément ce qu'est un accès par lien. | À poser |
-| Q-08b | Quand on retire un ami, vous parlez d'une option pour supprimer ou garder ses commentaires : c'est bien le propriétaire qui choisit au moment du retrait ? | Moyenne | Réponse notée avec un point d'interrogation, donc à confirmer. | À confirmer |
+| Q-18 | **Contradiction** : vous avez d'abord dit que le privé/public se règle **pour chaque logement**, puis que c'est **le compte** qui est privé ou public. Lequel est le bon ? Peut-on avoir un logement public et un logement privé sur le même compte ? | Bloquante | Détermine où est stockée la confidentialité et qui doit accepter les abonnés. Tout le modèle d'autorisation en dépend. | À poser |
+| Q-19 | Le lien à usage unique partage **un article**. Peut-on partager par lien un article **personnel** ? Combien de temps le lien reste-t-il valable s'il n'est jamais ouvert ? | Moyenne | Un lien ne doit pas contourner le statut « personnel ». | À poser |
 | Q-11b | « Le compte enfant est supprimé également » : si le compte adulte auquel l'enfant est rattaché est supprimé, le compte enfant l'est aussi ? Et ses articles ? | Moyenne | Ambiguïté dans la réponse à Q-11. | À confirmer |
 | Q-14b | « Dressing », ça désigne quoi : toute l'application, un logement, ou un stockage ? | Faible | L'interface doit utiliser le bon mot au bon endroit. | À poser |
-| Q-16 | Les priorités sont le scan, la création de compte et le partage Instagram. Le partage concerne une **tenue** : le **générateur** (filtres, météo) est-il dans la première version, ou suffit-il de composer une tenue à la main ? | Bloquante | Le générateur est la fonctionnalité la plus complexe : il change complètement la taille de la V1. | À poser |
 | Q-17 | La **vente** se fait dans l'application, paiement compris. Est-elle dans la première version ? Qui paie qui (l'application prend-elle une commission) ? Que se passe-t-il pour la livraison, un litige, un remboursement ? | Bloquante | Un paiement intégré implique un prestataire de paiement, des obligations légales et la gestion des litiges : c'est un projet à lui seul. | À poser |
 
 ## Questions reportées
@@ -42,6 +40,10 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | Q-13 | Peut-on supprimer le commentaire d'un ami ? | « Le propriétaire, le co-propriétaire, oui. » | Modération par propriétaire et co-propriétaires. |
 | Q-14 | Quel vocabulaire ? | « Dressing, article. » | « Article » confirmé. Voir Q-14b pour « dressing ». |
 | N-01 | Sans saison ni matière, comment le générateur juge-t-il la météo ? | « Uniquement grâce à la famille. » | Chaque **famille** d'article doit indiquer à quelles températures elle convient. |
+| Q-03b | Les abonnés voient-ils tous les logements publics ? | « Tout ce qui est public est visible par tout le monde. Dès qu'une personne est abonnée à un utilisateur, elle voit tous les articles non personnels. Le compte utilisateur est privé ou public. S'il est privé, l'abonné doit être accepté avant de voir les articles. » | L'abonnement porte sur un **compte**. Contredit Q-03 : voir **Q-18**. |
+| Q-05b | Comment fonctionne le lien à usage unique ? | « Tu partages l'article via un lien. » | Le lien donne accès à **un article**, pas à un logement. Voir Q-19. |
+| Q-08b | Option pour garder ou supprimer les commentaires d'un ami retiré ? | Décision laissée au développeur : l'option est proposée au propriétaire **au moment où il change le statut** de la personne. | Voir D-004. |
+| Q-16 | Le générateur de tenue est-il dans la première version ? | « Version 2. » | Générateur (filtres, météo) **hors V1**. Le partage Instagram en V1 porte sur une tenue composée à la main. |
 
 ## Journal des échanges
 
@@ -51,3 +53,4 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | 07/09/2026 | Séance 1-2 | — | Ajout de la valise (R-01) |
 | 12/10/2026 | Échange client | Q-01 à Q-15 | 11 réponses, nouvelles questions N-01, Q-16, Q-17 |
 | 12/10/2026 | Échange client | Q-02 à Q-08, Q-14, Q-15, N-01 | Partage par logement uniquement, vente intégrée, lien à usage unique, profil |
+| 12/10/2026 | Échange client | Q-03b, Q-05b, Q-08b, Q-16 | Générateur en V2, lien par article, contradiction Q-18 relevée |
