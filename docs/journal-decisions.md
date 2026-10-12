@@ -37,3 +37,43 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Décision** : le compte rendu est reconstitué par questions-réponses avec l'assistant. L'assistant pose des questions ouvertes **sans proposer de réponses** ; tout ce que je ne sais pas va dans les questions ouvertes au client au lieu d'être complété.
 - **Risque assumé** : des oublis ou des déformations de mémoire. Le client est invité à corriger le compte rendu.
 - **IA** : risque principal identifié par le module (l'assistant comble les trous avec ce qu'une application de ce genre contient d'habitude). Parade : le compte rendu sépare strictement « ce que le client a dit », « ce que j'en déduis » et « ce qui reste ouvert ».
+
+## D-004 – Commentaires d'un ami retiré : choix laissé au propriétaire
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Contexte** : le client permet au propriétaire de retirer un ami (le rétrograder en abonné ou le supprimer) et m'a laissé décider du sort de ses commentaires (Q-08b).
+- **Décision** : au moment de changer le statut d'une personne, le propriétaire choisit de **garder ou supprimer ses commentaires**.
+- **Alternatives écartées** :
+  - Toujours supprimer : efface un historique que le propriétaire peut vouloir garder.
+  - Toujours garder : laisse en ligne des commentaires d'une personne qu'on a justement voulu écarter.
+- **IA** : rien à signaler.
+
+## D-005 – Générateur de tenue hors version 1
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Contexte** : le client place le générateur (filtres, météo) en version 2 (Q-16).
+- **Décision** : en V1, une tenue est **composée à la main** à partir de ses articles, puis partagée sur Instagram et affichée sur le profil.
+- **Conséquence** : le modèle de données de la V1 contient déjà la notion de tenue ; seuls les filtres et la météo sont reportés.
+- **IA** : rien à signaler.
+
+## D-006 – La confidentialité se règle par compte
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Contexte** : le client a d'abord dit que chaque logement est privé ou public (Q-03), puis que c'est le compte (Q-03b). Contradiction relevée (Q-18).
+- **Décision** : le **compte** est privé ou public. Sur un compte privé, un abonné doit être accepté avant de voir les articles. Sur un compte public, l'abonnement est direct.
+- **Alternatives écartées** :
+  - Confidentialité par logement : plus fine, mais contredit la dernière réponse du client et le modèle Instagram qu'il cite.
+- **Conséquence** : l'abonnement et l'amitié portent sur un compte, et donnent accès à tous les articles non personnels de ses logements.
+- **IA** : la contradiction a été repérée par l'assistant en comparant deux réponses.
+
+## D-007 – Vente hors version 1
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Contexte** : la vente intégrée (mise en vente jusqu'au paiement) implique un prestataire de paiement, des obligations légales et la gestion des litiges. Le client la place en version 2 (Q-17).
+- **Décision** : aucune vente en V1.
+- **Conséquence** : la restriction « un compte mineur ne peut pas mettre en vente » n'est pas à implémenter en V1, mais sera à reprendre en V2.
+- **IA** : rien à signaler.
