@@ -6,13 +6,7 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 
 ## Questions ouvertes
 
-| # | Question | Impact | Pourquoi c'est important | Statut |
-|---|---|---|---|---|
-| Q-18 | **Contradiction** : vous avez d'abord dit que le privé/public se règle **pour chaque logement**, puis que c'est **le compte** qui est privé ou public. Lequel est le bon ? Peut-on avoir un logement public et un logement privé sur le même compte ? | Bloquante | Détermine où est stockée la confidentialité et qui doit accepter les abonnés. Tout le modèle d'autorisation en dépend. | À poser |
-| Q-19 | Le lien à usage unique partage **un article**. Peut-on partager par lien un article **personnel** ? Combien de temps le lien reste-t-il valable s'il n'est jamais ouvert ? | Moyenne | Un lien ne doit pas contourner le statut « personnel ». | À poser |
-| Q-11b | « Le compte enfant est supprimé également » : si le compte adulte auquel l'enfant est rattaché est supprimé, le compte enfant l'est aussi ? Et ses articles ? | Moyenne | Ambiguïté dans la réponse à Q-11. | À confirmer |
-| Q-14b | « Dressing », ça désigne quoi : toute l'application, un logement, ou un stockage ? | Faible | L'interface doit utiliser le bon mot au bon endroit. | À poser |
-| Q-17 | La **vente** se fait dans l'application, paiement compris. Est-elle dans la première version ? Qui paie qui (l'application prend-elle une commission) ? Que se passe-t-il pour la livraison, un litige, un remboursement ? | Bloquante | Un paiement intégré implique un prestataire de paiement, des obligations légales et la gestion des litiges : c'est un projet à lui seul. | À poser |
+Aucune question bloquante en attente au 12/10/2026.
 
 ## Questions reportées
 
@@ -20,6 +14,7 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 |---|---|---|
 | R-01 | Génération du contenu d'une **valise** selon la durée et la destination | « On verra plus tard ». Hors V1. |
 | R-02 (Q-06) | Destination des **pastilles** Instagram, cas d'un article personnel ou d'un logement privé | « On verra plus tard ». |
+| R-04 (Q-14b) | Ce que désigne le mot « dressing » | Écartée par moi : sans impact sur le modèle, à revoir lors des maquettes. |
 | R-03 (Q-15) | Liste complète des **informations remplies par la photo** | Pas de taille, matière ni saison. Le reste sera précisé plus tard. |
 
 ## Questions répondues
@@ -44,6 +39,10 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | Q-05b | Comment fonctionne le lien à usage unique ? | « Tu partages l'article via un lien. » | Le lien donne accès à **un article**, pas à un logement. Voir Q-19. |
 | Q-08b | Option pour garder ou supprimer les commentaires d'un ami retiré ? | Décision laissée au développeur : l'option est proposée au propriétaire **au moment où il change le statut** de la personne. | Voir D-004. |
 | Q-16 | Le générateur de tenue est-il dans la première version ? | « Version 2. » | Générateur (filtres, météo) **hors V1**. Le partage Instagram en V1 porte sur une tenue composée à la main. |
+| Q-17 | La vente avec paiement est-elle dans la première version ? | « Non, pas dans la première version. On verra en deuxième version. » | Vente **hors V1**. Voir D-007. |
+| Q-18 | Contradiction : confidentialité par logement ou par compte ? | Retenu : **le compte** est privé ou public. | La confidentialité est un attribut du **compte**, pas du logement. Voir D-006. |
+| Q-19 | Peut-on partager par lien un article personnel ? Durée de validité ? | « Oui, 24 h. » | Lien vers **un article**, y compris personnel, valable **24 h**, ouvrable **une seule fois**. |
+| Q-11b | Suppression du compte adulte : le compte enfant suit ? | « Oui, tout suit avec. » | Supprimer le compte adulte supprime le compte enfant **et ses articles**. |
 
 ## Journal des échanges
 
@@ -54,3 +53,4 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | 12/10/2026 | Échange client | Q-01 à Q-15 | 11 réponses, nouvelles questions N-01, Q-16, Q-17 |
 | 12/10/2026 | Échange client | Q-02 à Q-08, Q-14, Q-15, N-01 | Partage par logement uniquement, vente intégrée, lien à usage unique, profil |
 | 12/10/2026 | Échange client | Q-03b, Q-05b, Q-08b, Q-16 | Générateur en V2, lien par article, contradiction Q-18 relevée |
+| 12/10/2026 | Échange client | Q-11b, Q-14b, Q-17, Q-18, Q-19 | Confidentialité par compte, vente en V2, lien de 24 h |

@@ -53,6 +53,7 @@ Les articles sont rangés selon une hiérarchie : **Logement > Pièce > Stockage
 ### Confidentialité
 
 - Un logement peut être **privé ou public**, sur le modèle d'Instagram.
+  > **Révisé le 12/10/2026** : c'est le **compte** qui est privé ou public (Q-18, D-006).
 - **Propriétaire et co-propriétaires** voient tout leur logement : logement, pièces, stockages et articles.
 - **Amis, abonnés et non-inscrits** voient seulement **le logement et les articles**, pas les pièces ni les stockages.
 - Un article peut être marqué **« personnel »**. Il n'apparaît alors pas aux autres, même si le reste est visible.
@@ -127,7 +128,7 @@ Les articles sont rangés selon une hiérarchie : **Logement > Pièce > Stockage
 | H5 | Un non-inscrit voit **uniquement les logements publics**, jamais un logement privé. | Modèle Instagram cité par le client. | Hypothèse, sauf accès par lien à usage unique (Q-05). |
 | H6 | Les **informations remplies automatiquement** par la photo doivent pouvoir être **corrigées** par l'utilisateur. | Le générateur filtre uniquement grâce à la famille (N-01) : une famille mal détectée fausse les tenues. | Hypothèse |
 | H7 | L'**âge** du compte doit être connu (date de naissance) pour appliquer les restrictions du compte mineur. | Le compte passe automatiquement en majeur à 18 ans (Q-11). | Hypothèse renforcée par Q-11 |
-| H8 | Les **amis** sont liés à un **compte** et voient tous ses logements. La **confidentialité** est réglée **par logement**. | — | Confirmée pour les amis (Q-03). Abonnés : à confirmer (Q-03b). |
+| H8 | Les **amis** sont liés à un **compte** et voient tous ses logements. | — | Confirmée (Q-03). **Révisée** pour la confidentialité : elle est réglée **par compte**, pas par logement (Q-18, D-006). |
 
 **Point de vigilance** : l'application stocke des données de mineurs. Le recueil du consentement et les données collectées sur ces comptes devront être justifiés (RGPD).
 
