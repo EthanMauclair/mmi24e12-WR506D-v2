@@ -14,6 +14,7 @@ Projet réalisé dans le cadre du module **WR506D – Développement back avanc�
 |---|---|
 | [Compte rendu de lancement](docs/01-compte-rendu-lancement.md) | Ce que le client a dit, ce qu'on en déduit, ce qui reste ouvert |
 | [Échanges client](docs/02-echanges-client.md) | Questions posées au client, séance par séance, et questions en attente |
+| [Périmètre de la V1](docs/03-perimetre-v1.md) | Fonctions retenues, exclusions justifiées, hypothèses |
 | [Journal de décisions](docs/journal-decisions.md) | Chaque décision, ses alternatives et la part de l'assistant IA |
 
 ## Organisation Git

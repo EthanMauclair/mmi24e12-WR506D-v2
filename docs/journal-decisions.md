@@ -77,3 +77,16 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Décision** : aucune vente en V1.
 - **Conséquence** : la restriction « un compte mineur ne peut pas mettre en vente » n'est pas à implémenter en V1, mais sera à reprendre en V2.
 - **IA** : rien à signaler.
+
+## D-008 – Périmètre de la version 1
+
+- **Date** : 12/10/2026
+- **Statut** : Validée (à faire valider par le client)
+- **Contexte** : priorités de la cliente : ajout par photo, création de compte, partage Instagram (Q-01).
+- **Décision** : la V1 comprend les comptes, les logements, l'ajout par photo, les tenues composées à la main, toute la visibilité (abonnés, compte privé/public, articles personnels, amis, commentaires, lien de 24 h) et la co-propriété, y compris le compte mineur. Détail dans [03-perimetre-v1.md](03-perimetre-v1.md).
+- **Exclusions** : générateur, vente, pastilles, legs du logement, journal des prêts, valise (E-01 à E-07).
+- **Alternatives écartées** :
+  - V1 limitée aux trois priorités strictes : le partage et la visibilité n'auraient pas de sens sans abonnés ni comptes privés, et le modèle d'autorisation (cœur de la séance 8-9) ne serait pas testé.
+  - Inclure le journal des prêts : hors priorités, ne débloque rien.
+- **Risque assumé** : V1 large (25 fonctions). Parade : réalisation par lots démontrables, le lot 1 sert de tranche verticale au pitch 2.
+- **IA** : l'assistant a proposé de reporter les pastilles en V2 (recommandation suivie) et l'ordre des lots. Le choix des fonctions incluses est le mien.
