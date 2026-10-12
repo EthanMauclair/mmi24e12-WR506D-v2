@@ -1,0 +1,28 @@
+# Symfony
+/vendor/
+/var/
+/public/bundles/
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+
+# Front / outils
+/node_modules/
+/public/build/
+/assets/vendor/
+
+# Tests et qualité
+/.phpunit.cache/
+/phpunit.xml
+/.php-cs-fixer.cache
+/coverage/
+
+# Docker
+docker-compose.override.yml
+
+# IDE et système
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
