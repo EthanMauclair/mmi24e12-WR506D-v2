@@ -34,7 +34,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 ### Co-propriété
 | # | Fonction | Source |
 |---|---|---|
-| F-11 | Ajouter un **co-propriétaire** à un logement, le retirer | CR § 3, § 6 |
+| F-11 | Ajouter un **co-propriétaire** à un logement ; le **propriétaire** le retire, ou il part de lui-même : ses articles sont alors **supprimés** | CR § 3, § 6, Q-23 |
 | F-12 | Créer un **compte mineur** rattaché à un compte majeur, et l'ajouter comme co-propriétaire | CR § 3, § 5 |
 | F-13 | Passage **automatique en compte majeur** à 18 ans | Q-11 |
 | F-14 | Suppression du compte mineur **et de ses articles** quand le compte majeur de rattachement est supprimé | Q-11b |
@@ -92,7 +92,6 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 | H10 | Les **visiteurs** (amis, abonnés, non-inscrits) voient le **logement** et ses **articles**, mais pas les pièces ni les stockages. | CR § 5. |
 | H11 | La reconnaissance de l'article par photo passe par un **modèle d'IA externe** (OpenRouter), avec une image réduite, convertie en JPG puis en base64. | Preuve de concept de la séance 5. |
 | H18 | Un compte **mineur** ne peut être invité que dans un logement dont son **référent** est membre. | Le compte rendu dit qu'il est « obligatoirement rattaché à un compte majeur pour le logement ». À confirmer avec la cliente. |
-| H19 | On ne retire pas un co-propriétaire (et il ne quitte pas le logement) tant qu'il y a des **articles**. | Le client n'a rien dit du sort de ses articles ; les supprimer sans prévenir serait irréversible. À confirmer avec la cliente. |
 
 ---
 
