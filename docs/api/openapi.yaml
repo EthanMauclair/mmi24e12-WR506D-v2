@@ -1,0 +1,1259 @@
+openapi: 3.1.0
+info:
+  title: PENDERIE – API
+  version: 1.0.0-cadrage
+  description: |
+    Contrat de l'API de la version 1, écrit **avant l'implémentation**.
+
+    - Règles d'accès : `docs/06-modele-autorisation.md` (règles A-01 à A-15).
+    - Invariants : `docs/05-modele-donnees.md` (I-01 à I-20).
+    - Fonctions : `docs/03-perimetre-v1.md` (F-01 à F-27).
+
+    Conventions :
+    - JSON simple (`application/json`), dates ISO 8601.
+    - Une ressource qu'on n'a pas le droit de **voir** répond **404**, jamais 403 (D-014).
+    - Une action interdite sur une ressource qu'on **voit** répond **403**.
+    - Les listes sont paginées (`page`, 30 éléments par défaut).
+    - Les champs `auteur`, `role`, `proprietaire` ne sont **jamais** modifiables par une requête directe (A-15).
+servers:
+  - url: http://localhost:8080
+    description: Développement (Docker)
+
+tags:
+  - name: Authentification
+  - name: Mon compte
+  - name: Profils
+  - name: Relations
+  - name: Logements
+  - name: Membres
+  - name: Pièces et stockages
+  - name: Articles
+  - name: Catégories
+  - name: Tenues
+  - name: Commentaires
+  - name: Liens de partage
+
+security:
+  - cookieJwt: []
+  - bearerJwt: []
+
+paths:
+  # ───────────────────────── Authentification ─────────────────────────
+  /api/auth/inscription:
+    post:
+      tags: [Authentification]
+      summary: Créer un compte majeur (F-01)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InscriptionEntree' }
+      responses:
+        '201':
+          description: Compte créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MonCompte' }
+        '409': { $ref: '#/components/responses/Conflit' }
+        '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/auth/connexion:
+    post:
+      tags: [Authentification]
+      summary: Se connecter (F-01)
+      description: Pose le jeton JWT et le jeton de rafraîchissement dans des cookies httpOnly, Secure, SameSite. Renvoie aussi le jeton dans le corps pour Postman.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [identifiant, motDePasse]
+              properties:
+                identifiant: { type: string, description: E-mail ou pseudo }
+                motDePasse: { type: string, format: password }
+      responses:
+        '200':
+          description: Connecté
+          headers:
+            Set-Cookie: { schema: { type: string } }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jeton: { type: string }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+
+  /api/auth/rafraichir:
+    post:
+      tags: [Authentification]
+      summary: Renouveler le jeton JWT
+      security: []
+      responses:
+        '200': { description: Nouveau jeton posé en cookie }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+
+  /api/auth/deconnexion:
+    post:
+      tags: [Authentification]
+      summary: Se déconnecter (F-01)
+      responses:
+        '204': { description: Cookies supprimés, jeton de rafraîchissement révoqué }
+
+  # ───────────────────────── Mon compte ─────────────────────────
+  /api/moi:
+    get:
+      tags: [Mon compte]
+      summary: Lire mon compte
+      responses:
+        '200':
+          description: Mon compte
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MonCompte' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+    patch:
+      tags: [Mon compte]
+      summary: Modifier mon compte, dont privé/public (F-02)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MonCompteModification' }
+      responses:
+        '200':
+          description: Compte modifié
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MonCompte' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '422': { $ref: '#/components/responses/Invalide' }
+    delete:
+      tags: [Mon compte]
+      summary: Supprimer mon compte (F-03, I-03, I-04)
+      description: Refusé (409) tant que je suis propriétaire d'un logement. Supprime aussi les comptes mineurs dont je suis référent, avec leurs articles.
+      responses:
+        '204': { description: Compte supprimé }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '409': { $ref: '#/components/responses/Conflit' }
+
+  /api/moi/comptes-mineurs:
+    get:
+      tags: [Mon compte]
+      summary: Lister les comptes mineurs dont je suis référent
+      responses:
+        '200':
+          description: Comptes mineurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProfilResume' }
+    post:
+      tags: [Mon compte]
+      summary: Créer un compte mineur rattaché à mon compte (F-12, I-01)
+      description: Réservé aux comptes majeurs (403 sinon). La date de naissance doit correspondre à moins de 18 ans.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InscriptionEntree' }
+      responses:
+        '201':
+          description: Compte mineur créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfilResume' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '409': { $ref: '#/components/responses/Conflit' }
+        '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/moi/invitations:
+    get:
+      tags: [Membres]
+      summary: Lister mes invitations à devenir co-propriétaire (H13)
+      responses:
+        '200':
+          description: Invitations en attente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Membre' }
+
+  /api/moi/demandes-abonnement:
+    get:
+      tags: [Relations]
+      summary: Lister les demandes d'abonnement en attente sur mon compte privé (F-16)
+      responses:
+        '200':
+          description: Demandes en attente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Relation' }
+
+  /api/moi/relations:
+    get:
+      tags: [Relations]
+      summary: Lister mes abonnés et mes amis (F-16, F-17)
+      parameters:
+        - name: niveau
+          in: query
+          schema: { $ref: '#/components/schemas/NiveauRelation' }
+      responses:
+        '200':
+          description: Relations acceptées vers mon compte
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Relation' }
+
+  /api/moi/amis:
+    post:
+      tags: [Relations]
+      summary: Ajouter un ami (F-17)
+      description: Crée ou élève au niveau AMI la relation de cette personne vers moi.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pseudo]
+              properties:
+                pseudo: { type: string }
+      responses:
+        '201':
+          description: Ami ajouté
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Relation' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '409': { $ref: '#/components/responses/Conflit' }
+
+  # ───────────────────────── Profils ─────────────────────────
+  /api/utilisateurs/{pseudo}:
+    parameters:
+      - $ref: '#/components/parameters/Pseudo'
+    get:
+      tags: [Profils]
+      summary: Voir un profil (F-04, F-21)
+      description: Accessible sans compte. Ne renvoie jamais l'e-mail ni la date de naissance.
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      responses:
+        '200':
+          description: Profil public
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Profil' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  /api/utilisateurs/{pseudo}/articles:
+    parameters:
+      - $ref: '#/components/parameters/Pseudo'
+    get:
+      tags: [Profils]
+      summary: Articles visibles d'une personne, filtrables par logement et catégorie (F-21, F-27, A-03)
+      description: |
+        Uniquement les articles **dont cette personne est l'auteur** (D-013), non personnels,
+        si son compte est public ou si j'ai une relation acceptée avec elle. Liste vide sinon.
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      parameters:
+        - { name: logement, in: query, schema: { type: integer } }
+        - { name: categorie, in: query, schema: { type: integer } }
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Articles visibles
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ArticlePublic' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  /api/utilisateurs/{pseudo}/tenues:
+    parameters:
+      - $ref: '#/components/parameters/Pseudo'
+    get:
+      tags: [Profils]
+      summary: Tenues visibles d'une personne (F-04, A-05, A-06)
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Tenues visibles
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tenue' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  /api/utilisateurs/{pseudo}/abonnement:
+    parameters:
+      - $ref: '#/components/parameters/Pseudo'
+    post:
+      tags: [Relations]
+      summary: S'abonner à une personne (F-15, I-17, I-18)
+      description: Acceptée d'office si le compte est public, en attente s'il est privé.
+      responses:
+        '201':
+          description: Relation créée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Relation' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '409': { $ref: '#/components/responses/Conflit' }
+    delete:
+      tags: [Relations]
+      summary: Se désabonner
+      responses:
+        '204': { description: Relation supprimée }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  # ───────────────────────── Relations ─────────────────────────
+  /api/relations/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    patch:
+      tags: [Relations]
+      summary: Accepter une demande, ou rétrograder un ami en abonné (F-16, F-18)
+      description: Réservé à la personne suivie.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statut: { type: string, enum: [ACCEPTEE] }
+                niveau: { $ref: '#/components/schemas/NiveauRelation' }
+                supprimerCommentaires:
+                  type: boolean
+                  default: false
+                  description: Lors d'une rétrogradation d'ami (D-004).
+      responses:
+        '200':
+          description: Relation modifiée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Relation' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    delete:
+      tags: [Relations]
+      summary: Refuser une demande, retirer un abonné ou un ami (F-16, F-18)
+      parameters:
+        - name: supprimerCommentaires
+          in: query
+          schema: { type: boolean, default: false }
+          description: Supprimer les commentaires de la personne retirée (D-004).
+      responses:
+        '204': { description: Relation supprimée }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  # ───────────────────────── Logements ─────────────────────────
+  /api/logements:
+    get:
+      tags: [Logements]
+      summary: Lister les logements dont je suis membre
+      responses:
+        '200':
+          description: Mes logements
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Logement' }
+    post:
+      tags: [Logements]
+      summary: Créer un logement (F-05, I-08)
+      description: Je deviens son propriétaire. Interdit à un compte mineur (403).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NomEntree' }
+      responses:
+        '201':
+          description: Logement créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Logement' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/logements/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Logements]
+      summary: Voir un logement, avec ses pièces et stockages (A-01)
+      description: Réservé aux membres. Un non-membre reçoit 404.
+      responses:
+        '200':
+          description: Logement complet
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LogementDetail' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    patch:
+      tags: [Logements]
+      summary: Renommer un logement (A-10, A-11)
+      description: Propriétaire et co-propriétaires majeurs uniquement.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NomEntree' }
+      responses:
+        '200':
+          description: Logement modifié
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Logement' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    delete:
+      tags: [Logements]
+      summary: Supprimer mon logement (F-05, A-09, I-09)
+      description: |
+        Propriétaire uniquement. Supprime **mes** articles. S'il reste un co-propriétaire majeur,
+        le plus anciennement arrivé devient propriétaire et le logement est conservé (D-011) ;
+        sinon le logement est entièrement supprimé.
+      responses:
+        '204': { description: Logement quitté ou supprimé }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  # ───────────────────────── Membres ─────────────────────────
+  /api/logements/{id}/membres:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Membres]
+      summary: Lister les membres d'un logement
+      responses:
+        '200':
+          description: Membres
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Membre' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    post:
+      tags: [Membres]
+      summary: Inviter un co-propriétaire (F-11, I-07)
+      description: Propriétaire et co-propriétaires majeurs. L'invité doit accepter (H13).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pseudo]
+              properties:
+                pseudo: { type: string }
+      responses:
+        '201':
+          description: Invitation créée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Membre' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '409': { $ref: '#/components/responses/Conflit' }
+
+  /api/membres/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    delete:
+      tags: [Membres]
+      summary: Retirer un co-propriétaire, ou quitter le logement (F-11)
+      description: Le propriétaire ne peut pas être retiré par cette route (A-15).
+      responses:
+        '204': { description: Membre retiré }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  /api/membres/{id}/acceptation:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      tags: [Membres]
+      summary: Accepter une invitation (H13)
+      responses:
+        '200':
+          description: Invitation acceptée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Membre' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  # ───────────────────────── Pièces et stockages ─────────────────────────
+  /api/logements/{id}/pieces:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      tags: [Pièces et stockages]
+      summary: Ajouter une pièce (F-06)
+      description: Tout membre, y compris mineur (A-11).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NomEntree' }
+      responses:
+        '201':
+          description: Pièce créée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Piece' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/pieces/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    patch:
+      tags: [Pièces et stockages]
+      summary: Renommer une pièce (A-10, A-11)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NomEntree' }
+      responses:
+        '200':
+          description: Pièce modifiée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Piece' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    delete:
+      tags: [Pièces et stockages]
+      summary: Supprimer une pièce vide (A-10)
+      description: Refusé (409) si un stockage contient encore des articles.
+      responses:
+        '204': { description: Pièce supprimée }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '409': { $ref: '#/components/responses/Conflit' }
+
+  /api/pieces/{id}/stockages:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      tags: [Pièces et stockages]
+      summary: Ajouter un stockage (F-06)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NomEntree' }
+      responses:
+        '201':
+          description: Stockage créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stockage' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/stockages/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    patch:
+      tags: [Pièces et stockages]
+      summary: Renommer un stockage (A-10, A-11)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NomEntree' }
+      responses:
+        '200':
+          description: Stockage modifié
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stockage' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    delete:
+      tags: [Pièces et stockages]
+      summary: Supprimer un stockage vide (A-10)
+      responses:
+        '204': { description: Stockage supprimé }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '409': { $ref: '#/components/responses/Conflit' }
+
+  # ───────────────────────── Articles ─────────────────────────
+  /api/reconnaissances:
+    post:
+      tags: [Articles]
+      summary: Envoyer une photo et obtenir une proposition (F-07)
+      description: |
+        Étape 1 de l'ajout par photo (P2). L'image est réduite, convertie en JPG, débarrassée de ses
+        métadonnées, stockée, puis envoyée à OpenRouter. La catégorie proposée est toujours prise
+        dans la liste fixe. Si la reconnaissance échoue, `proposition` est vide : la saisie se fait à la main.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [photo]
+              properties:
+                photo: { type: string, format: binary, description: 'JPG, PNG ou HEIC, 10 Mo maximum' }
+      responses:
+        '201':
+          description: Photo enregistrée, proposition éventuelle
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reconnaissance' }
+        '413': { description: Image trop lourde }
+        '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/articles:
+    get:
+      tags: [Articles]
+      summary: Rechercher dans mes logements (F-26)
+      description: Parcourt les logements dont je suis membre, articles personnels compris (A-01). Renvoie l'emplacement de chaque article.
+      parameters:
+        - { name: q, in: query, schema: { type: string }, description: 'Mot cherché dans la marque, la couleur ou la note' }
+        - { name: logement, in: query, schema: { type: integer } }
+        - { name: categorie, in: query, schema: { type: integer } }
+        - { name: couleur, in: query, schema: { type: string } }
+        - { name: marque, in: query, schema: { type: string } }
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Articles trouvés
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ArticleMembre' }
+    post:
+      tags: [Articles]
+      summary: Enregistrer un article (F-07, F-08, F-10, I-10, I-11)
+      description: Étape 2 de l'ajout par photo. L'auteur est **toujours** l'utilisateur connecté, jamais une valeur envoyée (A-15). Le stockage doit appartenir à un logement dont je suis membre (403 sinon, test S-13).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ArticleEntree' }
+      responses:
+        '201':
+          description: Article créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticleMembre' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/articles/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Articles]
+      summary: Voir un article (A-01, A-03, A-04)
+      description: |
+        Un membre du logement reçoit `ArticleMembre` (avec emplacement).
+        Un visiteur autorisé reçoit `ArticlePublic` (sans pièce ni stockage, test S-05).
+        Sinon 404 (test S-01).
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      responses:
+        '200':
+          description: Article
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ArticleMembre'
+                  - $ref: '#/components/schemas/ArticlePublic'
+        '404': { $ref: '#/components/responses/Introuvable' }
+    patch:
+      tags: [Articles]
+      summary: Modifier, déplacer ou marquer personnel un article (F-09, F-10, A-10, A-11)
+      description: Membres majeurs ; un mineur ne modifie que ses propres articles (403 sinon, test S-06).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ArticleModification' }
+      responses:
+        '200':
+          description: Article modifié
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticleMembre' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '422': { $ref: '#/components/responses/Invalide' }
+    delete:
+      tags: [Articles]
+      summary: Supprimer un article (F-09, I-15)
+      description: Le retire des tenues ; une tenue devenue vide est supprimée.
+      responses:
+        '204': { description: Article supprimé }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  /api/articles/{id}/photo:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Articles]
+      summary: Télécharger la photo d'un article
+      description: Mêmes règles que la lecture de l'article. Les photos ne sont jamais servies en accès direct (D-015).
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      responses:
+        '200':
+          description: Image
+          content:
+            image/jpeg:
+              schema: { type: string, format: binary }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  # ───────────────────────── Catégories ─────────────────────────
+  /api/categories:
+    get:
+      tags: [Catégories]
+      summary: Lister les catégories (liste fixe, D-013)
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      responses:
+        '200':
+          description: Catégories
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Categorie' }
+
+  # ───────────────────────── Tenues ─────────────────────────
+  /api/tenues:
+    get:
+      tags: [Tenues]
+      summary: Lister mes tenues
+      parameters:
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Mes tenues
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tenue' }
+    post:
+      tags: [Tenues]
+      summary: Composer une tenue (F-23, I-13)
+      description: Uniquement avec des articles dont je suis l'auteur (422 sinon). Privée à la création.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TenueEntree' }
+      responses:
+        '201':
+          description: Tenue créée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenue' }
+        '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/tenues/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Tenues]
+      summary: Voir une tenue (A-05, A-06)
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      responses:
+        '200':
+          description: Tenue
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenue' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    patch:
+      tags: [Tenues]
+      summary: Modifier ou publier une tenue (F-24, A-12, I-14, I-16)
+      description: Auteur uniquement. Un compte mineur ne peut pas passer `estPublique` à vrai (403, test S-07).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TenueModification' }
+      responses:
+        '200':
+          description: Tenue modifiée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenue' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+        '422': { $ref: '#/components/responses/Invalide' }
+    delete:
+      tags: [Tenues]
+      summary: Supprimer une tenue
+      responses:
+        '204': { description: Tenue supprimée }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  # ───────────────────────── Commentaires ─────────────────────────
+  /api/articles/{id}/commentaires:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Commentaires]
+      summary: Lire les commentaires d'un article (A-07)
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      responses:
+        '200':
+          description: Commentaires
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Commentaire' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    post:
+      tags: [Commentaires]
+      summary: Commenter un article (F-19, I-19)
+      description: Amis de l'auteur uniquement (403, test S-10).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CommentaireEntree' }
+      responses:
+        '201':
+          description: Commentaire créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commentaire' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  /api/tenues/{id}/commentaires:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Commentaires]
+      summary: Lire les commentaires d'une tenue (A-07)
+      security: [{}, cookieJwt: [], bearerJwt: []]
+      responses:
+        '200':
+          description: Commentaires
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Commentaire' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    post:
+      tags: [Commentaires]
+      summary: Commenter une tenue (F-19, I-19)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CommentaireEntree' }
+      responses:
+        '201':
+          description: Commentaire créé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commentaire' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  /api/commentaires/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    patch:
+      tags: [Commentaires]
+      summary: Modifier mon commentaire (A-13)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CommentaireEntree' }
+      responses:
+        '200':
+          description: Commentaire modifié
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Commentaire' }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+    delete:
+      tags: [Commentaires]
+      summary: Supprimer un commentaire (F-20, A-13, A-14)
+      description: Son auteur, ou le propriétaire et les co-propriétaires majeurs du logement concerné.
+      responses:
+        '204': { description: Commentaire supprimé }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  # ───────────────────────── Liens de partage ─────────────────────────
+  /api/articles/{id}/liens:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      tags: [Liens de partage]
+      summary: Créer un lien de partage (F-22)
+      description: Membres du logement uniquement. Valable 24 h, une seule ouverture.
+      responses:
+        '201':
+          description: Lien créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url: { type: string, format: uri }
+                  expireLe: { type: string, format: date-time }
+        '403': { $ref: '#/components/responses/Interdit' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+  /api/liens/{jeton}:
+    parameters:
+      - name: jeton
+        in: path
+        required: true
+        schema: { type: string, minLength: 32 }
+    get:
+      tags: [Liens de partage]
+      summary: Ouvrir un lien de partage (F-22, I-20, A-08)
+      description: Sans compte. La première ouverture consomme le lien ; ensuite, ou après 24 h, 404 (test S-09).
+      security: []
+      responses:
+        '200':
+          description: Article partagé
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticlePublic' }
+        '404': { $ref: '#/components/responses/Introuvable' }
+
+components:
+  securitySchemes:
+    cookieJwt:
+      type: apiKey
+      in: cookie
+      name: BEARER
+      description: Jeton JWT en cookie httpOnly (utilisé par le front).
+    bearerJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Même jeton en en-tête (utilisé par Postman).
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+    Pseudo:
+      name: pseudo
+      in: path
+      required: true
+      schema: { type: string }
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+
+  responses:
+    NonAuthentifie:
+      description: Non connecté ou jeton invalide
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Probleme' }
+    Interdit:
+      description: Action interdite sur une ressource visible
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Probleme' }
+    Introuvable:
+      description: Ressource inexistante ou non visible (on ne distingue pas les deux)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Probleme' }
+    Conflit:
+      description: Action contraire à un invariant (ex. supprimer son compte en étant propriétaire)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Probleme' }
+    Invalide:
+      description: Données invalides
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Probleme' }
+
+  schemas:
+    Probleme:
+      type: object
+      properties:
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        violations:
+          type: array
+          items:
+            type: object
+            properties:
+              propertyPath: { type: string }
+              message: { type: string }
+
+    NiveauRelation:
+      type: string
+      enum: [ABONNE, AMI]
+
+    NomEntree:
+      type: object
+      required: [nom]
+      properties:
+        nom: { type: string, minLength: 1, maxLength: 80 }
+
+    InscriptionEntree:
+      type: object
+      required: [pseudo, email, motDePasse, dateNaissance]
+      properties:
+        pseudo: { type: string, minLength: 3, maxLength: 30, pattern: '^[a-z0-9_.]+$' }
+        email: { type: string, format: email }
+        motDePasse: { type: string, format: password, minLength: 12 }
+        dateNaissance: { type: string, format: date }
+        estPrive: { type: boolean, default: false }
+
+    MonCompte:
+      type: object
+      description: Vue réservée au titulaire du compte.
+      properties:
+        id: { type: integer }
+        pseudo: { type: string }
+        email: { type: string, format: email }
+        dateNaissance: { type: string, format: date }
+        estMineur: { type: boolean, readOnly: true }
+        estPrive: { type: boolean }
+        referent: { $ref: '#/components/schemas/ProfilResume' }
+
+    MonCompteModification:
+      type: object
+      additionalProperties: false
+      properties:
+        email: { type: string, format: email }
+        motDePasse: { type: string, format: password, minLength: 12 }
+        estPrive: { type: boolean }
+
+    ProfilResume:
+      type: object
+      description: Ce qu'on peut savoir de n'importe quel compte. Jamais d'e-mail ni de date de naissance (S-05).
+      properties:
+        pseudo: { type: string }
+
+    Profil:
+      allOf:
+        - $ref: '#/components/schemas/ProfilResume'
+        - type: object
+          properties:
+            estPrive: { type: boolean }
+            nombreAbonnes: { type: integer }
+            maRelation:
+              description: Ma relation avec ce compte, si je suis connecté.
+              oneOf:
+                - $ref: '#/components/schemas/Relation'
+                - type: 'null'
+
+    Relation:
+      type: object
+      properties:
+        id: { type: integer }
+        suiveur: { $ref: '#/components/schemas/ProfilResume' }
+        suivi: { $ref: '#/components/schemas/ProfilResume' }
+        niveau: { $ref: '#/components/schemas/NiveauRelation' }
+        statut: { type: string, enum: [EN_ATTENTE, ACCEPTEE] }
+        creeLe: { type: string, format: date-time }
+
+    Logement:
+      type: object
+      properties:
+        id: { type: integer }
+        nom: { type: string }
+        monRole: { type: string, enum: [PROPRIETAIRE, COPROPRIETAIRE], readOnly: true }
+
+    LogementDetail:
+      allOf:
+        - $ref: '#/components/schemas/Logement'
+        - type: object
+          properties:
+            pieces:
+              type: array
+              items: { $ref: '#/components/schemas/Piece' }
+
+    Membre:
+      type: object
+      properties:
+        id: { type: integer }
+        utilisateur: { $ref: '#/components/schemas/ProfilResume' }
+        logement: { $ref: '#/components/schemas/Logement' }
+        role: { type: string, enum: [PROPRIETAIRE, COPROPRIETAIRE], readOnly: true }
+        statut: { type: string, enum: [INVITE, ACCEPTE], readOnly: true }
+        arriveLe: { type: string, format: date-time, readOnly: true }
+
+    Piece:
+      type: object
+      properties:
+        id: { type: integer }
+        nom: { type: string }
+        stockages:
+          type: array
+          items: { $ref: '#/components/schemas/Stockage' }
+
+    Stockage:
+      type: object
+      properties:
+        id: { type: integer }
+        nom: { type: string }
+
+    Categorie:
+      type: object
+      properties:
+        id: { type: integer }
+        nom: { type: string }
+
+    Reconnaissance:
+      type: object
+      properties:
+        photo: { type: string, description: Identifiant de la photo stockée, à renvoyer dans ArticleEntree }
+        proposition:
+          description: Vide si la reconnaissance a échoué.
+          oneOf:
+            - type: object
+              properties:
+                categorie: { $ref: '#/components/schemas/Categorie' }
+                marque: { type: [string, 'null'] }
+                couleur: { type: [string, 'null'] }
+            - type: 'null'
+
+    ArticleEntree:
+      type: object
+      additionalProperties: false
+      required: [photo, stockage, categorie]
+      properties:
+        photo: { type: string }
+        stockage: { type: integer }
+        categorie: { type: integer }
+        marque: { type: string, maxLength: 80 }
+        couleur: { type: string, maxLength: 40 }
+        note: { type: string, maxLength: 2000 }
+        estPersonnel: { type: boolean, default: false }
+
+    ArticleModification:
+      type: object
+      additionalProperties: false
+      description: Ni `auteur` ni `photo` ne sont modifiables (A-15, test S-03).
+      properties:
+        stockage: { type: integer }
+        categorie: { type: integer }
+        marque: { type: string, maxLength: 80 }
+        couleur: { type: string, maxLength: 40 }
+        note: { type: string, maxLength: 2000 }
+        estPersonnel: { type: boolean }
+
+    ArticlePublic:
+      type: object
+      description: Vue d'un visiteur. Ni pièce, ni stockage, ni note, ni données personnelles de l'auteur (S-05).
+      properties:
+        id: { type: integer }
+        photoUrl: { type: string, format: uri-reference }
+        categorie: { $ref: '#/components/schemas/Categorie' }
+        marque: { type: [string, 'null'] }
+        couleur: { type: [string, 'null'] }
+        auteur: { $ref: '#/components/schemas/ProfilResume' }
+        logement:
+          type: object
+          properties:
+            nom: { type: string }
+
+    ArticleMembre:
+      allOf:
+        - $ref: '#/components/schemas/ArticlePublic'
+        - type: object
+          description: Vue d'un membre du logement, avec l'emplacement (P3).
+          properties:
+            note: { type: [string, 'null'] }
+            estPersonnel: { type: boolean }
+            emplacement:
+              type: object
+              properties:
+                logement: { $ref: '#/components/schemas/Logement' }
+                piece: { type: object, properties: { id: { type: integer }, nom: { type: string } } }
+                stockage: { $ref: '#/components/schemas/Stockage' }
+            creeLe: { type: string, format: date-time }
+
+    TenueEntree:
+      type: object
+      additionalProperties: false
+      required: [nom, articles]
+      properties:
+        nom: { type: string, maxLength: 80 }
+        articles:
+          type: array
+          minItems: 1
+          items: { type: integer }
+
+    TenueModification:
+      type: object
+      additionalProperties: false
+      properties:
+        nom: { type: string, maxLength: 80 }
+        articles:
+          type: array
+          minItems: 1
+          items: { type: integer }
+        estPublique: { type: boolean }
+
+    Tenue:
+      type: object
+      properties:
+        id: { type: integer }
+        nom: { type: string }
+        auteur: { $ref: '#/components/schemas/ProfilResume' }
+        estPublique: { type: boolean }
+        publieeLe: { type: [string, 'null'], format: date-time }
+        articles:
+          type: array
+          description: Un article personnel n'apparaît que dans ce contexte (Q-21).
+          items: { $ref: '#/components/schemas/ArticlePublic' }
+
+    CommentaireEntree:
+      type: object
+      additionalProperties: false
+      required: [contenu]
+      properties:
+        contenu: { type: string, minLength: 1, maxLength: 1000 }
+
+    Commentaire:
+      type: object
+      properties:
+        id: { type: integer }
+        auteur: { $ref: '#/components/schemas/ProfilResume' }
+        contenu: { type: string }
+        creeLe: { type: string, format: date-time }
