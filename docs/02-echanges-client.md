@@ -8,7 +8,6 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 
 | # | Question | Impact | Pourquoi c'est important | Statut |
 |---|---|---|---|---|
-| Q-21 | Une tenue contenant un article personnel est privée et « peut être mise publique » : l'article personnel devient-il alors visible **dans cette tenue uniquement** ? | Moyenne | Confirme l'interprétation H12. | À confirmer |
 | Q-22 | Un compte **mineur** peut-il être **public** et avoir des abonnés, ou est-il forcément privé ? | Importante | Protection des mineurs (RGPD) : un compte enfant public exposerait ses articles et ses tenues à n'importe qui. | À poser |
 
 ## Questions reportées
@@ -47,6 +46,7 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | Q-19 | Peut-on partager par lien un article personnel ? Durée de validité ? | « Oui, 24 h. » | Lien vers **un article**, y compris personnel, valable **24 h**, ouvrable **une seule fois**. |
 | Q-11b | Suppression du compte adulte : le compte enfant suit ? | « Oui, tout suit avec. » | Supprimer le compte adulte supprime le compte enfant **et ses articles**. |
 | Q-20 | Plusieurs co-propriétaires restants : qui devient propriétaire ? Et un mineur ? | « C'est la personne qui est arrivée en premier. » Un mineur ne peut **en aucun cas** gérer un logement. | Transfert au **majeur arrivé en premier** ; s'il ne reste que des mineurs, le logement est supprimé. |
+| Q-21 | Tenue contenant un article personnel rendue publique : l'article est-il visible partout ? | Visible **seulement dans la tenue**. | Règle A-04 du modèle d'autorisation. |
 | Q-12b | Supprimer son compte transfère-t-il automatiquement le logement ? | Non : il faut **léguer ou supprimer son logement avant** de pouvoir supprimer son compte. | Règle Q-12 confirmée. En V1, sans legs : supprimer le logement d'abord. |
 | — | « Catégorie » | Un filtre : « un abonné intéressé par les vinyles va sur le logement, filtre en mettant vinyle et voit tous les vinyles du logement. » Catégorie et famille : « c'est pareil, c'est ça qui va aider pour faire des recherches ciblées. » | Nouvelle fonction F-27. Un seul champ « catégorie » (D-012). |
 

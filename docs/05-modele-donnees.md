@@ -151,7 +151,7 @@ Règles que l'application garantit en permanence. Chacune devra être couverte p
 | I-11 | L'auteur d'un article est **membre** (accepté) du logement où il est rangé. | — |
 | I-12 | Un commentaire vise **exactement un** article **ou** une tenue. | — |
 | I-13 | Une tenue ne contient que des articles **dont son auteur est l'auteur**. | P4 |
-| I-14 | Une tenue contenant un article personnel est **privée par défaut** ; son auteur peut la rendre publique. | H12 (Q-21) |
+| I-14 | Une tenue contenant un article personnel est **privée par défaut** ; son auteur peut la rendre publique. L'article personnel n'est alors visible **que dans cette tenue**. | Q-21 |
 | I-15 | Supprimer un article le retire des tenues ; une tenue devenue **vide est supprimée**. | D-013 |
 | I-16 | Un mineur ne publie pas de tenue : `estPublique` reste faux. | CR § 5 |
 
@@ -163,7 +163,9 @@ Règles que l'application garantit en permanence. Chacune devra être couverte p
 | I-19 | Seul un **ami** (relation acceptée de niveau AMI) peut commenter. | Q-13 tour 2 |
 | I-20 | Un lien de partage est valide **si et seulement si** `utiliseLe` est vide **et** `expireLe` n'est pas dépassé. Sa première ouverture renseigne `utiliseLe`. | Q-05, Q-19 |
 
-## 4. Règle de visibilité d'un article (pour le modèle d'autorisation)
+## 4. Règle de visibilité d'un article
+
+> Version complète, avec les tenues, les commentaires et les droits d'écriture : [06-modele-autorisation.md](06-modele-autorisation.md).
 
 Un utilisateur **V** voit un article **A** (auteur **X**) si l'une de ces conditions est vraie :
 
@@ -177,5 +179,4 @@ Un utilisateur **V** voit un article **A** (auteur **X**) si l'une de ces condit
 
 | # | Question |
 |---|---|
-| Q-21 | Confirmer H12 / I-14 (tenue avec article personnel). |
 | Q-22 | Un compte **mineur** peut-il être **public** et avoir des abonnés ? Ou est-il forcément privé ? (protection des mineurs, RGPD) |
