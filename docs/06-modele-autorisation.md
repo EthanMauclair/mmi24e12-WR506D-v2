@@ -65,6 +65,7 @@ Situation : Camille est propriétaire, son compte est **public**. Léo est co-pr
 | A-06 | Une tenue **privée** est visible par son auteur, ses **amis** et les **membres** d'un logement qu'il partage avec l'auteur. |
 | A-07 | Les **commentaires** sont visibles par tous ceux qui voient l'article ou la tenue commentés. |
 | A-08 | Un **lien de partage** donne accès à **un seul article**, une seule fois, pendant 24 h, sans aucun accès au reste. |
+| A-16 | Un compte **mineur** est toujours privé : un non-inscrit ne voit **rien** de ses articles ni de ses tenues, et un abonné doit être accepté (I-21, D-017). |
 
 ### Écriture
 | # | Règle |

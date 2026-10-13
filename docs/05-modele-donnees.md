@@ -134,6 +134,7 @@ Règles que l'application garantit en permanence. Chacune devra être couverte p
 | I-02 | À 18 ans, le référent est retiré : le compte devient **indépendant**. | Q-11, D-013 |
 | I-03 | Supprimer un compte majeur supprime les comptes mineurs dont il est référent, **avec leurs articles**. | Q-11b |
 | I-04 | Un compte qui est **propriétaire** d'au moins un logement **ne peut pas être supprimé**. | Q-12 |
+| I-21 | Un compte **mineur** est **toujours privé** : `estPrive` reste vrai jusqu'à ses 18 ans. | Q-22 |
 
 ### Logements
 | # | Règle | Source |
@@ -179,4 +180,3 @@ Un utilisateur **V** voit un article **A** (auteur **X**) si l'une de ces condit
 
 | # | Question |
 |---|---|
-| Q-22 | Un compte **mineur** peut-il être **public** et avoir des abonnés ? Ou est-il forcément privé ? (protection des mineurs, RGPD) |

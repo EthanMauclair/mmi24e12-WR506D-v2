@@ -60,6 +60,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 
 ### Restrictions du compte mineur (applicables en V1)
 - Ne peut pas créer de logement.
+- Son compte est **toujours privé** (Q-22).
 - Ne peut pas publier de tenue (ni sur le profil, ni sur Instagram).
 - Voit les articles personnels du logement dont il est co-propriétaire.
 
