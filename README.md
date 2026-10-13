@@ -60,6 +60,8 @@ docker compose run --rm --no-deps php composer install
 #      JWT_PASSPHRASE=<une phrase secrète>
 #    (fichier : api/.env.local)
 
+#    Copier aussi ces deux valeurs dans api/.env.test.local (pour les tests)
+
 # 4. Générer les clés de signature des jetons JWT (stockées dans api/config/jwt/, jamais commitées)
 docker compose run --rm --no-deps php php bin/console lexik:jwt:generate-keypair
 
@@ -86,6 +88,18 @@ docker compose down                     # tout arrêter
 | MySQL (depuis la machine hôte) | `localhost:3307`, utilisateur `penderie` |
 
 Les mots de passe de `compose.yaml` ne servent qu'en développement local.
+
+### Tests
+
+```bash
+# Une seule fois : créer les tables de la base de test
+docker compose exec php php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+# Lancer tous les tests (unitaires et fonctionnels)
+docker compose exec php php bin/phpunit
+```
+
+Les tests utilisent la base `penderie_test` et lisent leurs secrets dans `api/.env.test.local` (non commité, mêmes valeurs que `api/.env.local`).
 
 ### Versions
 

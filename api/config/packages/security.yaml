@@ -1,39 +1,51 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        # Connexion par e-mail ou par pseudo : voir UtilisateurRepository::loadUserByIdentifier()
+        utilisateurs:
+            entity:
+                class: App\Entity\Utilisateur
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
-        main:
-            lazy: true
-            provider: users_in_memory
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
+        # POST /api/auth/connexion : vérifie identifiant + mot de passe, renvoie un JWT (D-015)
+        connexion:
+            pattern: ^/api/auth/connexion$
+            stateless: true
+            provider: utilisateurs
+            json_login:
+                check_path: /api/auth/connexion
+                username_path: identifiant
+                password_path: motDePasse
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+        # Reste de l'API : le JWT est lu dans le cookie BEARER (front) ou l'en-tête Authorization (Postman).
+        # Une requête sans jeton reste anonyme : chaque route décide si elle l'accepte.
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: utilisateurs
+            jwt: ~
 
-    # Note: Only the *first* matching rule is applied
+    # Interdit par défaut (D-014) : chaque route publique est listée explicitement.
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/api/auth/(inscription|connexion|deconnexion)$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        - { path: ^/api$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/moi, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
         password_hashers:
-            # Password hashers are resource-intensive by design to ensure security.
-            # In tests, it's safe to reduce their cost to improve performance.
+            # Hachage volontairement faible en test, pour la rapidité uniquement.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4
+                time_cost: 3
+                memory_cost: 10
