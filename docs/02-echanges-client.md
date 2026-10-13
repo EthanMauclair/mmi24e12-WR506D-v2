@@ -8,7 +8,6 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 
 | # | Question | Impact | Pourquoi c'est important | Statut |
 |---|---|---|---|---|
-| Q-22 | Un compte **mineur** peut-il être **public** et avoir des abonnés, ou est-il forcément privé ? | Importante | Protection des mineurs (RGPD) : un compte enfant public exposerait ses articles et ses tenues à n'importe qui. | À poser |
 
 ## Questions reportées
 
@@ -47,6 +46,7 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | Q-11b | Suppression du compte adulte : le compte enfant suit ? | « Oui, tout suit avec. » | Supprimer le compte adulte supprime le compte enfant **et ses articles**. |
 | Q-20 | Plusieurs co-propriétaires restants : qui devient propriétaire ? Et un mineur ? | « C'est la personne qui est arrivée en premier. » Un mineur ne peut **en aucun cas** gérer un logement. | Transfert au **majeur arrivé en premier** ; s'il ne reste que des mineurs, le logement est supprimé. |
 | Q-21 | Tenue contenant un article personnel rendue publique : l'article est-il visible partout ? | Visible **seulement dans la tenue**. | Règle A-04 du modèle d'autorisation. |
+| Q-22 | Un compte mineur peut-il être public ? | « Le compte mineur ne peut pas être public. » | Un compte mineur est **toujours privé** : ses abonnés doivent être acceptés (I-21, D-017). |
 | Q-12b | Supprimer son compte transfère-t-il automatiquement le logement ? | Non : il faut **léguer ou supprimer son logement avant** de pouvoir supprimer son compte. | Règle Q-12 confirmée. En V1, sans legs : supprimer le logement d'abord. |
 | — | « Catégorie » | Un filtre : « un abonné intéressé par les vinyles va sur le logement, filtre en mettant vinyle et voit tous les vinyles du logement. » Catégorie et famille : « c'est pareil, c'est ça qui va aider pour faire des recherches ciblées. » | Nouvelle fonction F-27. Un seul champ « catégorie » (D-012). |
 
@@ -62,3 +62,4 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | 12/10/2026 | Échange client | Q-11b, Q-14b, Q-17, Q-18, Q-19 | Confidentialité par compte, vente en V2, lien de 24 h |
 | 12/10/2026 | Échange client | Q-20, Q-12b, catégorie | Premier majeur arrivé, catégorie = famille, filtre par catégorie |
 | 13/10/2026 | Échange client | Identité visuelle | La cliente veut **retrouver du bordeaux** dans l'application : couleur principale des maquettes (09-maquettes.md). |
+| 13/10/2026 | Échange client | Q-22 | Compte mineur toujours privé |

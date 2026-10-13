@@ -206,3 +206,12 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Création d'article et photo en une seule requête : impossible de corriger la proposition de l'IA avant enregistrement.
 - **Vérification** : fichier analysé par un script (syntaxe YAML, 36 chemins, 56 opérations, références et paramètres de chemin cohérents). Une validation complète par un outil OpenAPI reste à faire (éditeur Swagger, ou comparaison avec la documentation générée par API Platform).
 - **IA** : l'assistant a rédigé le contrat à partir du périmètre, du modèle de données et du modèle d'autorisation, et proposé les conventions. Relecture complète à faire de mon côté avant le pitch.
+
+## D-017 – Compte mineur toujours privé
+
+- **Date** : 13/10/2026
+- **Statut** : Validée
+- **Contexte** : question Q-22 posée à la cliente pour protéger les comptes mineurs.
+- **Décision** : un compte mineur est **toujours privé** jusqu'à ses 18 ans (I-21). Son passage en public est refusé par l'API (422). À 18 ans, il garde son réglage et peut le changer.
+- **Conséquences** : les articles et tenues d'un mineur ne sont jamais visibles par un non-inscrit ; ses abonnés doivent être acceptés. Les articles de Jules dans le logement de Camille ne sont jamais visibles par les abonnés de Camille (règle D-013, renforcée).
+- **IA** : l'assistant a proposé la question au client ; la réponse vient de la cliente.

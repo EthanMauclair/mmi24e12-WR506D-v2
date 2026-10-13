@@ -1060,7 +1060,9 @@ components:
       properties:
         email: { type: string, format: email }
         motDePasse: { type: string, format: password, minLength: 12 }
-        estPrive: { type: boolean }
+        estPrive:
+          type: boolean
+          description: Un compte mineur ne peut pas passer à `false` (422, I-21).
 
     ProfilResume:
       type: object
