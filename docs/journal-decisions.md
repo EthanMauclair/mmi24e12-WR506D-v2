@@ -257,3 +257,15 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Décision** : seul le **propriétaire** retire un co-propriétaire ; un co-propriétaire peut **partir** de lui-même. Dans les deux cas, **ses articles sont supprimés** (A-17). Les autres co-propriétaires majeurs ne retirent plus personne.
 - **Conséquence** : action irréversible ; le front devra demander une confirmation explicite en indiquant le nombre d'articles supprimés.
 - **IA** : l'assistant avait proposé de refuser le retrait (H19) ; la règle vient de la cliente.
+
+## D-021 – Liste initiale des catégories
+
+- **Date** : 13/10/2026
+- **Statut** : Proposée (à montrer à la cliente)
+- **Contexte** : D-013 fixe une liste de catégories extensible par l'administrateur, sans en donner le contenu (« vinyle, pull, baskets… »).
+- **Décision** :
+  - 31 catégories au singulier, remplies par une migration de données : vêtements (T-shirt, Chemise, Pull, Sweat, Veste, Manteau, Pantalon, Jean, Short, Jupe, Robe, Pyjama, Sous-vêtement, Maillot de bain), chaussures (Baskets, Bottines, Bottes, Sandales, Chaussures de ville), accessoires (Sac, Ceinture, Écharpe, Chapeau, Bonnet, Bijou, Montre, Lunettes), objets (Vinyle, Livre, Jeu vidéo) et **Autre**, que la reconnaissance photo choisira quand rien ne convient.
+  - `GET /api/categories` est public et en lecture seule ; l'administrateur ajoute une catégorie avec `php bin/console app:categorie:ajouter <nom>`.
+  - Les doublons sont refusés sans tenir compte de la casse ni des accents (« vinyle », « Echarpe ») : l'interclassement MySQL `utf8mb4_0900_ai_ci` et l'index unique sur `nom` le garantissent.
+- **Alternatives écartées** : deux niveaux (famille > catégorie), déjà écartés par D-012 ; une route d'administration, inutile en V1 (docs/08-contrat-api.md).
+- **IA** : l'assistant a proposé la liste ; elle reste à valider avec la cliente.
