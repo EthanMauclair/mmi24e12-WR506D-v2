@@ -616,7 +616,7 @@ paths:
               type: object
               required: [photo]
               properties:
-                photo: { type: string, format: binary, description: 'JPG, PNG ou HEIC, 10 Mo maximum' }
+                photo: { type: string, format: binary, description: 'JPG, PNG ou WebP, 10 Mo maximum (D-022)' }
       responses:
         '201':
           description: Photo enregistrée, proposition éventuelle

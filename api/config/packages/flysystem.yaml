@@ -5,3 +5,12 @@ flysystem:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%/var/storage/default'
+
+when@test:
+    flysystem:
+        storages:
+            default.storage:
+                adapter: 'local'
+                options:
+                    # Les photos envoyées par les tests ne se mélangent pas à celles du développement.
+                    directory: '%kernel.project_dir%/var/storage/test'
