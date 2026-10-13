@@ -279,6 +279,54 @@ final class ArticleApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(401);
     }
 
+    #[Test]
+    public function f21_un_visiteur_voit_les_articles_non_personnels_d_un_compte_public(): void
+    {
+        $pull = $this->article($this->camille);
+        $this->article($this->camille, personnel: true);
+        $this->article($this->leo);
+
+        $this->json('GET', '/api/utilisateurs/camille/articles');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame([$pull->getId()], array_column($this->reponse(), 'id'), 'Ni l\'article personnel, ni celui de Léo rangé dans le même logement.');
+        self::assertArrayNotHasKey('emplacement', $this->reponse()[0], 'Toujours la vue publique.');
+    }
+
+    #[Test]
+    public function f27_on_filtre_les_articles_d_une_personne_par_categorie(): void
+    {
+        $this->article($this->camille);
+        $vinyle = $this->article($this->camille);
+        $vinyle->decrire($this->categorie('Vinyle'), null, null, null);
+        $this->em->flush();
+
+        $this->json('GET', '/api/utilisateurs/camille/articles?categorie='.$this->categorie('Vinyle')->getId(), null, $this->jetonDe($this->nora));
+
+        self::assertResponseIsSuccessful();
+        self::assertSame([$vinyle->getId()], array_column($this->reponse(), 'id'));
+    }
+
+    #[Test]
+    public function s04_compte_prive_liste_vide_sauf_pour_soi(): void
+    {
+        $this->camille->definirPrive(true, new \DateTimeImmutable());
+        $pull = $this->article($this->camille);
+
+        $this->json('GET', '/api/utilisateurs/camille/articles');
+        self::assertResponseIsSuccessful();
+        self::assertSame([], $this->reponse());
+
+        $this->json('GET', '/api/utilisateurs/camille/articles', null, $this->jetonDe($this->nora));
+        self::assertSame([], $this->reponse());
+
+        $this->json('GET', '/api/utilisateurs/camille/articles', null, $this->jetonDe($this->camille));
+        self::assertSame([$pull->getId()], array_column($this->reponse(), 'id'));
+
+        $this->json('GET', '/api/utilisateurs/inconnu/articles');
+        self::assertResponseStatusCodeSame(404);
+    }
+
     /**
      * Après chaque requête, Symfony vide le gestionnaire d'entités : on recharge l'auteur et le
      * rangement pour pouvoir créer un article à tout moment du test.
