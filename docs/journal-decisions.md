@@ -215,3 +215,19 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Décision** : un compte mineur est **toujours privé** jusqu'à ses 18 ans (I-21). Son passage en public est refusé par l'API (422). À 18 ans, il garde son réglage et peut le changer.
 - **Conséquences** : les articles et tenues d'un mineur ne sont jamais visibles par un non-inscrit ; ses abonnés doivent être acceptés. Les articles de Jules dans le logement de Camille ne sont jamais visibles par les abonnés de Camille (règle D-013, renforcée).
 - **IA** : l'assistant a proposé la question au client ; la réponse vient de la cliente.
+
+## D-018 – Les règles métier vivent dans les entités
+
+- **Date** : 13/10/2026
+- **Statut** : Validée
+- **Contexte** : début du lot 1. Les invariants (05-modele-donnees.md) doivent être garantis et testés.
+- **Décision** :
+  - Les entités n'ont **pas de setters libres** : on crée un logement par `Logement::creer()`, un article par `Article::creer()`, etc. Chaque méthode refuse une action qui violerait un invariant, en levant une `RegleMetierException` qui porte son numéro (I-xx).
+  - L'heure courante est **passée en paramètre** (`$maintenant`) pour que les règles d'âge soient testables à date fixe.
+  - Les champs protégés (auteur d'un article, rôle d'un membre) n'ont **aucune méthode** pour être modifiés directement (A-15).
+  - Les invariants sont testés **sans base de données** (tests unitaires), donc rapides.
+- **Alternatives écartées** :
+  - Entités « anémiques » avec getters/setters générés et règles dans des services : une règle oubliée dans un service suffit à violer un invariant.
+  - Contraintes de validation seules : elles ne couvrent pas les règles qui portent sur plusieurs objets (ex. I-11).
+- **Hypothèse ajoutée** : H18, un mineur ne rejoint que le logement de son référent.
+- **IA** : l'assistant a écrit les entités et les tests ; j'ai validé le choix d'entités riches et l'hypothèse H18. Tests exécutés sous PHP 8.4 : 20 tests, 43 assertions.
