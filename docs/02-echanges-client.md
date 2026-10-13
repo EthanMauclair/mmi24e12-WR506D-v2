@@ -61,3 +61,4 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | 12/10/2026 | Échange client | Q-03b, Q-05b, Q-08b, Q-16 | Générateur en V2, lien par article, contradiction Q-18 relevée |
 | 12/10/2026 | Échange client | Q-11b, Q-14b, Q-17, Q-18, Q-19 | Confidentialité par compte, vente en V2, lien de 24 h |
 | 12/10/2026 | Échange client | Q-20, Q-12b, catégorie | Premier majeur arrivé, catégorie = famille, filtre par catégorie |
+| 13/10/2026 | Échange client | Identité visuelle | La cliente veut **retrouver du bordeaux** dans l'application : couleur principale des maquettes (09-maquettes.md). |
