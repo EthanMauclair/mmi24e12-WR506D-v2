@@ -21,3 +21,12 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+when@test:
+    services:
+        # Les erreurs attendues par les tests (401, 403, 404, 409, 422) sont journalisées au niveau
+        # « error » et noieraient la sortie de PHPUnit. On n'affiche que les erreurs « critical » (500).
+        logger:
+            class: Symfony\Component\HttpKernel\Log\Logger
+            autowire: false
+            arguments: ['critical']

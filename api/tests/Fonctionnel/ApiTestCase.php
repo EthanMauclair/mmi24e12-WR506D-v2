@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Fonctionnel;
 
 use App\Entity\Utilisateur;
-use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Base des tests fonctionnels : une base de test vide à chaque test, et des raccourcis
- * pour créer des comptes et appeler l'API en JSON.
+ * Base des tests fonctionnels : des raccourcis pour créer des comptes et appeler l'API en JSON.
+ *
+ * La base de test (penderie_test) est créée une seule fois par les migrations.
+ * DAMADoctrineTestBundle ouvre une transaction avant chaque test et l'annule après :
+ * chaque test part donc d'une base vide, sans recréer le schéma.
  */
 abstract class ApiTestCase extends WebTestCase
 {
@@ -29,16 +30,6 @@ abstract class ApiTestCase extends WebTestCase
         // Même noyau (et même connexion) pour toutes les requêtes du test.
         $this->client->disableReboot();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
-
-        // Seulement pour une base SQLite locale : MySQL applique toujours les clés étrangères.
-        if ($this->em->getConnection()->getDatabasePlatform() instanceof SQLitePlatform) {
-            $this->em->getConnection()->executeStatement('PRAGMA foreign_keys = ON');
-        }
-
-        $outil = new SchemaTool($this->em);
-        $metadonnees = $this->em->getMetadataFactory()->getAllMetadata();
-        $outil->dropDatabase();
-        $outil->createSchema($metadonnees);
     }
 
     protected function creerMajeur(string $pseudo, bool $estPrive = false): Utilisateur
