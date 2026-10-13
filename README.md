@@ -19,6 +19,7 @@ Projet réalisé dans le cadre du module **WR506D – Développement back avanc�
 | [Modèle de données](docs/05-modele-donnees.md) | Entités, schéma, invariants, règle de visibilité |
 | [Modèle d'autorisation](docs/06-modele-autorisation.md) | Qui voit quoi, qui modifie quoi, tests de sécurité |
 | [Choix techniques](docs/07-choix-techniques.md) | Symfony, front, base de données, stockage, IA : chaque choix justifié |
+| [Contrat d'API](docs/08-contrat-api.md) | Conventions, correspondance avec les fonctions, fichier [OpenAPI](docs/api/openapi.yaml) |
 | [Journal de décisions](docs/journal-decisions.md) | Chaque décision, ses alternatives et la part de l'assistant IA |
 
 ## Organisation Git

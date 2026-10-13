@@ -188,3 +188,21 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **OpenRouter** pour la reconnaissance, avec catégorie imposée dans la liste fixe.
   - **Un seul dépôt** contenant `api/` et `front/`.
 - **IA** : l'assistant a présenté les options et leurs conséquences, et vérifié les dates de maintenance de Symfony au 13/10/2026. Les choix sont les miens ; j'ai retenu MySQL contre sa recommandation (PostgreSQL), en assumant la limite sur I-05.
+
+## D-016 – Contrat d'API
+
+- **Date** : 13/10/2026
+- **Statut** : Validée (à présenter au pitch 1)
+- **Décisions** : détail dans [08-contrat-api.md](08-contrat-api.md) et [api/openapi.yaml](api/openapi.yaml).
+  - Routes **en français**, comme le modèle de données et le vocabulaire de la cliente.
+  - **Deux vues d'un article** : `ArticleMembre` (avec emplacement) et `ArticlePublic` (sans pièce, stockage, note ni données personnelles).
+  - **Ajout par photo en deux temps** : reconnaissance, puis enregistrement après validation par l'utilisateur.
+  - **404** pour une ressource non visible, **403** pour une action interdite sur une ressource visible, **409** pour un invariant violé.
+  - Les schémas d'entrée **refusent tout champ non prévu** (`additionalProperties: false`), pour qu'on ne puisse pas envoyer `auteur` ou `role` (A-15).
+  - Recherche du propriétaire (`/api/articles`) et consultation d'un visiteur (`/api/utilisateurs/{pseudo}/articles`) sur deux routes distinctes, car elles n'appliquent pas les mêmes règles.
+- **Alternatives écartées** :
+  - Routes en anglais : plus courant, mais un vocabulaire de plus à traduire entre la cliente, la documentation et le code.
+  - Un seul format d'article avec des champs vides selon le profil : un oubli de filtrage exposerait l'emplacement.
+  - Création d'article et photo en une seule requête : impossible de corriger la proposition de l'IA avant enregistrement.
+- **Vérification** : fichier analysé par un script (syntaxe YAML, 36 chemins, 56 opérations, références et paramètres de chemin cohérents). Une validation complète par un outil OpenAPI reste à faire (éditeur Swagger, ou comparaison avec la documentation générée par API Platform).
+- **IA** : l'assistant a rédigé le contrat à partir du périmètre, du modèle de données et du modèle d'autorisation, et proposé les conventions. Relecture complète à faire de mon côté avant le pitch.
