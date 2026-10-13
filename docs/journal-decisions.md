@@ -140,3 +140,20 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Ajout de **F-27 – Filtrer les articles d'un logement par catégorie**, y compris pour un visiteur.
 - **Alternatives écartées** : deux niveaux (famille « vêtement » > catégorie « pull ») : le client n'en a pas exprimé le besoin.
 - **IA** : l'assistant a demandé si catégorie et famille étaient la même chose, pour éviter un doublon dans le modèle de données.
+
+## D-013 – Modèle de données
+
+- **Date** : 12/10/2026
+- **Statut** : Validée (à présenter au pitch 1)
+- **Décisions** : détail dans [05-modele-donnees.md](05-modele-donnees.md).
+  - **On s'abonne à une personne, pas à un logement** : un abonné ne voit que les articles de la personne suivie, selon la confidentialité de **son** compte. Les articles d'un co-propriétaire rangés dans le même logement ne sont pas visibles via cet abonnement.
+  - **Catégories** : liste fixe, extensible par l'administrateur.
+  - Une tenue devenue **vide** est **supprimée**.
+  - À **18 ans**, le lien avec le référent disparaît : le compte devient **indépendant**.
+  - Une seule table **Membre** (rôle, date d'arrivée) pour propriétaire et co-propriétaires ; une seule table **Relation** (niveau abonné / ami).
+- **Alternatives écartées** :
+  - Abonnement donnant accès à tout le logement : un co-propriétaire verrait ses articles exposés aux abonnés d'un autre, selon une confidentialité qui n'est pas la sienne.
+  - Catégories libres : doublons (« Vinyle », « vinyles », « vynile ») qui rendent les filtres inutilisables.
+  - Clé `proprietaire` sur Logement plus une table de co-propriétaires : un transfert de propriété toucherait deux tables.
+  - Deux tables Abonné et Ami : rétrograder un ami imposerait de supprimer puis recréer une ligne.
+- **IA** : l'assistant a proposé la structure et les invariants ; les quatre arbitrages ci-dessus sont les miens.
