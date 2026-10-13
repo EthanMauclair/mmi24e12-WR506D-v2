@@ -9,6 +9,7 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 | # | Question | Impact | Pourquoi c'est important | Statut |
 |---|---|---|---|---|
 | Q-21 | Une tenue contenant un article personnel est privée et « peut être mise publique » : l'article personnel devient-il alors visible **dans cette tenue uniquement** ? | Moyenne | Confirme l'interprétation H12. | À confirmer |
+| Q-22 | Un compte **mineur** peut-il être **public** et avoir des abonnés, ou est-il forcément privé ? | Importante | Protection des mineurs (RGPD) : un compte enfant public exposerait ses articles et ses tenues à n'importe qui. | À poser |
 
 ## Questions reportées
 
