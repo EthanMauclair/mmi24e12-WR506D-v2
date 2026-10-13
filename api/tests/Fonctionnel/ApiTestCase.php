@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Fonctionnel;
 
+use App\Entity\Categorie;
 use App\Entity\Utilisateur;
+use App\Repository\CategorieRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -44,6 +46,13 @@ abstract class ApiTestCase extends WebTestCase
         $utilisateur = Utilisateur::creerMineur($referent, $pseudo, $pseudo.'@exemple.fr', new \DateTimeImmutable('-12 years'), new \DateTimeImmutable());
 
         return $this->enregistrer($utilisateur);
+    }
+
+    /** Une catégorie de la liste fixe, remplie par la migration de données. */
+    protected function categorie(string $nom): Categorie
+    {
+        return static::getContainer()->get(CategorieRepository::class)->nommee($nom)
+            ?? throw new \LogicException(\sprintf('Catégorie « %s » absente : lancer les migrations sur la base de test.', $nom));
     }
 
     /** Se connecte comme le ferait Postman et renvoie le jeton. */

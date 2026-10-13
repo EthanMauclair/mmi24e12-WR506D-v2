@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Fonctionnel;
 
 use App\Entity\Article;
-use App\Entity\Categorie;
 use App\Entity\Logement;
 use App\Entity\Utilisateur;
 use PHPUnit\Framework\Attributes\Test;
@@ -196,8 +195,7 @@ final class LogementApiTest extends ApiTestCase
     public function i10_une_piece_qui_contient_des_articles_ne_se_supprime_pas(): void
     {
         $armoire = $this->appartement->getPieces()->first()->getStockages()->first();
-        $pull = new Categorie('Pull');
-        $this->em->persist($pull);
+        $pull = $this->categorie('Pull');
         $this->em->persist(Article::creer($this->camille, $armoire, $pull, 'photos/1.jpg', new \DateTimeImmutable()));
         $this->em->flush();
 
@@ -212,8 +210,7 @@ final class LogementApiTest extends ApiTestCase
     public function a17_seul_le_proprietaire_retire_un_coproprietaire_et_ses_articles_partent_avec_lui(): void
     {
         $armoire = $this->appartement->getPieces()->first()->getStockages()->first();
-        $pull = new Categorie('Pull');
-        $this->em->persist($pull);
+        $pull = $this->categorie('Pull');
         $this->em->persist(Article::creer($this->jules, $armoire, $pull, 'photos/1.jpg', new \DateTimeImmutable()));
         $this->em->persist(Article::creer($this->camille, $armoire, $pull, 'photos/2.jpg', new \DateTimeImmutable()));
         $this->em->flush();
