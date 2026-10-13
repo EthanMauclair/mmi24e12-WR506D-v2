@@ -38,7 +38,7 @@ Personnages d'illustration, construits à partir des rôles décrits par la clie
 **Ce qu'elle veut** : ajouter un article vite, sans tout saisir à la main.
 
 1. Où qu'elle soit dans l'application, Camille touche le bouton **photo** et photographie un pull.
-2. L'application remplit **la famille, la marque et la couleur**. Camille vérifie et **corrige** la marque, mal reconnue.
+2. L'application remplit **la catégorie, la marque et la couleur**. Camille vérifie et **corrige** la marque, mal reconnue.
 3. Elle ajoute une note : « acheté à Milan, à faire retoucher ».
 4. Elle **choisit où le ranger** : Appartement Lyon > Chambre > Grande armoire.
 5. S'il s'agit d'un article qu'elle ne veut montrer à personne, comme une montre de luxe, elle le marque **personnel**.
@@ -63,7 +63,7 @@ Personnages d'illustration, construits à partir des rôles décrits par la clie
 
 **Ce qu'elle veut** : montrer sa tenue du jour à ses abonnés.
 
-1. Camille crée une tenue et **sélectionne ses articles** dans sa liste, triée par famille : un pull, un pantalon, des bottines.
+1. Camille crée une tenue et **sélectionne ses articles** dans sa liste, triée par catégorie : un pull, un pantalon, des bottines.
 2. Elle **publie** la tenue : elle apparaît sur son **profil**.
 3. Elle la **partage sur Instagram** : l'image de la tenue part vers Instagram.
 
@@ -84,7 +84,9 @@ Personnages d'illustration, construits à partir des rôles décrits par la clie
 
 **Variante – compte privé** : si le compte de Camille était privé, le visiteur ne verrait rien. Nora enverrait une **demande d'abonnement** ; Camille l'accepterait ou la refuserait.
 
-**Fonctions** : F-15, F-16, F-21.
+**Variante – recherche ciblée** : Nora s'intéresse aux vinyles. Dans le logement de Camille, elle **filtre par catégorie** « vinyle » et ne voit que les vinyles **de Camille**, non personnels.
+
+**Fonctions** : F-15, F-16, F-21, F-27.
 
 ## P6 – Sophie commente une tenue, puis Camille la retire de ses amis
 
@@ -124,10 +126,13 @@ Personnages d'illustration, construits à partir des rôles décrits par la clie
 
 1. Camille demande la suppression de son compte.
 2. Elle possède encore un logement : l'application **refuse** et lui explique qu'elle doit d'abord **supprimer son logement** (le legs volontaire arrivera en V2).
-3. Camille supprime son logement. **Seuls ses articles à elle sont supprimés.** Léo, co-propriétaire, **garde le logement**, ses pièces, ses stockages et **les articles qu'il a ajoutés**. Il en devient le propriétaire.
+3. Camille supprime son logement. **Seuls ses articles à elle sont supprimés.** Léo, co-propriétaire, **garde le logement**, ses pièces, ses stockages et **les articles qu'il a ajoutés**. Il en devient le propriétaire, car c'est le **co-propriétaire majeur arrivé en premier**.
 4. Camille supprime son compte. Le compte de Jules, rattaché au sien, est **supprimé avec ses articles**.
 
-**Règles** : un logement sans aucun co-propriétaire est entièrement supprimé.
+**Règles** :
+- S'il reste plusieurs co-propriétaires, le logement passe au **majeur arrivé en premier**.
+- **Un mineur n'est jamais propriétaire** : s'il ne reste que des mineurs, ou personne, le logement est entièrement supprimé.
+- Il n'y a **pas** de transfert à la suppression du compte : il faut d'abord supprimer (ou, en V2, léguer) son logement.
 **Fonctions** : F-03, F-05, F-14.
 
 ---
