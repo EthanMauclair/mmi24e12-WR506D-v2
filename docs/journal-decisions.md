@@ -104,3 +104,39 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Alternatives écartées** :
   - Filtres enregistrés en V1 : utiles sans le générateur, mais ajoutent une fonction à une V1 déjà large.
 - **IA** : l'assistant a relevé l'absence de recherche et la contradiction avec D-005. J'ai choisi de garder les filtres en V2.
+
+## D-010 – Choix d'expérience dans les parcours
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Décisions** :
+  - Après l'inscription, une **création guidée** (logement, pièce, stockage, premier article), plutôt qu'un profil vide : la valeur de l'application n'apparaît qu'une fois un article rangé.
+  - Ajout d'article : **photo d'abord, rangement ensuite**, avec un bouton photo accessible partout : on photographie un article quand on l'a en main, pas quand on est devant le bon meuble dans l'application.
+  - Lien de partage : la personne sans compte voit **la fiche de l'article et une invitation à créer un compte**.
+- **Alternatives écartées** : profil vide après inscription ; choix du rangement avant la photo ; fiche seule sans invitation.
+- **IA** : l'assistant a proposé les options ; les choix sont les miens.
+
+## D-011 – Suppression d'un logement : seuls les articles du propriétaire disparaissent
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Contexte** : hypothèse H16 infirmée. Quand le propriétaire supprime son logement, les co-propriétaires ne doivent pas perdre leurs articles.
+- **Décision** : supprimer un logement **retire le propriétaire et ses articles**. Si des co-propriétaires restent, le logement subsiste avec ses pièces, ses stockages et leurs articles, et le **co-propriétaire majeur arrivé en premier** en devient propriétaire (Q-20). **Un mineur n'est jamais propriétaire** : s'il ne reste que des mineurs, ou personne, le logement est entièrement supprimé.
+- **Conséquences** :
+  - Chaque article doit connaître son **auteur** (H17), indépendamment du propriétaire du logement.
+  - C'est un **transfert automatique** de propriété, alors que le legs volontaire est exclu de la V1 (E-04). Les deux devront partager la même règle en V2.
+- **Alternatives écartées** :
+  - Tout supprimer : les co-propriétaires perdraient des articles qui sont les leurs.
+  - Articles des co-propriétaires « à ranger », sans logement : le logement qu'ils partagent existe toujours pour eux.
+- **IA** : l'assistant avait supposé l'inverse (H16). Hypothèse corrigée par moi.
+
+## D-012 – Catégorie : un seul champ, filtrable par les visiteurs
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Contexte** : le client parle de « catégorie » (vinyle, pull…) pour filtrer les articles d'un logement, et confirme que c'est la même chose que la « famille » remplie par la photo.
+- **Décision** :
+  - Un **seul champ, « catégorie »** (mot du client), rempli par la photo et corrigeable. Il remplace « famille » dans la documentation.
+  - Ajout de **F-27 – Filtrer les articles d'un logement par catégorie**, y compris pour un visiteur.
+- **Alternatives écartées** : deux niveaux (famille « vêtement » > catégorie « pull ») : le client n'en a pas exprimé le besoin.
+- **IA** : l'assistant a demandé si catégorie et famille étaient la même chose, pour éviter un doublon dans le modèle de données.

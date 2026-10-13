@@ -24,11 +24,12 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 |---|---|---|
 | F-05 | Créer, modifier et supprimer un **logement** (supprimer : propriétaire uniquement) | CR § 4-5 |
 | F-06 | Créer, modifier et supprimer des **pièces** et des **stockages** | CR § 4 |
-| F-07 | Ajouter un **article en le prenant en photo** : la famille, la marque et la couleur sont remplies automatiquement, et **corrigeables** | Q-01, CR § 6, H6 |
+| F-07 | Ajouter un **article en le prenant en photo** : la **catégorie**, la marque et la couleur sont remplies automatiquement, et **corrigeables** | Q-01, CR § 6, H6 |
 | F-08 | Ajouter un **bloc-notes** à un article | CR § 6 |
 | F-09 | Modifier, déplacer et supprimer un article | CR § 5 |
 | F-10 | Marquer un article comme **personnel** | CR § 5 |
-| F-26 | **Rechercher un article** (par famille, marque, couleur, mot du bloc-notes) et voir **où il est rangé** (logement > pièce > stockage) | CR § 2 : le problème à résoudre |
+| F-27 | **Filtrer les articles d'un logement par catégorie**, y compris pour un visiteur qui y a accès (ex. : un abonné ne voit que les vinyles). Ne montre jamais les articles personnels, ni ceux d'une autre personne que celle qu'il suit. | Échange client 12/10, D-012 |
+| F-26 | **Rechercher un article** (par catégorie, marque, couleur, mot du bloc-notes) et voir **où il est rangé** (logement > pièce > stockage) | CR § 2 : le problème à résoudre |
 
 ### Co-propriété
 | # | Fonction | Source |
@@ -53,7 +54,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 ### Tenues
 | # | Fonction | Source |
 |---|---|---|
-| F-23 | **Composer une tenue à la main** en sélectionnant librement ses propres articles, avec un tri par famille | D-005, D-009 |
+| F-23 | **Composer une tenue à la main** en sélectionnant librement ses propres articles, avec un tri par catégorie | D-005, D-009 |
 | F-24 | **Publier** la tenue sur son profil | Q-07 |
 | F-25 | **Partager** l'image de la tenue sur Instagram, **sans pastilles** | Q-01 (voir E-03) |
 
@@ -84,7 +85,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 |---|---|---|
 | H2 | Le **rôle dépend du logement** : un compte peut être propriétaire de l'un et co-propriétaire d'un autre. | Plusieurs logements par compte, co-propriété de plusieurs logements. |
 | H5 | Un non-inscrit voit les logements et articles non personnels des **comptes publics uniquement**, et ce qu'on lui envoie par lien. | Modèle Instagram, Q-03b, Q-19. |
-| H6 | Les informations remplies par la photo sont **corrigeables**. | Une famille mal détectée fausserait plus tard le générateur (N-01). |
+| H6 | Les informations remplies par la photo sont **corrigeables**. | Une catégorie mal détectée fausserait plus tard le générateur (N-01). |
 | H7 | La **date de naissance** est demandée à la création d'un compte mineur. | Nécessaire au passage automatique en majeur (F-13). |
 | H9 | Un **ami** a au minimum les mêmes droits de lecture qu'un abonné accepté, même si le compte est privé. | « Les deux statuts voient la même chose » (tour 2, Q-01). |
 | H10 | Les **visiteurs** (amis, abonnés, non-inscrits) voient le **logement** et ses **articles**, mais pas les pièces ni les stockages. | CR § 5. |
@@ -94,11 +95,11 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 
 ## 4. Point de vigilance : la taille de la V1
 
-La V1 contient **26 fonctions**. Le pitch 2 demande une **tranche verticale qui fonctionne de bout en bout**, pas toutes les fonctions à moitié. Ordre de réalisation proposé, chaque lot devant être démontrable seul :
+La V1 contient **27 fonctions**. Le pitch 2 demande une **tranche verticale qui fonctionne de bout en bout**, pas toutes les fonctions à moitié. Ordre de réalisation proposé, chaque lot devant être démontrable seul :
 
 1. **Lot 1 – Le cœur** : comptes (F-01, F-02), logement, pièces, stockages, articles, recherche (F-05 à F-09, F-26). *Tranche verticale du pitch 2.*
 2. **Lot 2 – La photo** : ajout par photo (F-07 complet).
-3. **Lot 3 – La visibilité** : articles personnels, abonnés, non-inscrits (F-10, F-15, F-16, F-21).
+3. **Lot 3 – La visibilité** : articles personnels, abonnés, non-inscrits, filtre par catégorie (F-10, F-15, F-16, F-21, F-27).
 4. **Lot 4 – Les tenues** : composer, publier, partager (F-04, F-23 à F-25).
 5. **Lot 5 – Le social** : amis, commentaires, lien de partage (F-17 à F-20, F-22).
 6. **Lot 6 – La co-propriété** : co-propriétaires et compte mineur (F-11 à F-14), suppression de compte (F-03).

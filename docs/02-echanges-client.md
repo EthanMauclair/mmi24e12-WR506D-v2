@@ -6,7 +6,9 @@ Statuts : **À poser**, **Répondue**, **Partielle** (réponse incomplète ou am
 
 ## Questions ouvertes
 
-Aucune question bloquante en attente au 12/10/2026.
+| # | Question | Impact | Pourquoi c'est important | Statut |
+|---|---|---|---|---|
+| Q-21 | Une tenue contenant un article personnel est privée et « peut être mise publique » : l'article personnel devient-il alors visible **dans cette tenue uniquement** ? | Moyenne | Confirme l'interprétation H12. | À confirmer |
 
 ## Questions reportées
 
@@ -43,6 +45,9 @@ Aucune question bloquante en attente au 12/10/2026.
 | Q-18 | Contradiction : confidentialité par logement ou par compte ? | Retenu : **le compte** est privé ou public. | La confidentialité est un attribut du **compte**, pas du logement. Voir D-006. |
 | Q-19 | Peut-on partager par lien un article personnel ? Durée de validité ? | « Oui, 24 h. » | Lien vers **un article**, y compris personnel, valable **24 h**, ouvrable **une seule fois**. |
 | Q-11b | Suppression du compte adulte : le compte enfant suit ? | « Oui, tout suit avec. » | Supprimer le compte adulte supprime le compte enfant **et ses articles**. |
+| Q-20 | Plusieurs co-propriétaires restants : qui devient propriétaire ? Et un mineur ? | « C'est la personne qui est arrivée en premier. » Un mineur ne peut **en aucun cas** gérer un logement. | Transfert au **majeur arrivé en premier** ; s'il ne reste que des mineurs, le logement est supprimé. |
+| Q-12b | Supprimer son compte transfère-t-il automatiquement le logement ? | Non : il faut **léguer ou supprimer son logement avant** de pouvoir supprimer son compte. | Règle Q-12 confirmée. En V1, sans legs : supprimer le logement d'abord. |
+| — | « Catégorie » | Un filtre : « un abonné intéressé par les vinyles va sur le logement, filtre en mettant vinyle et voit tous les vinyles du logement. » Catégorie et famille : « c'est pareil, c'est ça qui va aider pour faire des recherches ciblées. » | Nouvelle fonction F-27. Un seul champ « catégorie » (D-012). |
 
 ## Journal des échanges
 
@@ -54,3 +59,4 @@ Aucune question bloquante en attente au 12/10/2026.
 | 12/10/2026 | Échange client | Q-02 à Q-08, Q-14, Q-15, N-01 | Partage par logement uniquement, vente intégrée, lien à usage unique, profil |
 | 12/10/2026 | Échange client | Q-03b, Q-05b, Q-08b, Q-16 | Générateur en V2, lien par article, contradiction Q-18 relevée |
 | 12/10/2026 | Échange client | Q-11b, Q-14b, Q-17, Q-18, Q-19 | Confidentialité par compte, vente en V2, lien de 24 h |
+| 12/10/2026 | Échange client | Q-20, Q-12b, catégorie | Premier majeur arrivé, catégorie = famille, filtre par catégorie |
