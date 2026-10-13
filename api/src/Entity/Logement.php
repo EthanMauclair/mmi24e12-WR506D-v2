@@ -131,6 +131,41 @@ class Logement
         return $successeur->getUtilisateur();
     }
 
+    /**
+     * F-11. Retirer un co-propriétaire, ou le quitter soi-même.
+     *
+     * Hypothèse H19 : refusé tant que la personne a des articles dans le logement,
+     * pour ne jamais supprimer d'articles sans le vouloir (I-11 interdit de les laisser).
+     */
+    public function retirerMembre(Membre $membre, Utilisateur $parQui, \DateTimeImmutable $maintenant): void
+    {
+        if ($membre->getLogement() !== $this) {
+            throw new \InvalidArgumentException('Ce membre n\'appartient pas à ce logement.');
+        }
+        if ($membre->estProprietaire()) {
+            throw new RegleMetierException('A-15', 'Le propriétaire ne quitte son logement qu\'en le supprimant.');
+        }
+        if ($membre->getUtilisateur() !== $parQui && !$this->estMembreMajeur($parQui, $maintenant)) {
+            throw new RegleMetierException('A-10', 'Seuls le propriétaire et les co-propriétaires majeurs retirent un membre.');
+        }
+        if ($this->compterArticlesDe($membre->getUtilisateur()) > 0) {
+            throw new RegleMetierException('H19', 'Cette personne a encore des articles dans le logement.');
+        }
+
+        $this->membres->removeElement($membre);
+    }
+
+    /** Une pièce ne se supprime que vide : un article est toujours rangé (I-10). */
+    public function retirerPiece(Piece $piece): void
+    {
+        foreach ($piece->getStockages() as $stockage) {
+            if (!$stockage->getArticles()->isEmpty()) {
+                throw new RegleMetierException('I-10', 'Videz d\'abord les rangements de cette pièce.');
+            }
+        }
+        $this->pieces->removeElement($piece);
+    }
+
     public function ajouterPiece(string $nom): Piece
     {
         $piece = new Piece($this, $nom);
@@ -158,6 +193,22 @@ class Logement
     public function estMembreMajeur(Utilisateur $utilisateur, \DateTimeImmutable $aujourdhui): bool
     {
         return $this->estMembreAccepte($utilisateur) && !$utilisateur->estMineur($aujourdhui);
+    }
+
+    public function compterArticlesDe(Utilisateur $auteur): int
+    {
+        $total = 0;
+        foreach ($this->pieces as $piece) {
+            foreach ($piece->getStockages() as $stockage) {
+                foreach ($stockage->getArticles() as $article) {
+                    if ($article->getAuteur() === $auteur) {
+                        ++$total;
+                    }
+                }
+            }
+        }
+
+        return $total;
     }
 
     public function getProprietaire(): Utilisateur

@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Membre;
 use App\Entity\Utilisateur;
 use App\Enum\RoleMembre;
+use App\Enum\StatutMembre;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,5 +33,26 @@ class MembreRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /** @return list<Membre> mes adhésions acceptées, avec leur logement */
+    public function adhesionsAcceptees(Utilisateur $utilisateur): array
+    {
+        return $this->createQueryBuilder('m')
+            ->addSelect('l')
+            ->join('m.logement', 'l')
+            ->where('m.utilisateur = :utilisateur')
+            ->andWhere('m.statut = :statut')
+            ->setParameter('utilisateur', $utilisateur)
+            ->setParameter('statut', StatutMembre::Accepte)
+            ->orderBy('l.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return list<Membre> */
+    public function invitationsEnAttente(Utilisateur $utilisateur): array
+    {
+        return $this->findBy(['utilisateur' => $utilisateur, 'statut' => StatutMembre::Invite]);
     }
 }

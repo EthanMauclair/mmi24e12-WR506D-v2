@@ -37,7 +37,7 @@ abstract class ApiTestCase extends WebTestCase
 
         $outil = new SchemaTool($this->em);
         $metadonnees = $this->em->getMetadataFactory()->getAllMetadata();
-        $outil->dropSchema($metadonnees);
+        $outil->dropDatabase();
         $outil->createSchema($metadonnees);
     }
 

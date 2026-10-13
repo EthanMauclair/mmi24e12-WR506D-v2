@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Exception\RegleMetierException;
 use App\Repository\PieceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -51,6 +52,15 @@ class Piece
         $this->stockages->add($stockage);
 
         return $stockage;
+    }
+
+    /** Un rangement ne se supprime que vide (I-10). */
+    public function retirerStockage(Stockage $stockage): void
+    {
+        if (!$stockage->getArticles()->isEmpty()) {
+            throw new RegleMetierException('I-10', 'Ce rangement contient encore des articles.');
+        }
+        $this->stockages->removeElement($stockage);
     }
 
     public function getId(): ?int
