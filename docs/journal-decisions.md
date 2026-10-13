@@ -231,3 +231,20 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Contraintes de validation seules : elles ne couvrent pas les règles qui portent sur plusieurs objets (ex. I-11).
 - **Hypothèse ajoutée** : H18, un mineur ne rejoint que le logement de son référent.
 - **IA** : l'assistant a écrit les entités et les tests ; j'ai validé le choix d'entités riches et l'hypothèse H18. Tests exécutés sous PHP 8.4 : 20 tests, 43 assertions.
+
+## D-019 – API Platform avec des ressources dédiées (DTO)
+
+- **Date** : 13/10/2026
+- **Statut** : Validée (précise D-015)
+- **Contexte** : nos entités n'ont pas de setters (D-018), alors qu'API Platform modifie par défaut les entités champ par champ.
+- **Décision** : les ressources de l'API sont des **classes dédiées** (`src/ApiResource/`), distinctes des entités :
+  - un **provider** (`src/State/*Provider`) charge les données et applique les droits ;
+  - un **processor** (`src/State/*Processor`) exécute l'action en appelant les méthodes métier des entités ;
+  - un **voter** (`LogementVoter`) porte les règles A-01 à A-11, un service (`AccesLogement`) applique la règle 404 / 403 (D-014) ;
+  - les ressources listent leurs champs un par un, et les corps de requête refusent tout champ non prévu (A-15).
+- **Codes de réponse** : 401 sans connexion, 404 pour une ressource qu'on ne voit pas, 403 pour une action interdite sur une ressource visible, 409 pour un invariant violé.
+- **Alternatives écartées** :
+  - Contrôleurs Symfony classiques (comme l'authentification) : plus simples, mais pas de documentation `/api/docs` générée.
+  - Exposer directement les entités : impossible sans setters, et risque d'exposer des champs internes (défaut n°5 de la séance 8-9).
+- **Hypothèse ajoutée** : H19, on ne retire pas un co-propriétaire qui a encore des articles.
+- **IA** : l'assistant a proposé les contrôleurs ; j'ai choisi API Platform pour rester fidèle à D-015. 51 tests, dont les tests de sécurité S-01, S-04, S-05, S-07 et S-08.
