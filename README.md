@@ -18,6 +18,7 @@ Projet réalisé dans le cadre du module **WR506D – Développement back avanc�
 | [Parcours utilisateurs](docs/04-parcours-utilisateurs.md) | Les principaux parcours de la V1, du point de vue de la personne |
 | [Modèle de données](docs/05-modele-donnees.md) | Entités, schéma, invariants, règle de visibilité |
 | [Modèle d'autorisation](docs/06-modele-autorisation.md) | Qui voit quoi, qui modifie quoi, tests de sécurité |
+| [Choix techniques](docs/07-choix-techniques.md) | Symfony, front, base de données, stockage, IA : chaque choix justifié |
 | [Journal de décisions](docs/journal-decisions.md) | Chaque décision, ses alternatives et la part de l'assistant IA |
 
 ## Organisation Git

@@ -173,3 +173,18 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Une ressource non autorisée répond **404** plutôt que 403, pour ne pas confirmer son existence.
 - **Point de vigilance assumé** : une tenue privée contenant un article personnel est visible par les **amis** ; ils voient donc cet article dans la tenue. C'est cohérent avec Q-21, mais à rappeler à la cliente.
 - **IA** : l'assistant a pré-rempli uniquement les cases déjà tranchées par le client et m'a laissé les autres, conformément à la consigne de la séance (« aucune case vide, sinon c'est l'assistant qui décide »). Il a proposé la liste des tests S-01 à S-13.
+
+## D-015 – Choix techniques
+
+- **Date** : 13/10/2026
+- **Statut** : Validée (à présenter au pitch 1)
+- **Décisions** : détail et justifications dans [07-choix-techniques.md](07-choix-techniques.md).
+  - **Symfony 7.4 LTS** et PHP 8.4 : maintenue jusqu'en 2028-2029, alors que 8.1 s'arrête en janvier 2027, pendant le module.
+  - **Front découplé en Nuxt** : une seule porte d'entrée (l'API) à sécuriser, interface riche sur mobile, rendu serveur pour les pages publiques et les aperçus de liens.
+  - **API Platform**, avec des groupes de sérialisation explicites.
+  - **JWT** en cookie httpOnly.
+  - **MySQL** : I-05 garanti par le code, une transaction et un test, faute d'index partiel.
+  - **Flysystem** : disque en V1, S3 ensuite ; photos servies par l'API, jamais en accès direct.
+  - **OpenRouter** pour la reconnaissance, avec catégorie imposée dans la liste fixe.
+  - **Un seul dépôt** contenant `api/` et `front/`.
+- **IA** : l'assistant a présenté les options et leurs conséquences, et vérifié les dates de maintenance de Symfony au 13/10/2026. Les choix sont les miens ; j'ai retenu MySQL contre sa recommandation (PostgreSQL), en assumant la limite sur I-05.
