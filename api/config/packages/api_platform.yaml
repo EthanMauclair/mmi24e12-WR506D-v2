@@ -2,7 +2,16 @@ api_platform:
     title: PENDERIE – API
     description: Contrat de référence dans docs/api/openapi.yaml
     version: 1.0.0
+    # Le contrat d'API impose du JSON simple (D-016) ; JSON-LD reste disponible sur demande.
+    formats:
+        json: ['application/json']
+        jsonld: ['application/ld+json']
+    patch_formats:
+        json: ['application/merge-patch+json', 'application/json']
     defaults:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+        # A-15 : un champ non prévu dans le corps d'une requête est refusé (ChampNonPrevuListener).
+        denormalization_context:
+            allow_extra_attributes: false
