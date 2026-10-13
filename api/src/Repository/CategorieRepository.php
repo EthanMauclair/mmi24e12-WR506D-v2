@@ -18,6 +18,12 @@ class CategorieRepository extends ServiceEntityRepository
         parent::__construct($registry, Categorie::class);
     }
 
+    /** @return list<Categorie> */
+    public function parNom(): array
+    {
+        return $this->findBy([], ['nom' => 'ASC']);
+    }
+
     /**
      * La comparaison suit l'interclassement MySQL (utf8mb4_0900_ai_ci) : sans casse ni accents,
      * donc « vinyle » ou « VINYLE » retrouvent « Vinyle ».
