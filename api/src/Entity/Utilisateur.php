@@ -139,6 +139,11 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return true;
     }
 
+    public function changerEmail(string $email): void
+    {
+        $this->email = mb_strtolower($email);
+    }
+
     public function definirMotDePasseHache(string $motDePasseHache): void
     {
         $this->motDePasse = $motDePasseHache;
