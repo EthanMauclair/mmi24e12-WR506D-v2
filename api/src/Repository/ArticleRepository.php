@@ -8,6 +8,7 @@ use App\Entity\Article;
 use App\Entity\Utilisateur;
 use App\Enum\StatutMembre;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -38,19 +39,10 @@ class ArticleRepository extends ServiceEntityRepository
         ?string $marque = null,
         int $page = 1,
     ): array {
-        $requete = $this->createQueryBuilder('a')
-            ->addSelect('s', 'p', 'l', 'c')
-            ->join('a.stockage', 's')
-            ->join('s.piece', 'p')
-            ->join('p.logement', 'l')
-            ->join('a.categorie', 'c')
+        $requete = $this->requetePaginee($page)
             ->join('l.membres', 'm', 'WITH', 'm.utilisateur = :moi AND m.statut = :accepte')
             ->setParameter('moi', $moi)
-            ->setParameter('accepte', StatutMembre::Accepte)
-            ->orderBy('a.creeLe', 'DESC')
-            ->addOrderBy('a.id', 'DESC')
-            ->setFirstResult(($page - 1) * self::PAR_PAGE)
-            ->setMaxResults(self::PAR_PAGE);
+            ->setParameter('accepte', StatutMembre::Accepte);
 
         if (null !== $texte) {
             $requete->andWhere('a.marque LIKE :texte OR a.couleur LIKE :texte OR a.note LIKE :texte')
@@ -72,10 +64,48 @@ class ArticleRepository extends ServiceEntityRepository
         return $requete->getQuery()->getResult();
     }
 
+    /**
+     * F-21, F-27 : les articles non personnels dont cette personne est l'auteur, les plus récents d'abord.
+     * La décision de montrer ou non ces articles (compte public ou privé) revient à l'appelant.
+     *
+     * @return list<Article>
+     */
+    public function visiblesDe(Utilisateur $auteur, ?int $logement = null, ?int $categorie = null, int $page = 1): array
+    {
+        $requete = $this->requetePaginee($page)
+            ->andWhere('a.auteur = :auteur')
+            ->andWhere('a.estPersonnel = false')
+            ->setParameter('auteur', $auteur);
+
+        if (null !== $logement) {
+            $requete->andWhere('l.id = :logement')->setParameter('logement', $logement);
+        }
+        if (null !== $categorie) {
+            $requete->andWhere('c.id = :categorie')->setParameter('categorie', $categorie);
+        }
+
+        return $requete->getQuery()->getResult();
+    }
+
     /** Une photo ne sert qu'à un seul article. */
     public function photoDejaUtilisee(string $photo): bool
     {
         return null !== $this->findOneBy(['photo' => $photo]);
+    }
+
+    /** Article, emplacement et catégorie chargés en une requête ; 30 par page. */
+    private function requetePaginee(int $page): QueryBuilder
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('s', 'p', 'l', 'c')
+            ->join('a.stockage', 's')
+            ->join('s.piece', 'p')
+            ->join('p.logement', 'l')
+            ->join('a.categorie', 'c')
+            ->orderBy('a.creeLe', 'DESC')
+            ->addOrderBy('a.id', 'DESC')
+            ->setFirstResult(($page - 1) * self::PAR_PAGE)
+            ->setMaxResults(self::PAR_PAGE);
     }
 
     private static function contient(string $texte): string

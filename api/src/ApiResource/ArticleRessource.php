@@ -9,11 +9,13 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Dto\ArticleEntree;
 use App\Dto\ArticleModification;
 use App\Entity\Article;
+use App\Entity\Utilisateur;
 use App\State\ArticleProcessor;
 use App\State\ArticleProvider;
 
@@ -29,6 +31,12 @@ use App\State\ArticleProvider;
     shortName: 'Article',
     operations: [
         new GetCollection(uriTemplate: '/articles', provider: ArticleProvider::class),
+        new GetCollection(
+            uriTemplate: '/utilisateurs/{pseudo}/articles',
+            uriVariables: ['pseudo' => new Link(fromClass: Utilisateur::class, identifiers: ['pseudo'])],
+            provider: ArticleProvider::class,
+            name: 'articles_d_un_utilisateur',
+        ),
         new Post(uriTemplate: '/articles', input: ArticleEntree::class, processor: ArticleProcessor::class),
         new Get(uriTemplate: '/articles/{id}', provider: ArticleProvider::class),
         new Patch(uriTemplate: '/articles/{id}', input: ArticleModification::class, provider: ArticleProvider::class, processor: ArticleProcessor::class),
