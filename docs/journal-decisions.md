@@ -90,3 +90,17 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Inclure le journal des prêts : hors priorités, ne débloque rien.
 - **Risque assumé** : V1 large (25 fonctions). Parade : réalisation par lots démontrables, le lot 1 sert de tranche verticale au pitch 2.
 - **IA** : l'assistant a proposé de reporter les pastilles en V2 (recommandation suivie) et l'ordre des lots. Le choix des fonctions incluses est le mien.
+
+## D-009 – Recherche d'article en V1, filtres de tenue en V2
+
+- **Date** : 12/10/2026
+- **Statut** : Validée
+- **Contexte** : en préparant les parcours, deux points sont apparus :
+  1. Le problème de la cliente est de **retrouver** ses articles (CR § 2), mais le périmètre ne contenait aucune fonction de recherche.
+  2. J'ai d'abord voulu composer les tenues avec des **filtres enregistrés** (« travail »…), ce qui contredisait D-005 : les filtres font partie du générateur, placé en V2.
+- **Décision** :
+  1. Ajout de **F-26 – Rechercher un article et voir où il est rangé**.
+  2. En V1, une tenue se compose par **sélection libre avec un tri par famille**. Les filtres enregistrés arrivent en V2 avec le générateur.
+- **Alternatives écartées** :
+  - Filtres enregistrés en V1 : utiles sans le générateur, mais ajoutent une fonction à une V1 déjà large.
+- **IA** : l'assistant a relevé l'absence de recherche et la contradiction avec D-005. J'ai choisi de garder les filtres en V2.

@@ -28,6 +28,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 | F-08 | Ajouter un **bloc-notes** à un article | CR § 6 |
 | F-09 | Modifier, déplacer et supprimer un article | CR § 5 |
 | F-10 | Marquer un article comme **personnel** | CR § 5 |
+| F-26 | **Rechercher un article** (par famille, marque, couleur, mot du bloc-notes) et voir **où il est rangé** (logement > pièce > stockage) | CR § 2 : le problème à résoudre |
 
 ### Co-propriété
 | # | Fonction | Source |
@@ -52,7 +53,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 ### Tenues
 | # | Fonction | Source |
 |---|---|---|
-| F-23 | **Composer une tenue à la main** à partir de ses propres articles | D-005 |
+| F-23 | **Composer une tenue à la main** en sélectionnant librement ses propres articles, avec un tri par famille | D-005, D-009 |
 | F-24 | **Publier** la tenue sur son profil | Q-07 |
 | F-25 | **Partager** l'image de la tenue sur Instagram, **sans pastilles** | Q-01 (voir E-03) |
 
@@ -67,7 +68,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 
 | # | Exclusion | Raison | Quand |
 |---|---|---|---|
-| E-01 | **Générateur de tenue** (filtres personnalisés, météo, changement de lieu) | Placé en V2 par la cliente (Q-16). | V2 |
+| E-01 | **Générateur de tenue** (filtres personnalisés enregistrés, météo, changement de lieu) | Placé en V2 par la cliente (Q-16). Les filtres enregistrés arrivent avec lui (D-009). | V2 |
 | E-02 | **Vente** (mise en vente, paiement, espace de vente) | Placée en V2 par la cliente (Q-17). Implique un prestataire de paiement, des obligations légales et la gestion des litiges (D-007). | V2 |
 | E-03 | **Pastilles** sur la tenue partagée | La cliente n'a pas tranché leur destination ni le cas d'un article personnel ou d'un compte privé (R-02). Les concevoir maintenant, c'est décider à sa place. | Quand la cliente aura tranché |
 | E-04 | **Léguer un logement** | Hors des trois priorités. En V1, on peut supprimer son compte après avoir supprimé ses logements : la règle du client (« léguer ou supprimer avant ») reste respectée, avec une seule des deux options. | V2 |
@@ -93,9 +94,9 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 
 ## 4. Point de vigilance : la taille de la V1
 
-La V1 contient **25 fonctions**. Le pitch 2 demande une **tranche verticale qui fonctionne de bout en bout**, pas toutes les fonctions à moitié. Ordre de réalisation proposé, chaque lot devant être démontrable seul :
+La V1 contient **26 fonctions**. Le pitch 2 demande une **tranche verticale qui fonctionne de bout en bout**, pas toutes les fonctions à moitié. Ordre de réalisation proposé, chaque lot devant être démontrable seul :
 
-1. **Lot 1 – Le cœur** : comptes (F-01, F-02), logement, pièces, stockages, articles (F-05 à F-09). *Tranche verticale du pitch 2.*
+1. **Lot 1 – Le cœur** : comptes (F-01, F-02), logement, pièces, stockages, articles, recherche (F-05 à F-09, F-26). *Tranche verticale du pitch 2.*
 2. **Lot 2 – La photo** : ajout par photo (F-07 complet).
 3. **Lot 3 – La visibilité** : articles personnels, abonnés, non-inscrits (F-10, F-15, F-16, F-21).
 4. **Lot 4 – Les tenues** : composer, publier, partager (F-04, F-23 à F-25).
