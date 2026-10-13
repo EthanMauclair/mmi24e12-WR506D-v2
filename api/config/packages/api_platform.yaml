@@ -1,5 +1,6 @@
 api_platform:
-    title: Hello API Platform
+    title: PENDERIE – API
+    description: Contrat de référence dans docs/api/openapi.yaml
     version: 1.0.0
     defaults:
         stateless: true

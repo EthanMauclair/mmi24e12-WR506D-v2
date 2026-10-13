@@ -2,3 +2,25 @@ lexik_jwt_authentication:
     secret_key: '%env(resolve:JWT_SECRET_KEY)%'
     public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
     pass_phrase: '%env(JWT_PASSPHRASE)%'
+    token_ttl: 3600
+
+    # Le jeton est lu dans le cookie (front Nuxt) ou dans l'en-tête Authorization (Postman).
+    token_extractors:
+        authorization_header:
+            enabled: true
+            prefix: Bearer
+            name: Authorization
+        cookie:
+            enabled: true
+            name: BEARER
+
+    # D-015 : le jeton est posé dans un cookie httpOnly, illisible par un script injecté.
+    set_cookies:
+        BEARER:
+            samesite: lax
+            httpOnly: true
+            secure: true
+            path: /
+
+    # Le jeton reste aussi dans la réponse, pour Postman (renommé « jeton », voir JetonConnexionListener).
+    remove_token_from_body_when_cookies_used: false

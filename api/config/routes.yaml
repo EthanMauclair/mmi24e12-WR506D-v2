@@ -9,3 +9,9 @@
 
 controllers:
     resource: routing.controllers
+
+# POST /api/auth/connexion : traitée par le pare-feu « connexion » (json_login + LexikJWT),
+# la route n'existe que pour être reconnue par le routeur.
+auth_connexion:
+    path: /api/auth/connexion
+    methods: [POST]
