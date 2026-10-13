@@ -133,4 +133,33 @@ final class LogementTest extends TestCase
         self::assertSame([$articleDeLeo], array_values($armoire->getArticles()->toArray()));
         self::assertCount(1, $logement->getPieces(), 'Les pièces et les stockages restent.');
     }
+
+    #[Test]
+    public function a17_retirer_un_coproprietaire_supprime_ses_articles(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+        $membreLeo = $logement->inviter($this->leo, $this->camille, $this->aujourdhui);
+        $membreLeo->accepter($this->aujourdhui);
+        $armoire = $logement->ajouterPiece('Chambre')->ajouterStockage('Grande armoire');
+        $pull = new Categorie('Pull');
+        $articleDeCamille = Article::creer($this->camille, $armoire, $pull, 'photos/1.jpg', $this->aujourdhui);
+        Article::creer($this->leo, $armoire, $pull, 'photos/2.jpg', $this->aujourdhui);
+
+        $logement->retirerMembre($membreLeo, $this->camille);
+
+        self::assertNull($logement->membreDe($this->leo));
+        self::assertSame([$articleDeCamille], array_values($armoire->getArticles()->toArray()));
+    }
+
+    #[Test]
+    public function a17_un_coproprietaire_ne_retire_pas_un_autre_coproprietaire(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+        $logement->inviter($this->leo, $this->camille, $this->aujourdhui)->accepter($this->aujourdhui);
+        $membreNina = $logement->inviter($this->nina, $this->camille, $this->aujourdhui);
+        $membreNina->accepter($this->aujourdhui);
+
+        $this->expectExceptionMessage('A-17');
+        $logement->retirerMembre($membreNina, $this->leo);
+    }
 }

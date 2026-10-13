@@ -77,6 +77,7 @@ Situation : Camille est propriétaire, son compte est **public**. Léo est co-pr
 | A-13 | Seul un **ami** de l'auteur commente. Il peut **modifier et supprimer ses propres** commentaires. |
 | A-14 | Propriétaire et co-propriétaires **majeurs** suppriment les commentaires sur le contenu de leur logement. Un mineur ne supprime pas de commentaire. |
 | A-15 | Personne ne modifie l'**auteur** d'un article, le **rôle** d'un membre ou le **propriétaire** d'un logement par une requête directe : ces champs ne changent que par les actions prévues (transfert D-011). |
+| A-17 | Seul le **propriétaire** retire un co-propriétaire (ou annule une invitation) ; un co-propriétaire peut **quitter** le logement de lui-même. Dans les deux cas, **ses articles sont supprimés** (Q-23). |
 
 ## 4. Les quatre situations de la séance 8-9
 

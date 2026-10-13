@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * - inviter : un membre majeur invite une personne par son pseudo (F-11, A-10, I-07, H18) ;
  * - accepter : seule la personne invitée accepte son invitation (H13) ;
- * - DELETE : retirer un co-propriétaire, ou quitter le logement (H19).
+ * - DELETE : le propriétaire retire un co-propriétaire, ou on quitte le logement ; ses articles sont supprimés (A-17).
  *
  * @implements ProcessorInterface<InvitationEntree|MembreRessource|null, MembreRessource|null>
  */
@@ -54,7 +54,7 @@ final class MembreProcessor implements ProcessorInterface
         $membre = $this->membres->membreVisible($uriVariables['id']);
 
         if ($operation instanceof DeleteOperationInterface) {
-            $membre->getLogement()->retirerMembre($membre, $moi, $maintenant);
+            $membre->getLogement()->retirerMembre($membre, $moi);
             $this->em->flush();
 
             return null;

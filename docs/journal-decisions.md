@@ -246,5 +246,14 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Alternatives écartées** :
   - Contrôleurs Symfony classiques (comme l'authentification) : plus simples, mais pas de documentation `/api/docs` générée.
   - Exposer directement les entités : impossible sans setters, et risque d'exposer des champs internes (défaut n°5 de la séance 8-9).
-- **Hypothèse ajoutée** : H19, on ne retire pas un co-propriétaire qui a encore des articles.
+- **Hypothèse ajoutée** : H19, on ne retire pas un co-propriétaire qui a encore des articles. **Remplacée par D-020** après réponse de la cliente.
 - **IA** : l'assistant a proposé les contrôleurs ; j'ai choisi API Platform pour rester fidèle à D-015. 51 tests, dont les tests de sécurité S-01, S-04, S-05, S-07 et S-08.
+
+## D-020 – Retrait d'un co-propriétaire
+
+- **Date** : 13/10/2026
+- **Statut** : Validée
+- **Contexte** : hypothèse H19 soumise à la cliente (Q-23).
+- **Décision** : seul le **propriétaire** retire un co-propriétaire ; un co-propriétaire peut **partir** de lui-même. Dans les deux cas, **ses articles sont supprimés** (A-17). Les autres co-propriétaires majeurs ne retirent plus personne.
+- **Conséquence** : action irréversible ; le front devra demander une confirmation explicite en indiquant le nombre d'articles supprimés.
+- **IA** : l'assistant avait proposé de refuser le retrait (H19) ; la règle vient de la cliente.

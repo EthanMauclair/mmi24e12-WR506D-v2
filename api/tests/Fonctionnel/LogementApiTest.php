@@ -209,20 +209,46 @@ final class LogementApiTest extends ApiTestCase
     }
 
     #[Test]
-    public function h19_on_ne_retire_pas_un_membre_qui_a_des_articles_mais_on_peut_quitter_sinon(): void
+    public function a17_seul_le_proprietaire_retire_un_coproprietaire_et_ses_articles_partent_avec_lui(): void
     {
         $armoire = $this->appartement->getPieces()->first()->getStockages()->first();
         $pull = new Categorie('Pull');
         $this->em->persist($pull);
         $this->em->persist(Article::creer($this->jules, $armoire, $pull, 'photos/1.jpg', new \DateTimeImmutable()));
+        $this->em->persist(Article::creer($this->camille, $armoire, $pull, 'photos/2.jpg', new \DateTimeImmutable()));
         $this->em->flush();
-
         $membreJules = $this->appartement->membreDe($this->jules)->getId();
-        $this->json('DELETE', '/api/membres/'.$membreJules, null, $this->jetonDe($this->camille));
-        self::assertResponseStatusCodeSame(409);
 
+        $this->json('DELETE', '/api/membres/'.$membreJules, null, $this->jetonDe($this->leo));
+        self::assertResponseStatusCodeSame(403, 'Léo, co-propriétaire, ne retire personne.');
+
+        $this->json('DELETE', '/api/membres/'.$membreJules, null, $this->jetonDe($this->camille));
+        self::assertResponseStatusCodeSame(204);
+
+        $this->em->clear();
+        $articles = $this->em->getRepository(Article::class)->findAll();
+        self::assertCount(1, $articles, 'Seul l\'article de Camille reste.');
+        self::assertSame('camille', $articles[0]->getAuteur()->getPseudo());
+    }
+
+    #[Test]
+    public function a17_un_coproprietaire_quitte_le_logement_de_lui_meme(): void
+    {
         $membreLeo = $this->appartement->membreDe($this->leo)->getId();
+
         $this->json('DELETE', '/api/membres/'.$membreLeo, null, $this->jetonDe($this->leo));
-        self::assertResponseStatusCodeSame(204, 'Léo quitte le logement.');
+        self::assertResponseStatusCodeSame(204);
+
+        $this->json('GET', '/api/logements/'.$this->appartement->getId(), null, $this->jetonDe($this->leo));
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    #[Test]
+    public function a15_le_proprietaire_ne_se_retire_pas_lui_meme(): void
+    {
+        $membreCamille = $this->appartement->membreDe($this->camille)->getId();
+
+        $this->json('DELETE', '/api/membres/'.$membreCamille, null, $this->jetonDe($this->camille));
+        self::assertResponseStatusCodeSame(403);
     }
 }
