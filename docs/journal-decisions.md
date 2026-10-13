@@ -157,3 +157,19 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Clé `proprietaire` sur Logement plus une table de co-propriétaires : un transfert de propriété toucherait deux tables.
   - Deux tables Abonné et Ami : rétrograder un ami imposerait de supprimer puis recréer une ligne.
 - **IA** : l'assistant a proposé la structure et les invariants ; les quatre arbitrages ci-dessus sont les miens.
+
+## D-014 – Modèle d'autorisation
+
+- **Date** : 13/10/2026
+- **Statut** : Validée (à présenter au pitch 1)
+- **Contexte** : exercice « Qui a le droit de voir ? » (séance 8-9). Détail dans [06-modele-autorisation.md](06-modele-autorisation.md).
+- **Décisions** (mes arbitrages sur les cases non tranchées par le client) :
+  - Tout est **interdit par défaut** ; chaque droit est une exception écrite.
+  - Le **co-propriétaire mineur** ne renomme pas le logement et ne modifie **que ses propres articles** ; il voit ceux des autres, personnels compris.
+  - Une **tenue appartient à une personne**, pas au logement : seuls son auteur la modifie. Les co-propriétaires voient ses tenues, y compris privées, sans pouvoir les modifier.
+  - Une **tenue privée** est visible par l'auteur, ses **amis** et les membres d'un logement partagé ; jamais par les abonnés.
+  - Un **ami** modifie et supprime ses propres commentaires. Un **mineur** ne supprime pas de commentaire. Un **non-inscrit** voit les commentaires d'un compte public.
+  - Un **article personnel** dans une tenue visible est montré **dans la tenue uniquement** (Q-21).
+  - Une ressource non autorisée répond **404** plutôt que 403, pour ne pas confirmer son existence.
+- **Point de vigilance assumé** : une tenue privée contenant un article personnel est visible par les **amis** ; ils voient donc cet article dans la tenue. C'est cohérent avec Q-21, mais à rappeler à la cliente.
+- **IA** : l'assistant a pré-rempli uniquement les cases déjà tranchées par le client et m'a laissé les autres, conformément à la consigne de la séance (« aucune case vide, sinon c'est l'assistant qui décide »). Il a proposé la liste des tests S-01 à S-13.
