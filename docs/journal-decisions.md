@@ -269,3 +269,17 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Les doublons sont refusés sans tenir compte de la casse ni des accents (« vinyle », « Echarpe ») : l'interclassement MySQL `utf8mb4_0900_ai_ci` et l'index unique sur `nom` le garantissent.
 - **Alternatives écartées** : deux niveaux (famille > catégorie), déjà écartés par D-012 ; une route d'administration, inutile en V1 (docs/08-contrat-api.md).
 - **IA** : l'assistant a proposé la liste ; elle reste à valider avec la cliente.
+
+## D-022 – Articles : photo, formes de réponse et droits
+
+- **Date** : 13/10/2026
+- **Statut** : Validée
+- **Contexte** : mise en œuvre de `POST /api/reconnaissances` et de `/api/articles` (F-07 à F-10, F-26).
+- **Décisions** :
+  - **Photo** : réduite à 1 600 px, redressée, réencodée en JPG (ce qui supprime les métadonnées, dont la position GPS), rangée sous `photos/{id de l'auteur}/`. Elle ne sert qu'à celui qui l'a envoyée et qu'à un seul article. Formats acceptés : **JPG, PNG, WebP**. Le **HEIC** est retiré du contrat : l'extension GD ne le lit pas, et les navigateurs des iPhone envoient en général un JPG.
+  - **Proposition vide** tant qu'OpenRouter n'est pas branché : le contrat prévoit déjà ce cas (saisie à la main).
+  - **Une seule ressource** pour les deux vues : les champs réservés aux membres (note, `estPersonnel`, emplacement, date) restent nuls pour un visiteur et API Platform omet les valeurs nulles. Conséquence : une marque ou une couleur vide est aussi omise dans la vue membre.
+  - **S-13** : créer ou déplacer un article vers un rangement d'un logement dont on n'est pas membre répond **403**, que le rangement existe ou non, pour ne rien révéler.
+  - **Droits d'écriture** : on applique A-10 et A-11 (un membre majeur modifie et supprime tous les articles du logement, un mineur seulement les siens), plutôt que la phrase du modèle de données qui réserve la visibilité et la suppression à l'auteur (H17). H17 sert à savoir quels articles supprimer quand un membre part (D-011, D-020).
+  - **Visiteurs** : en attendant les relations, un non-membre voit un article non personnel si le compte de son auteur est public (A-03 sans abonnés ni amis).
+- **IA** : l'assistant a proposé ces choix pendant l'implémentation ; le point H17 / A-10 reste à confirmer avec la cliente si besoin.
