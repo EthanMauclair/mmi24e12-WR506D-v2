@@ -283,3 +283,19 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **Droits d'écriture** : on applique A-10 et A-11 (un membre majeur modifie et supprime tous les articles du logement, un mineur seulement les siens), plutôt que la phrase du modèle de données qui réserve la visibilité et la suppression à l'auteur (H17). H17 sert à savoir quels articles supprimer quand un membre part (D-011, D-020).
   - **Visiteurs** : en attendant les relations, un non-membre voit un article non personnel si le compte de son auteur est public (A-03 sans abonnés ni amis).
 - **IA** : l'assistant a proposé ces choix pendant l'implémentation ; le point H17 / A-10 reste à confirmer avec la cliente si besoin.
+
+## D-023 – Remplissage automatique par photo reporté après la V1
+
+- **Date** : 14/10/2026
+- **Statut** : Validée (à annoncer à la cliente)
+- **Contexte** : F-07 prévoit que la catégorie, la marque et la couleur soient remplies automatiquement à partir de la photo (docs/07-choix-techniques.md, § 7). Le branchement sur OpenRouter a été écrit et testé, mais l'essai réel avec le modèle gratuit `google/gemma-4-31b-it:free` a échoué : le fournisseur (Google AI Studio) renvoie « 429 temporarily rate-limited upstream » sur le quota partagé des modèles gratuits, indépendamment de notre compte.
+- **Décision** : en V1, l'ajout par photo s'arrête au **scan** : `POST /api/reconnaissances` enregistre la photo (réduite, redressée, sans métadonnées) et renvoie `proposition: null` ; l'utilisateur remplit catégorie, marque et couleur **à la main** avant `POST /api/articles`. Le contrat d'API ne change pas : le front gère déjà la proposition vide (P2).
+- **Alternatives écartées** :
+  - Garder le modèle gratuit : réponses aléatoires (429 fréquents), donc une fonction qui marche « parfois », difficile à démontrer.
+  - Changer de modèle gratuit ou ajouter une clé Google personnelle (BYOK) : possible, mais le résultat reste soumis aux quotas gratuits ; à réévaluer après la V1.
+  - Un modèle payant : coût à valider, hors du temps du lot 2.
+- **Conséquences** :
+  - F-07 est livrée **partiellement** en V1 (photo sans remplissage automatique) : à présenter à la cliente.
+  - Aucune photo n'est envoyée à un service tiers en V1 : rien à ajouter à la politique de confidentialité pour l'instant.
+  - Le travail est conservé sur la branche locale `feature/reconnaissance-ia` (service `ReconnaissanceArticles`, double de test `OpenRouterSimule`, 7 tests) : catégorie hors liste → « Autre », toute panne → proposition vide, clé dans `.env.local`.
+- **IA** : l'assistant a écrit le branchement et diagnostiqué l'erreur 429 ; j'ai décidé de reporter la fonction plutôt que de dépendre d'un quota gratuit.

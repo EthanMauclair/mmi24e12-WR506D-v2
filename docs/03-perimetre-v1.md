@@ -24,7 +24,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 |---|---|---|
 | F-05 | Créer, modifier et supprimer un **logement** (supprimer : propriétaire uniquement) | CR § 4-5 |
 | F-06 | Créer, modifier et supprimer des **pièces** et des **stockages** | CR § 4 |
-| F-07 | Ajouter un **article en le prenant en photo** : la **catégorie**, la marque et la couleur sont remplies automatiquement, et **corrigeables** | Q-01, CR § 6, H6 |
+| F-07 | Ajouter un **article en le prenant en photo** : la **catégorie**, la marque et la couleur sont remplies automatiquement, et **corrigeables**. **V1 : photo seule, saisie à la main ; remplissage automatique reporté (D-023)** | Q-01, CR § 6, H6 |
 | F-08 | Ajouter un **bloc-notes** à un article | CR § 6 |
 | F-09 | Modifier, déplacer et supprimer un article | CR § 5 |
 | F-10 | Marquer un article comme **personnel** | CR § 5 |
@@ -100,7 +100,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 La V1 contient **27 fonctions**. Le pitch 2 demande une **tranche verticale qui fonctionne de bout en bout**, pas toutes les fonctions à moitié. Ordre de réalisation proposé, chaque lot devant être démontrable seul :
 
 1. **Lot 1 – Le cœur** : comptes (F-01, F-02), logement, pièces, stockages, articles, recherche (F-05 à F-09, F-26). *Tranche verticale du pitch 2.*
-2. **Lot 2 – La photo** : ajout par photo (F-07 complet).
+2. **Lot 2 – La photo** : ajout par photo (F-07 ; remplissage automatique reporté après la V1, D-023).
 3. **Lot 3 – La visibilité** : articles personnels, abonnés, non-inscrits, filtre par catégorie (F-10, F-15, F-16, F-21, F-27).
 4. **Lot 4 – Les tenues** : composer, publier, partager (F-04, F-23 à F-25).
 5. **Lot 5 – Le social** : amis, commentaires, lien de partage (F-17 à F-20, F-22).
