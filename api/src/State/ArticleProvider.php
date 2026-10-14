@@ -10,6 +10,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ArticleRessource;
 use App\Entity\Utilisateur;
 use App\Repository\ArticleRepository;
+use App\Repository\RelationRepository;
 use App\Repository\UtilisateurRepository;
 use App\Security\AccesArticle;
 use App\Security\AccesLogement;
@@ -31,6 +32,7 @@ final class ArticleProvider implements ProviderInterface
         private readonly ArticleRepository $articles,
         private readonly Security $securite,
         private readonly UtilisateurRepository $utilisateurs,
+        private readonly RelationRepository $relations,
     ) {
     }
 
@@ -73,7 +75,7 @@ final class ArticleProvider implements ProviderInterface
     /**
      * Uniquement les articles dont cette personne est l'auteur (D-013), jamais les personnels (A-04),
      * toujours sous la forme publique (contrat : ArticlePublic). Compte privé : liste vide (S-04),
-     * sauf pour la personne elle-même. Les relations acceptées l'ouvriront avec le lot « relations ».
+     * sauf pour la personne elle-même et pour ses abonnés et amis acceptés (A-03).
      *
      * @param array<string, mixed> $filtres
      *
@@ -83,7 +85,9 @@ final class ArticleProvider implements ProviderInterface
     {
         $auteur = $this->utilisateurs->findOneBy(['pseudo' => $pseudo])
             ?? throw new NotFoundHttpException('Ressource introuvable.');
-        if ($auteur->estPrive() && $this->securite->getUser() !== $auteur) {
+        $moi = $this->securite->getUser();
+        if ($auteur->estPrive() && $moi !== $auteur
+            && !($moi instanceof Utilisateur && $this->relations->estAcceptee($moi, $auteur))) {
             return [];
         }
 

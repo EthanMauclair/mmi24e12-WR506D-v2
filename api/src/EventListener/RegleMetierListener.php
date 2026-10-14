@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 #[AsEventListener(event: KernelEvents::EXCEPTION)]
 final class RegleMetierListener
 {
-    private const CONFLITS = ['I-04', 'I-07', 'I-10'];
+    private const CONFLITS = ['I-04', 'I-07', 'I-10', 'I-17'];
     /** Règles qui interdisent une action à une catégorie de compte (ex. I-08 : un mineur ne crée pas de logement). */
     private const INTERDITS = ['I-08'];
 

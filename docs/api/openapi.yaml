@@ -323,6 +323,17 @@ paths:
   /api/relations/{id}:
     parameters:
       - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Relations]
+      summary: Lire une relation (D-024)
+      description: Visible par le suiveur et par la personne suivie uniquement (404 sinon).
+      responses:
+        '200':
+          description: La relation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Relation' }
+        '404': { $ref: '#/components/responses/Introuvable' }
     patch:
       tags: [Relations]
       summary: Accepter une demande, ou rétrograder un ami en abonné (F-16, F-18)
