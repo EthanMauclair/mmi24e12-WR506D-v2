@@ -299,3 +299,18 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Aucune photo n'est envoyée à un service tiers en V1 : rien à ajouter à la politique de confidentialité pour l'instant.
   - Le travail est conservé sur la branche locale `feature/reconnaissance-ia` (service `ReconnaissanceArticles`, double de test `OpenRouterSimule`, 7 tests) : catégorie hors liste → « Autre », toute panne → proposition vide, clé dans `.env.local`.
 - **IA** : l'assistant a écrit le branchement et diagnostiqué l'erreur 429 ; j'ai décidé de reporter la fonction plutôt que de dépendre d'un quota gratuit.
+
+## D-024 – Relations : abonnés et amis
+
+- **Date** : 14/10/2026
+- **Statut** : Validée (un point à confirmer avec la cliente)
+- **Contexte** : mise en œuvre de F-15 à F-18 (entité `Relation`, routes de docs/08-contrat-api.md § 4) et élargissement de A-03 aux relations acceptées.
+- **Décisions** :
+  - **Qui gère une relation** : seule la personne **suivie** accepte, rétrograde ou supprime par `/api/relations/{id}` ; le suiveur y reçoit un 403 et se désabonne par `DELETE /api/utilisateurs/{pseudo}/abonnement`. Une relation reste invisible (404) pour les autres comptes. `GET /api/relations/{id}` est ajouté au contrat pour la relire.
+  - **Ajouter un ami** (`POST /api/moi/amis`) : crée une relation AMI acceptée de cette personne vers moi, ou élève sa relation existante (abonné ou demande en attente, qui est alors acceptée). 409 si elle est déjà amie.
+  - **I-17 répond 409** : se suivre soi-même ou suivre deux fois la même personne.
+  - **Passer son compte en public** accepte les demandes encore en attente, pour rester cohérent avec I-18.
+  - **Commentaires (D-004)** : le choix « garder ou supprimer » (`supprimerCommentaires`) est déjà accepté par `PATCH` et `DELETE /api/relations/{id}` pour ne pas changer le contrat, mais reste **sans effet** jusqu'aux commentaires (lot 5, F-19, F-20), où il sera branché.
+  - **A-03** : un non-membre voit un article non personnel si le compte de son auteur est public **ou** s'il a une relation acceptée (abonné ou ami) avec cet auteur. Une demande en attente ne donne rien. On suit une personne, pas un logement (D-013).
+- **À confirmer** : un compte **mineur** gère lui-même ses demandes d'abonnement (comme Jules dans les tests). Faut-il que son référent les valide à sa place ?
+- **IA** : l'assistant a proposé ces choix pendant l'implémentation.
