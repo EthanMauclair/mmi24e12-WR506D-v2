@@ -30,3 +30,7 @@ when@test:
             class: Symfony\Component\HttpKernel\Log\Logger
             autowire: false
             arguments: ['critical']
+
+        # Réponses d'OpenRouter choisies par chaque test (framework.http_client.mock_response_factory).
+        App\Tests\Double\OpenRouterSimule:
+            public: true
