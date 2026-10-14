@@ -14,3 +14,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY php.ini /usr/local/etc/php/conf.d/zz-penderie.ini
 
 WORKDIR /var/www/api
+
+# Tout le conteneur tourne en www-data, l'utilisateur de PHP-FPM : les fichiers créés par la ligne
+# de commande (cache, photos des tests) restent ainsi modifiables par l'application.
+# Les volumes vendor/ et var/ (compose.yaml) héritent de ces droits à leur création.
+RUN mkdir -p vendor var && chown -R www-data:www-data /var/www/api
+ENV COMPOSER_HOME=/tmp/composer
+USER www-data
