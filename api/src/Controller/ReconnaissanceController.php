@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Utilisateur;
 use App\Service\PhotoArticles;
 use App\Service\PhotoRefuseeException;
+use App\Service\ReconnaissanceArticles;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,13 +19,13 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  * POST /api/reconnaissances (F-07, étape 1 du parcours P2) : la photo est enregistrée et son
  * identifiant renvoyé, à reprendre dans POST /api/articles.
  *
- * La proposition (catégorie, marque, couleur) viendra d'OpenRouter ; en attendant elle est vide,
- * ce que le contrat prévoit déjà quand la reconnaissance échoue : la saisie se fait à la main.
+ * La proposition (catégorie, marque, couleur) vient d'OpenRouter (D-023). Elle n'est pas
+ * enregistrée (H6) et reste vide si la reconnaissance échoue : la saisie se fait alors à la main.
  */
 final class ReconnaissanceController
 {
     #[Route('/api/reconnaissances', name: 'reconnaissance', methods: ['POST'])]
-    public function __invoke(#[CurrentUser] Utilisateur $moi, Request $requete, PhotoArticles $photos): JsonResponse
+    public function __invoke(#[CurrentUser] Utilisateur $moi, Request $requete, PhotoArticles $photos, ReconnaissanceArticles $reconnaissance): JsonResponse
     {
         $fichier = $requete->files->get('photo');
         if (!$fichier instanceof UploadedFile) {
@@ -44,7 +45,10 @@ final class ReconnaissanceController
             return $this->refus(Response::HTTP_UNPROCESSABLE_ENTITY, $exception->getMessage());
         }
 
-        return new JsonResponse(['photo' => $chemin, 'proposition' => null], Response::HTTP_CREATED);
+        return new JsonResponse(
+            ['photo' => $chemin, 'proposition' => $reconnaissance->proposer($photos->lire($chemin))],
+            Response::HTTP_CREATED,
+        );
     }
 
     private function refus(int $statut, string $detail): JsonResponse

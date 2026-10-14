@@ -5,6 +5,14 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    # Reconnaissance des photos (D-023) : délais courts, la saisie à la main prend le relais.
+    http_client:
+        scoped_clients:
+            openrouter.client:
+                base_uri: 'https://openrouter.ai/api/v1/'
+                timeout: 10
+                max_duration: 20
+
     #esi: true
     #fragments: true
 
@@ -13,3 +21,6 @@ when@test:
         test: true
         session:
             storage_factory_id: session.storage.factory.mock_file
+        # Aucun appel réel à OpenRouter pendant les tests.
+        http_client:
+            mock_response_factory: App\Tests\Double\OpenRouterSimule
