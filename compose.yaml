@@ -4,6 +4,9 @@
 services:
   php:
     build: ./docker/php
+    # Les photos sont écrites par PHP-FPM (utilisateur www-data), les tests par la ligne de commande (root) :
+    # le dossier de stockage est créé au démarrage et attribué à www-data, sinon le premier envoi échoue (500).
+    command: sh -c "mkdir -p var/storage/default var/storage/test && (chown -R www-data:www-data var/storage || true) && exec php-fpm"
     volumes:
       - ./api:/var/www/api
     environment:
