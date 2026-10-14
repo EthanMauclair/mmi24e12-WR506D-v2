@@ -1,0 +1,191 @@
+/*
+ * Styles communs de PENDERIE (docs/09-maquettes.md, « Choix visuels »).
+ * Mobile d'abord : les règles de base visent un téléphone, la mise en page desktop
+ * s'ajoute à partir de 1024 px.
+ */
+
+:root {
+  --bordeaux: #6e1a2b;
+  --bordeaux-fonce: #561421;
+  --bordeaux-clair: #f3e8ea;
+  --fond: #faf7f2;
+  --surface: #ffffff;
+  --texte: #1c1a19;
+  --texte-doux: #6b6461;
+  --bordure: #e4ddd5;
+  --erreur: #b3261e;
+  --succes: #2e6b3f;
+
+  --police-titre: 'Cormorant Garamond', Georgia, serif;
+  --police-texte: 'Manrope', system-ui, sans-serif;
+
+  --rayon: 12px;
+  --zone-tactile: 44px;
+  --largeur-menu: 260px;
+  --hauteur-barre: 72px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: var(--police-texte);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--police-titre);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0 0 0.5rem;
+}
+
+h1 {
+  font-size: 2.25rem;
+}
+
+h2 {
+  font-size: 1.6rem;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--bordeaux);
+}
+
+:focus-visible {
+  outline: 3px solid var(--bordeaux);
+  outline-offset: 2px;
+}
+
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Boutons ---------- */
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--zone-tactile);
+  padding: 0.6rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: 600 1rem var(--police-texte);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bouton-principal {
+  background: var(--bordeaux);
+  color: #fff;
+}
+
+.bouton-principal:hover {
+  background: var(--bordeaux-fonce);
+}
+
+.bouton-secondaire {
+  background: transparent;
+  border-color: var(--bordure);
+  color: var(--texte);
+}
+
+.bouton-secondaire:hover {
+  border-color: var(--bordeaux);
+}
+
+.bouton[disabled] {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.bouton-large {
+  width: 100%;
+}
+
+/* ---------- Formulaires ---------- */
+
+.formulaire {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.champ {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.champ label,
+.champ legend {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.champ input {
+  min-height: var(--zone-tactile);
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--texte);
+  font: inherit;
+}
+
+.champ input:focus {
+  border-color: var(--bordeaux);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--bordeaux-clair);
+}
+
+.champ input[aria-invalid='true'] {
+  border-color: var(--erreur);
+}
+
+.aide {
+  color: var(--texte-doux);
+  font-size: 0.85rem;
+}
+
+.message-champ {
+  color: var(--erreur);
+  font-size: 0.85rem;
+}
+
+.alerte {
+  padding: 0.75rem 1rem;
+  border-radius: var(--rayon);
+  background: #fbeaea;
+  color: var(--erreur);
+  font-size: 0.95rem;
+}
+
+.carte {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 1.25rem;
+}
