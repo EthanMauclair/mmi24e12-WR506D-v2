@@ -314,3 +314,21 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **A-03** : un non-membre voit un article non personnel si le compte de son auteur est public **ou** s'il a une relation acceptée (abonné ou ami) avec cet auteur. Une demande en attente ne donne rien. On suit une personne, pas un logement (D-013).
 - **À confirmer** : un compte **mineur** gère lui-même ses demandes d'abonnement (comme Jules dans les tests). Faut-il que son référent les valide à sa place ?
 - **IA** : l'assistant a proposé ces choix pendant l'implémentation.
+
+## D-025 – Front : session, accès aux pages et mise en page
+
+- **Date** : 14/10/2026
+- **Statut** : Validée
+- **Contexte** : premiers écrans du front Nuxt (écrans 1 et 2 des maquettes), branchés sur l'authentification de l'API (D-015).
+- **Décisions** :
+  - **Le front ne lit jamais le jeton.** Il reste dans le cookie httpOnly `BEARER`. Pour savoir qui est connecté, le front demande `GET /api/moi` ; un 401 veut dire « personne ». Le jeton renvoyé aussi dans la réponse de connexion (pour Postman) est ignoré.
+  - **Deux adresses pour l'API** : pendant le rendu serveur, Nuxt joint l'API par le réseau Docker (`http://nginx`) et recopie l'en-tête `Cookie` du navigateur ; dans le navigateur, il appelle `http://localhost:8080` avec `credentials: 'include'`. Le front (port 3000) et l'API (port 8080) sont sur le **même site** (`localhost`) : le cookie `SameSite=Lax` est donc bien envoyé.
+  - **Pages réservées par défaut**, comme l'API (D-014) : un middleware global renvoie vers la connexion, sauf pour les pages marquées `public` (profils publics, liens de partage, à venir) ou `invite` (connexion, inscription). Ce n'est qu'un confort : la protection reste l'API.
+  - **Retour après connexion** : la page demandée est passée dans `?retour=`, et seul un chemin interne est accepté, pour ne pas servir de redirection vers un autre site.
+  - **Connexion refusée** : un seul message (« identifiant ou mot de passe incorrect »), qui ne dit pas si le compte existe.
+  - **CSS écrit à la main**, sans bibliothèque de composants : six écrans, une couleur, deux polices ; une bibliothèque ajouterait du poids sans rien apporter.
+  - **Navigation complète dès maintenant** : les entrées qui arrivent avec les prochaines branches (recherche, logements, profil, ajout) sont affichées mais inactives, pour ne pas changer la mise en page à chaque étape.
+- **Conséquences** :
+  - Les messages de validation par défaut de Symfony (longueur, e-mail…) sont en anglais : le formulaire d'inscription vérifie donc les mêmes règles en français avant l'envoi. Traduire les messages de l'API reste à faire.
+  - Un jeton expiré dans le cookie fait répondre 401 à toutes les routes, même publiques, tant que le navigateur garde le cookie. Le cookie et le jeton ont la même durée (1 h), donc le cas reste rare ; il sera réglé avec `/api/auth/rafraichir`.
+- **IA** : l'assistant a proposé et écrit ces choix ; les essais ont été faits dans le navigateur (inscription, connexion, rendu serveur, déconnexion, mauvais mot de passe, mobile et desktop).
