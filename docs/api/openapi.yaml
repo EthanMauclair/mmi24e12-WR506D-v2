@@ -1145,7 +1145,7 @@ components:
       properties:
         photo: { type: string, description: Identifiant de la photo stockée, à renvoyer dans ArticleEntree }
         proposition:
-          description: Vide si la reconnaissance a échoué.
+          description: Vide si la reconnaissance a échoué ; toujours vide en V1 (D-023).
           oneOf:
             - type: object
               properties:

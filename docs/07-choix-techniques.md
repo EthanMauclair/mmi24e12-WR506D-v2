@@ -126,10 +126,12 @@ Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API
 
 **Précautions** : la clé d'API reste côté serveur, jamais dans le front ni dans le dépôt. Les photos envoyées à un service tiers devront être mentionnées dans la politique de confidentialité.
 
+**V1** (D-023) : le remplissage automatique est **reporté**. Le modèle gratuit essayé (`google/gemma-4-31b-it:free`) était saturé chez son fournisseur (erreur 429) : la photo est enregistrée et la saisie se fait à la main. Le branchement est conservé sur la branche `feature/reconnaissance-ia`.
+
 ## 8. Encore à décider
 
 | Sujet | Quand |
 |---|---|
 | Envoi d'e-mails (invitation d'un co-propriétaire, mot de passe oublié) : Symfony Mailer avec Mailpit en développement ; prestataire en production à choisir | Avant le lot 6 |
 | Hébergement de production | Avant le pitch 2 |
-| Modèle de vision précis sur OpenRouter (coût, qualité) | Pendant le lot 2 |
+| Remplissage automatique par photo : modèle OpenRouter fiable (payant, clé Google personnelle ou autre modèle gratuit), D-023 | Après la V1 |
