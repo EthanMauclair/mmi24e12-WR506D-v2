@@ -51,7 +51,7 @@ Depuis la racine du dépôt :
 # 1. Construire l'image PHP
 docker compose build php
 
-# 2. Installer les dépendances de l'API
+# 2. Installer les dépendances de l'API (dans le volume Docker api_vendor)
 docker compose run --rm --no-deps php composer install
 
 # 3. Créer le fichier des secrets locaux (jamais commité)
@@ -88,6 +88,16 @@ docker compose down                     # tout arrêter
 | MySQL (depuis la machine hôte) | `localhost:3307`, utilisateur `penderie` |
 
 Les mots de passe de `compose.yaml` ne servent qu'en développement local.
+
+### Dossiers gardés dans Docker
+
+`api/vendor/`, `api/var/` (cache, journaux de tests, photos) et `front/node_modules/` sont des **volumes Docker**, pas des dossiers du dépôt : sous Windows, le partage de fichiers rendait chaque requête de l'API 50 fois plus lente (plus de 10 s). Conséquences :
+
+- les dépendances s'installent toujours dans les conteneurs (`docker compose exec php composer …`, `docker compose exec front npm …`) ; les dossiers `vendor/` ou `node_modules/` éventuellement présents sur la machine ne sont pas utilisés ;
+- pour lire un fichier de `var/`, passer par le conteneur : `docker compose exec php cat var/phpunit.txt` ;
+- `docker compose down -v` supprime ces volumes (et la base) : il faut alors relancer `composer install`.
+
+Le conteneur PHP tourne avec l'utilisateur `www-data`, celui de PHP-FPM : les fichiers créés en ligne de commande restent modifiables par l'application.
 
 ### Tests
 
