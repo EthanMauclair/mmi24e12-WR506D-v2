@@ -8,6 +8,7 @@ use App\Dto\MonCompteModification;
 use App\Entity\Utilisateur;
 use App\Exception\RegleMetierException;
 use App\Repository\MembreRepository;
+use App\Repository\RelationRepository;
 use App\Repository\UtilisateurRepository;
 use App\Vue\MonCompteVue;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,6 +45,7 @@ final class MonCompteController
         #[MapRequestPayload(serializationContext: ['allow_extra_attributes' => false])] MonCompteModification $modification,
         UtilisateurRepository $utilisateurs,
         UserPasswordHasherInterface $hacheur,
+        RelationRepository $relations,
         EntityManagerInterface $em,
     ): JsonResponse {
         $aujourdhui = $this->horloge->now();
@@ -63,6 +65,12 @@ final class MonCompteController
         }
         if (null !== $modification->estPrive) {
             $moi->definirPrive($modification->estPrive, $aujourdhui);
+            // I-18 : un compte public accepte d'office ; les demandes encore en attente le sont donc aussi.
+            if (!$moi->estPrive()) {
+                foreach ($relations->demandesVers($moi) as $demande) {
+                    $demande->accepter();
+                }
+            }
         }
 
         $em->flush();
