@@ -366,3 +366,17 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Les dépendances s'installent uniquement dans les conteneurs ; les dossiers `vendor/` et `node_modules/` de la machine ne servent plus (l'éditeur peut perdre l'autocomplétion des bibliothèques).
   - Les fichiers de `var/` (cache, `phpunit.txt`, photos) se lisent par `docker compose exec php …`. `docker compose down -v` efface aussi ces volumes.
 - **IA** : l'assistant a mesuré la lenteur et proposé la correction ; les 93 tests passent après le changement.
+
+## D-028 – Profil et paramètres du compte
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : après la connexion, le front affichait directement l'e-mail et la date de naissance. Les maquettes mènent au profil (écran 4), et ces informations relèvent des réglages du compte. Le profil attendait `GET /api/utilisateurs/{pseudo}` (F-04), pas encore codé.
+- **Décisions** :
+  - **API F-04** : `GET /api/utilisateurs/{pseudo}` renvoie le pseudo, la visibilité, le nombre d'abonnés (abonnés et amis acceptés) et, si je suis connecté, ma relation avec ce compte. Accessible sans compte, jamais d'e-mail ni de date de naissance (S-05).
+  - **`nombreAbonnes` est toujours visible**, même pour un compte privé : il ne dit rien du contenu.
+  - **`nombreArticles` (ajouté au contrat) suit A-03** : absent si je ne peux pas voir les articles de la personne, pour que le compteur ne révèle pas ce que la liste cache. La règle est écrite une seule fois (`AccesProfil`) et partagée avec `GET /api/utilisateurs/{pseudo}/articles`.
+  - **Front** : la connexion mène à `/profil` (écran 4). L'e-mail, la date de naissance, la visibilité, le mot de passe et la déconnexion passent dans **`/profil/parametres`**, ouvert par l'icône des réglages (mobile) ou « Paramètres » (desktop), comme sur les maquettes. Seuls les champs modifiés sont envoyés à `PATCH /api/moi`.
+  - **Tenues** : le compteur affiche 0 et l'onglet annonce la fonction, en attendant F-23.
+- **Dette assumée** : changer son mot de passe ou son e-mail ne demande pas le mot de passe actuel. Quelqu'un qui trouve une session ouverte pourrait s'approprier le compte. À ajouter côté API (champ `motDePasseActuel` exigé pour ces deux changements).
+- **IA** : demandé par moi après essai ; l'assistant a écrit la route, ses tests et les deux écrans.
