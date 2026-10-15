@@ -1,28 +1,30 @@
 /*
- * Styles communs de PENDERIE (docs/09-maquettes.md, « Choix visuels »).
+ * Styles communs de PENDERIE, repris du canevas « Maquettes PENDERIE » (docs/09-maquettes.md).
  * Mobile d'abord : les règles de base visent un téléphone, la mise en page desktop
  * s'ajoute à partir de 1024 px.
  */
 
 :root {
   --bordeaux: #6e1a2b;
-  --bordeaux-fonce: #561421;
-  --bordeaux-clair: #f3e8ea;
-  --fond: #faf7f2;
+  --bordeaux-fonce: #4a101c;
+  --bordeaux-clair: #f5e9ec;
+  --fond: #faf8f7;
   --surface: #ffffff;
-  --texte: #1c1a19;
-  --texte-doux: #6b6461;
-  --bordure: #e4ddd5;
+  --texte: #1f1517;
+  --texte-doux: #5c4e51;
+  --texte-aide: #6b5d60;
+  --bordure: #d9cfd1;
+  --ligne: #e6dddf;
   --erreur: #b3261e;
-  --succes: #2e6b3f;
 
   --police-titre: 'Cormorant Garamond', Georgia, serif;
   --police-texte: 'Manrope', system-ui, sans-serif;
 
   --rayon: 12px;
+  --rayon-bouton: 14px;
   --zone-tactile: 44px;
   --largeur-menu: 260px;
-  --hauteur-barre: 72px;
+  --hauteur-barre: 76px;
 }
 
 *,
@@ -69,6 +71,10 @@ a {
   color: var(--bordeaux);
 }
 
+a:hover {
+  color: var(--bordeaux-fonce);
+}
+
 :focus-visible {
   outline: 3px solid var(--bordeaux);
   outline-offset: 2px;
@@ -90,11 +96,11 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: var(--zone-tactile);
-  padding: 0.6rem 1.25rem;
+  min-height: 52px;
+  padding: 0 1.25rem;
   border: 1px solid transparent;
-  border-radius: 999px;
-  font: 600 1rem var(--police-texte);
+  border-radius: var(--rayon-bouton);
+  font: 700 1rem var(--police-texte);
   text-decoration: none;
   cursor: pointer;
 }
@@ -109,7 +115,11 @@ a {
 }
 
 .bouton-secondaire {
-  background: transparent;
+  min-height: var(--zone-tactile);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  font-size: 0.875rem;
+  font-weight: 600;
   border-color: var(--bordure);
   color: var(--texte);
 }
@@ -131,34 +141,36 @@ a {
 
 .formulaire {
   display: grid;
-  gap: 1.1rem;
+  gap: 1rem;
 }
 
 .champ {
   display: grid;
-  gap: 0.35rem;
+  gap: 6px;
+  min-width: 0;
 }
 
 .champ label,
 .champ legend {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 13px;
 }
 
 .champ input {
-  min-height: var(--zone-tactile);
-  padding: 0.6rem 0.85rem;
+  height: 50px;
+  min-width: 0;
+  padding: 0 14px;
   border: 1px solid var(--bordure);
   border-radius: var(--rayon);
   background: var(--surface);
   color: var(--texte);
   font: inherit;
+  font-size: 15px;
 }
 
 .champ input:focus {
-  border-color: var(--bordeaux);
-  outline: none;
-  box-shadow: 0 0 0 3px var(--bordeaux-clair);
+  outline: 2px solid var(--bordeaux);
+  outline-offset: 1px;
 }
 
 .champ input[aria-invalid='true'] {
@@ -166,13 +178,13 @@ a {
 }
 
 .aide {
-  color: var(--texte-doux);
-  font-size: 0.85rem;
+  color: var(--texte-aide);
+  font-size: 12px;
 }
 
 .message-champ {
   color: var(--erreur);
-  font-size: 0.85rem;
+  font-size: 12px;
 }
 
 .alerte {

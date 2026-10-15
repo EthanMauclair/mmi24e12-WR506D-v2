@@ -1,21 +1,24 @@
 <script setup lang="ts">
+import type { NomIcone } from '~/components/Icone.vue'
+
 /**
- * Mise en page des écrans connectés (docs/09-maquettes.md) :
- * - mobile : barre du bas, bouton photo au centre, accessible partout (D-010) ;
+ * Mise en page des écrans connectés (maquette 4, Profil) :
+ * - mobile : barre du bas à cinq icônes, bouton photo au centre, accessible partout (D-010) ;
  * - desktop : menu latéral, « Ajouter un article » en tête.
  * Les entrées sans `vers` arrivent avec les prochaines branches : affichées, mais inactives.
  */
 interface Entree {
   libelle: string
-  icone: 'accueil' | 'recherche' | 'logement' | 'profil'
+  icone: NomIcone
   vers: string | null
 }
 
+// « Mes logements » est l'accueil : il listera les logements à l'étape suivante.
 const entrees: Entree[] = [
-  { libelle: 'Accueil', icone: 'accueil', vers: '/' },
+  { libelle: 'Mes logements', icone: 'logement', vers: '/' },
   { libelle: 'Rechercher', icone: 'recherche', vers: null },
-  { libelle: 'Logements', icone: 'logement', vers: null },
-  { libelle: 'Profil', icone: 'profil', vers: null },
+  { libelle: 'Mes tenues', icone: 'tenue', vers: null },
+  { libelle: 'Mon profil', icone: 'profil', vers: null },
 ]
 const ajout: string | null = null
 
@@ -29,39 +32,31 @@ async function seDeconnecter() {
 
 <template>
   <div class="application">
-    <aside class="menu-lateral" aria-label="Menu principal">
+    <nav class="menu-lateral" aria-label="Navigation principale">
       <NuxtLink to="/" class="logo">Penderie</NuxtLink>
 
-      <NuxtLink v-if="ajout" :to="ajout" class="bouton bouton-principal">
-        <Icone nom="photo" /> Ajouter un article
+      <NuxtLink v-if="ajout" :to="ajout" class="ajouter">
+        <Icone nom="photo" :taille="20" :epaisseur="1.8" /> Ajouter un article
       </NuxtLink>
-      <span v-else class="bouton bouton-principal inactif" aria-disabled="true" title="Bientôt disponible">
-        <Icone nom="photo" /> Ajouter un article
+      <span v-else class="ajouter inactif" aria-disabled="true" title="Bientôt disponible">
+        <Icone nom="photo" :taille="20" :epaisseur="1.8" /> Ajouter un article
       </span>
 
-      <nav>
-        <template v-for="entree in entrees" :key="entree.libelle">
-          <NuxtLink v-if="entree.vers" :to="entree.vers" class="lien-menu">
-            <Icone :nom="entree.icone" /> {{ entree.libelle }}
-          </NuxtLink>
-          <span v-else class="lien-menu inactif" aria-disabled="true" title="Bientôt disponible">
-            <Icone :nom="entree.icone" /> {{ entree.libelle }}
-          </span>
-        </template>
-      </nav>
+      <template v-for="entree in entrees" :key="entree.libelle">
+        <NuxtLink v-if="entree.vers" :to="entree.vers" class="lien-menu">{{ entree.libelle }}</NuxtLink>
+        <span v-else class="lien-menu inactif" aria-disabled="true" title="Bientôt disponible">{{ entree.libelle }}</span>
+      </template>
 
       <div class="compte">
         <span v-if="moi" class="pseudo">@{{ moi.pseudo }}</span>
-        <button type="button" class="lien-menu" @click="seDeconnecter">
-          <Icone nom="deconnexion" /> Se déconnecter
-        </button>
+        <button type="button" class="lien-menu" @click="seDeconnecter">Se déconnecter</button>
       </div>
-    </aside>
+    </nav>
 
     <header class="entete-mobile">
       <NuxtLink to="/" class="logo">Penderie</NuxtLink>
       <button type="button" class="bouton-icone" aria-label="Se déconnecter" @click="seDeconnecter">
-        <Icone nom="deconnexion" />
+        <Icone nom="deconnexion" :taille="22" />
       </button>
     </header>
 
@@ -69,24 +64,22 @@ async function seDeconnecter() {
       <slot />
     </main>
 
-    <nav class="barre-bas" aria-label="Navigation">
+    <nav class="barre-bas" aria-label="Navigation principale">
       <template v-for="(entree, index) in entrees" :key="entree.libelle">
-        <NuxtLink v-if="entree.vers" :to="entree.vers" class="onglet">
+        <NuxtLink v-if="entree.vers" :to="entree.vers" class="onglet" :aria-label="entree.libelle">
           <Icone :nom="entree.icone" />
-          <span>{{ entree.libelle }}</span>
         </NuxtLink>
-        <span v-else class="onglet inactif" aria-disabled="true">
+        <span v-else class="onglet inactif" aria-disabled="true" :aria-label="`${entree.libelle} (bientôt)`">
           <Icone :nom="entree.icone" />
-          <span>{{ entree.libelle }}</span>
         </span>
 
         <!-- Bouton photo au centre, entre la 2e et la 3e entrée -->
         <template v-if="index === 1">
-          <NuxtLink v-if="ajout" :to="ajout" class="bouton-photo" aria-label="Ajouter un article">
-            <Icone nom="photo" />
+          <NuxtLink v-if="ajout" :to="ajout" class="bouton-photo" aria-label="Ajouter un article en photo">
+            <Icone nom="photo" :taille="26" :epaisseur="1.8" />
           </NuxtLink>
-          <span v-else class="bouton-photo inactif" aria-disabled="true" aria-label="Ajouter un article (bientôt)">
-            <Icone nom="photo" />
+          <span v-else class="bouton-photo inactif" aria-disabled="true" aria-label="Ajouter un article en photo (bientôt)">
+            <Icone nom="photo" :taille="26" :epaisseur="1.8" />
           </span>
         </template>
       </template>
@@ -97,7 +90,7 @@ async function seDeconnecter() {
 <style scoped>
 .logo {
   font-family: var(--police-titre);
-  font-size: 1.75rem;
+  font-size: 26px;
   font-weight: 600;
   color: var(--bordeaux);
   text-decoration: none;
@@ -121,51 +114,45 @@ async function seDeconnecter() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
+  padding: 18px 20px 8px;
   background: var(--fond);
-  border-bottom: 1px solid var(--bordure);
 }
 
 .bouton-icone {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: var(--zone-tactile);
   height: var(--zone-tactile);
   border: 0;
-  border-radius: 50%;
   background: transparent;
   color: var(--texte);
   cursor: pointer;
 }
 
 .contenu {
-  padding: 1.25rem 1rem calc(var(--hauteur-barre) + 1.5rem);
-  max-width: 960px;
+  padding: 8px 20px calc(var(--hauteur-barre) + 24px);
 }
 
 .barre-bas {
   position: fixed;
   inset: auto 0 0;
   z-index: 10;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
-  justify-content: space-around;
   height: var(--hauteur-barre);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
   background: var(--surface);
-  border-top: 1px solid var(--bordure);
+  border-top: 1px solid var(--ligne);
 }
 
 .onglet {
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-  min-width: var(--zone-tactile);
-  min-height: var(--zone-tactile);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
   color: var(--texte-doux);
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-decoration: none;
 }
 
 .onglet.router-link-exact-active {
@@ -173,15 +160,15 @@ async function seDeconnecter() {
 }
 
 .bouton-photo {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  margin-top: -28px;
-  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
   background: var(--bordeaux);
   color: #fff;
-  box-shadow: 0 6px 16px rgb(110 26 43 / 0.35);
 }
 
 .bouton-photo.inactif {
@@ -201,29 +188,44 @@ async function seDeconnecter() {
     inset: 0 auto 0 0;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 6px;
     width: var(--largeur-menu);
-    padding: 1.5rem 1rem;
+    padding: 28px 18px;
     background: var(--surface);
-    border-right: 1px solid var(--bordure);
+    border-right: 1px solid var(--ligne);
   }
 
-  .menu-lateral nav {
-    display: grid;
-    gap: 0.25rem;
+  .menu-lateral .logo {
+    padding: 0 12px 20px;
+    font-size: 30px;
+  }
+
+  .ajouter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 48px;
+    margin-bottom: 14px;
+    border-radius: var(--rayon);
+    background: var(--bordeaux);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
   }
 
   .lien-menu {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    min-height: var(--zone-tactile);
-    padding: 0 0.75rem;
+    height: var(--zone-tactile);
+    padding: 0 12px;
     border: 0;
-    border-radius: var(--rayon);
+    border-radius: 10px;
     background: transparent;
-    color: var(--texte);
-    font: 500 1rem var(--police-texte);
+    color: #4a3d40;
+    font: 500 15px var(--police-texte);
+    text-align: left;
     text-decoration: none;
     cursor: pointer;
   }
@@ -235,20 +237,20 @@ async function seDeconnecter() {
   }
 
   .compte {
-    margin-top: auto;
     display: grid;
-    gap: 0.25rem;
+    gap: 4px;
+    margin-top: auto;
   }
 
   .pseudo {
-    padding: 0 0.75rem;
+    padding: 0 12px;
     color: var(--texte-doux);
-    font-size: 0.9rem;
+    font-size: 14px;
   }
 
   .contenu {
     margin-left: var(--largeur-menu);
-    padding: 2.5rem 3rem;
+    padding: 40px 56px;
   }
 }
 </style>
