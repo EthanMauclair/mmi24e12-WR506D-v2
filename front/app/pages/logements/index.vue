@@ -40,9 +40,14 @@ const { data: logements } = await useAsyncData('mes-logements', async () => {
       <p v-if="!logement.pieces?.length" class="aide">Aucune pièce pour l'instant.</p>
       <ul v-else class="pieces">
         <li v-for="piece in logement.pieces" :key="piece.id" class="piece">
-          <h3>{{ piece.nom }}</h3>
+          <NuxtLink :to="`/logements/${logement.id}/pieces/${piece.id}`" class="piece-lien">
+            <h3>{{ piece.nom }}</h3>
+            <span class="voir">Voir les articles <span aria-hidden="true">›</span></span>
+          </NuxtLink>
           <ul v-if="piece.stockages.length" class="rangements">
-            <li v-for="stockage in piece.stockages" :key="stockage.id" class="puce">{{ stockage.nom }}</li>
+            <li v-for="stockage in piece.stockages" :key="stockage.id">
+              <NuxtLink :to="`/logements/${logement.id}/pieces/${piece.id}?rangement=${stockage.id}`" class="puce">{{ stockage.nom }}</NuxtLink>
+            </li>
           </ul>
           <p v-else class="aide">Aucun rangement</p>
         </li>
@@ -112,6 +117,27 @@ h2 {
   border-top: 1px solid var(--ligne);
 }
 
+.piece-lien {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: var(--zone-tactile);
+  color: var(--texte);
+  text-decoration: none;
+}
+
+.piece-lien:hover h3 {
+  color: var(--bordeaux);
+}
+
+.voir {
+  flex-shrink: 0;
+  color: var(--bordeaux);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 h3 {
   margin: 0;
   font-size: 15px;
@@ -127,7 +153,9 @@ h3 {
 }
 
 .puce {
+  display: inline-block;
   padding: 6px 11px;
+  text-decoration: none;
   border-radius: 999px;
   background: var(--bordeaux-clair);
   color: var(--bordeaux);
