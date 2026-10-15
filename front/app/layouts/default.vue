@@ -14,7 +14,7 @@ interface Entree {
 }
 
 const entrees: Entree[] = [
-  { libelle: 'Mes logements', icone: 'logement', vers: null },
+  { libelle: 'Mes logements', icone: 'logement', vers: '/logements' },
   { libelle: 'Rechercher', icone: 'recherche', vers: null },
   { libelle: 'Mes tenues', icone: 'tenue', vers: null },
   { libelle: 'Mon profil', icone: 'profil', vers: '/profil' },

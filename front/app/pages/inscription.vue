@@ -59,8 +59,8 @@ async function sInscrire() {
   envoi.value = true
   try {
     await inscrire({ ...formulaire, email: formulaire.email.trim() })
-    // D-010 : la création guidée du logement suit l'inscription (écran 3, prochaine étape).
-    await navigateTo('/')
+    // D-010 : la création guidée du logement suit l'inscription (écran 3).
+    await navigateTo('/logements/nouveau')
   }
   catch (e) {
     const { general, champs } = lireErreur(e)
