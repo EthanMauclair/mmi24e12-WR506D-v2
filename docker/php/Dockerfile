@@ -8,7 +8,9 @@ COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /u
 # pcov : mesure de la couverture des tests (désactivé par défaut, voir php.ini)
 RUN install-php-extensions pdo_mysql intl zip opcache apcu gd exif pcov
 
-RUN apk add --no-cache git unzip
+# apk upgrade : applique les correctifs de sécurité d'Alpine publiés depuis l'image de base
+# (zlib, nghttp2, curl… relevés par Snyk le 15/10/2026).
+RUN apk upgrade --no-cache && apk add --no-cache git unzip
 
 # Même identifiant que www-data sous Debian (33) : les volumes vendor/ et var/ déjà créés restent utilisables.
 RUN apk add --no-cache --virtual .modif-utilisateur shadow \

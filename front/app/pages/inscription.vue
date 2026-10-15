@@ -98,7 +98,7 @@ async function sInscrire() {
       <h1>Créer votre compte</h1>
       <p class="sous-titre">Ensuite, on crée ensemble votre premier logement.</p>
 
-      <form class="formulaire" novalidate @submit.prevent="sInscrire">
+      <form class="formulaire" method="post" novalidate @submit.prevent="sInscrire">
         <p v-if="erreurGenerale" class="alerte" role="alert">{{ erreurGenerale }}</p>
 
         <div class="paire">

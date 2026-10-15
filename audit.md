@@ -68,6 +68,7 @@ Règles `@Symfony`, avec deux exceptions assumées ([`api/.php-cs-fixer.dist.php
 | `simple-git`, `@simple-git/argv-parser` | **Critique** (×2) | `nuxt` → `@nuxt/devtools` 3.4.2 | ✅ **Corrigé** : `@nuxt/devtools` 3.4.3 imposé (`overrides` dans `front/package.json`), qui ne dépend plus de `simple-git`. |
 | `node-forge` ≤ 1.4.0 | Haute | `nuxt` → `nitropack` → `listhen` | ⚠️ **Accepté** : aucune version corrigée publiée (1.4.0 est la dernière). `listhen` s'en sert pour fabriquer un certificat HTTPS **du serveur de développement** ; la faille concerne la *vérification* de signatures RSA, que nous n'utilisons pas. Absent du serveur de production. |
 | `braces` ≤ 3.0.3 (et `micromatch`, `fast-glob`, `globby` qui en dépendent) | Haute | `nuxt` → `nitropack` → `globby` | ⚠️ **Accepté** : aucune version corrigée (3.0.3 est la dernière). Déni de service sur des motifs de fichiers très imbriqués, utilisés **à la compilation** sur des motifs écrits par nous, jamais par un utilisateur. |
+| `ioredis` 5.11.1 (relevé par Snyk, pas par `npm audit`) | Haute | `nuxt` → `nitropack` et `@nuxt/devtools` → `unstorage` | ⚠️ **Accepté** : récursion non contrôlée dans le client Redis. `unstorage` ne l'utilise que pour son connecteur Redis, que l'application n'emploie pas (aucun serveur Redis). Pas de version compatible avec Nuxt pour l'instant. |
 | `nuxt`, `@nuxt/*`, `nitropack`, `listhen` | Haute | – | Signalés uniquement parce qu'ils dépendent des deux paquets ci-dessus. |
 
 Une seule correction proposée par npm (`npm audit fix --force`) : **revenir à Nuxt 4.1.3**, une version plus ancienne, sans corriger `node-forge` ni `braces`. Refusée.
@@ -83,6 +84,8 @@ Snyk a été branché sur le dépôt GitHub (branche `develop`). Il analyse auss
 - Elles viennent du **système Debian** embarqué, pas de notre code : les 3 critiques concernent `perl`, que l'application n'utilise pas ; les hautes, `libssh2`, `pcre2`, `sqlite3`, `gzip`…
 - 220 sur 288 n'ont aucune correction publiée : mettre les paquets à jour ne suffisait pas.
 - Snyk proposait `php:8.6-rc-zts-alpine3.24` : écarté, c'est une version **candidate** de PHP 8.6, en mode multi-thread (ZTS) dont nous n'avons pas besoin.
+
+**Nouvelle analyse Snyk après le changement** : 22 failles (0 critique, 1 haute dans `zlib`, 1 moyenne dans `nghttp2`, 20 faibles dans `curl`), toutes corrigées dans les paquets Alpine publiés depuis l'image de base. Le Dockerfile lance donc `apk upgrade` à la construction : **l'image construite ne contient plus aucune faille connue** (Trivy, 15/10/2026). Snyk continue d'afficher ces 22 failles, car il analyse l'image de base déclarée dans le Dockerfile, pas l'image construite.
 
 **Décision** : passer à `php:8.4-fpm-alpine`, avec **la même version de PHP** (8.4) et un système Alpine réduit au strict nécessaire. Résultat Trivy : **0 critique, 0 haute, 2 moyennes**. `www-data` garde l'identifiant 33 de Debian, pour que les volumes `vendor/` et `var/` déjà créés restent utilisables sans manipulation. Vérifié après le changement : 98 tests verts (dont la réduction des photos avec GD), PHPStan, linters, API et front.
 
