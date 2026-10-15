@@ -4,8 +4,9 @@ FROM php:8.4-fpm-alpine
 
 # Outil officieux mais standard pour installer les extensions PHP
 COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
-# pdo_mysql : MySQL ; intl : Symfony ; gd + exif : redimensionnement et nettoyage des photos (D-015)
-RUN install-php-extensions pdo_mysql intl zip opcache apcu gd exif
+# pdo_mysql : MySQL ; intl : Symfony ; gd + exif : redimensionnement et nettoyage des photos (D-015) ;
+# pcov : mesure de la couverture des tests (désactivé par défaut, voir php.ini)
+RUN install-php-extensions pdo_mysql intl zip opcache apcu gd exif pcov
 
 RUN apk add --no-cache git unzip
 

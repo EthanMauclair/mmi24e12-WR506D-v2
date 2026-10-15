@@ -207,7 +207,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->motDePasse;
     }
 
-    /** Aucune donnée sensible en clair n'est stockée dans l'objet. Méthode dépréciée par Symfony 7.3. */
+    /**
+     * Aucune donnée sensible en clair n'est stockée dans l'objet. Méthode dépréciée par Symfony 7.3,
+     * gardée pour l'interface : l'appeler dans un test déclencherait l'avertissement de dépréciation.
+     *
+     * @codeCoverageIgnore
+     */
     #[\Deprecated]
     public function eraseCredentials(): void
     {

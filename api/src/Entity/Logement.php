@@ -209,7 +209,8 @@ class Logement
             }
         }
 
-        throw new \LogicException('I-05 violé : logement sans propriétaire.');
+        // Inatteignable : creer() pose le propriétaire et le transfert en garde toujours un (I-05, I-09).
+        throw new \LogicException('I-05 violé : logement sans propriétaire.'); // @codeCoverageIgnore
     }
 
     public function getId(): ?int

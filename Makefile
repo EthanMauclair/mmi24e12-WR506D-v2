@@ -7,7 +7,7 @@ PHP = $(DC) exec -T php
 
 .DEFAULT_GOAL := aide
 .PHONY: aide demarrer front arreter installer migrer fixtures cache \
-        tests tests-unitaires tests-fonctionnels couverture \
+        tests tests-unitaires tests-fonctionnels tests-integration couverture \
         phpstan cs cs-corriger lint audit qualite
 
 ## —— Projet ————————————————————————————————————————————
@@ -48,6 +48,12 @@ tests-unitaires: ## Lance les tests unitaires (sans base de données)
 
 tests-fonctionnels: ## Lance les tests fonctionnels (requêtes HTTP sur l'API)
 	$(PHP) php bin/phpunit tests/Fonctionnel
+
+tests-integration: ## Lance les tests d'intégration (Symfony et base de test, sans HTTP)
+	$(PHP) php bin/phpunit tests/Integration
+
+couverture: ## Mesure la couverture des tests (rapport HTML : api/coverage/index.html)
+	$(PHP) php -d pcov.enabled=1 bin/phpunit --coverage-text --coverage-html=coverage
 
 ## —— Qualité ————————————————————————————————————————————
 phpstan: ## Analyse statique PHPStan, niveau 6
