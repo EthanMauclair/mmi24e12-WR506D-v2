@@ -152,10 +152,9 @@ async function sInscrire() {
 
         <div class="champ">
           <label for="mot-de-passe">Mot de passe</label>
-          <input
+          <ChampMotDePasse
             id="mot-de-passe"
             v-model="formulaire.motDePasse"
-            type="password"
             name="motDePasse"
             autocomplete="new-password"
             :aria-invalid="!!erreurs.motDePasse"
@@ -306,7 +305,8 @@ h1 {
   gap: 14px;
 }
 
-.champ input {
+/* :deep : atteint aussi le champ du composant ChampMotDePasse. */
+.champ :deep(input:not([type='radio'])) {
   height: 48px;
 }
 

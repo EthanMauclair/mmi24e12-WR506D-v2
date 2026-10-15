@@ -86,10 +86,9 @@ async function seConnecter() {
 
         <div class="champ">
           <label for="mot-de-passe">Mot de passe</label>
-          <input
+          <ChampMotDePasse
             id="mot-de-passe"
             v-model="motDePasse"
-            type="password"
             name="motDePasse"
             autocomplete="current-password"
             required
