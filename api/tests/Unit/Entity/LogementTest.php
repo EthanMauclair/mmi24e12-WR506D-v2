@@ -162,4 +162,68 @@ final class LogementTest extends TestCase
         $this->expectExceptionMessage('A-17');
         $logement->retirerMembre($membreNina, $this->leo);
     }
+
+    #[Test]
+    public function on_ne_retire_pas_d_un_logement_le_membre_d_un_autre_logement(): void
+    {
+        $appartement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+        $studio = Logement::creer('Studio', $this->nina, $this->aujourdhui);
+        $membreDuStudio = $studio->inviter($this->leo, $this->nina, $this->aujourdhui);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $appartement->retirerMembre($membreDuStudio, $this->camille);
+    }
+
+    #[Test]
+    public function i10_une_piece_ou_un_rangement_ne_se_supprime_que_vide(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+        $chambre = $logement->ajouterPiece('Chambre');
+        $armoire = $chambre->ajouterStockage('Grande armoire');
+        $commode = $chambre->ajouterStockage('Commode');
+        $entree = $logement->ajouterPiece('Entrée');
+        Article::creer($this->camille, $armoire, new Categorie('Pull'), 'photos/1.jpg', $this->aujourdhui);
+
+        $chambre->retirerStockage($commode);
+        $logement->retirerPiece($entree);
+        self::assertSame([$armoire], $chambre->getStockages()->getValues(), 'Un rangement vide se supprime.');
+        self::assertSame([$chambre], $logement->getPieces()->getValues(), 'Une pièce vide se supprime.');
+
+        $this->expectException(RegleMetierException::class);
+        $this->expectExceptionMessage('I-10');
+        $chambre->retirerStockage($armoire);
+    }
+
+    #[Test]
+    public function f06_on_renomme_une_piece_et_un_rangement(): void
+    {
+        $chambre = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui)->ajouterPiece('Chambre');
+        $armoire = $chambre->ajouterStockage('Armoire');
+
+        $chambre->renommer('Chambre de Jules');
+        $armoire->renommer('Grande armoire');
+
+        self::assertSame('Chambre de Jules', $chambre->getNom());
+        self::assertSame('Grande armoire', $armoire->getNom());
+    }
+
+    #[Test]
+    public function la_date_de_creation_du_logement_est_conservee(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+
+        self::assertEquals($this->aujourdhui, $logement->getCreeLe());
+    }
+
+    #[Test]
+    public function accepter_deux_fois_une_invitation_garde_la_date_d_arrivee(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+        $invitation = $logement->inviter($this->leo, $this->camille, $this->aujourdhui);
+        $invitation->accepter($this->aujourdhui);
+
+        $invitation->accepter(new \DateTimeImmutable('2026-12-01'));
+
+        self::assertEquals($this->aujourdhui, $invitation->getArriveLe(), 'L\'ancienneté sert à désigner le prochain propriétaire (I-09).');
+    }
 }

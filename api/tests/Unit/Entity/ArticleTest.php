@@ -82,4 +82,15 @@ final class ArticleTest extends TestCase
         self::assertSame('Maison Lune', $article->getMarque());
         self::assertNull($article->getCouleur());
     }
+
+    #[Test]
+    public function deplacer_un_article_dans_son_propre_rangement_ne_change_rien(): void
+    {
+        $article = Article::creer($this->camille, $this->armoire, $this->pull, 'photos/1.jpg', $this->aujourdhui);
+
+        $article->deplacerVers($this->armoire);
+
+        self::assertSame($this->armoire, $article->getStockage());
+        self::assertCount(1, $this->armoire->getArticles(), 'L\'article n\'est pas rangé deux fois.');
+    }
 }

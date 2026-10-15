@@ -86,4 +86,23 @@ final class UtilisateurTest extends TestCase
     {
         return Utilisateur::creerMajeur('camille', 'camille@exemple.fr', new \DateTimeImmutable('1995-04-02'), false, $this->aujourdhui);
     }
+
+    #[Test]
+    public function i01_on_ne_cree_pas_un_compte_mineur_pour_une_personne_majeure(): void
+    {
+        $this->expectException(RegleMetierException::class);
+        $this->expectExceptionMessage('I-01');
+        Utilisateur::creerMineur($this->camille(), 'leo', 'leo@exemple.fr', new \DateTimeImmutable('2000-01-01'), $this->aujourdhui);
+    }
+
+    #[Test]
+    public function l_e_mail_est_enregistre_en_minuscules_pour_eviter_les_doublons(): void
+    {
+        $camille = $this->camille();
+
+        $camille->changerEmail('Camille.Martin@Exemple.FR');
+
+        self::assertSame('camille.martin@exemple.fr', $camille->getEmail());
+        self::assertEquals($this->aujourdhui, $camille->getCreeLe(), 'La date d\'inscription est conservée.');
+    }
 }
