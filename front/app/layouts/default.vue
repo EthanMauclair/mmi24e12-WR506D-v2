@@ -65,7 +65,7 @@ const { moi } = useSession()
         <NuxtLink v-if="entree.vers" :to="entree.vers" class="onglet" :aria-label="entree.libelle">
           <Icone :nom="entree.icone" />
         </NuxtLink>
-        <span v-else class="onglet inactif" aria-disabled="true" :aria-label="`${entree.libelle} (bientôt)`">
+        <span v-else class="onglet inactif" role="link" aria-disabled="true" :aria-label="`${entree.libelle} (bientôt)`">
           <Icone :nom="entree.icone" />
         </span>
 
@@ -74,7 +74,7 @@ const { moi } = useSession()
           <NuxtLink v-if="ajout" :to="ajout" class="bouton-photo" aria-label="Ajouter un article en photo">
             <Icone nom="photo" :taille="26" :epaisseur="1.8" />
           </NuxtLink>
-          <span v-else class="bouton-photo inactif" aria-disabled="true" aria-label="Ajouter un article en photo (bientôt)">
+          <span v-else class="bouton-photo inactif" role="link" aria-disabled="true" aria-label="Ajouter un article en photo (bientôt)">
             <Icone nom="photo" :taille="26" :epaisseur="1.8" />
           </span>
         </template>

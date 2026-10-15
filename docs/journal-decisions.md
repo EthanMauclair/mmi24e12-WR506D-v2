@@ -433,3 +433,26 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **Ajouter un rangement là où il manque** : depuis la page de la pièce (« + Rangement ») et depuis la fiche d'un nouvel article, sans quitter l'ajout.
   - **La fiche liste toutes les pièces**, y compris celles sans rangement (non sélectionnables, avec une invitation à en créer un).
 - **IA** : le défaut de la fiche venait du code écrit par l'assistant (filtre silencieux sur les pièces sans rangement) ; reproduit puis corrigé.
+
+## D-033 – Outils de qualité et vulnérabilités acceptées
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : séance 15 (qualité du code). Résultats détaillés dans [audit.md](../audit.md).
+- **Décisions** :
+  - **PHPStan niveau 6, sans baseline**, sur `src/` et `tests/`, avec les extensions Symfony, Doctrine et PHPUnit. Les 16 erreurs trouvées sont corrigées, aucune n'est ignorée.
+  - **Style `@Symfony`** (PHP-CS-Fixer), sauf deux règles : les noms de tests restent en snake_case, préfixés par la règle testée (convention du projet), et pas de point ajouté après « … ».
+  - **Makefile** à la racine : chaque commande passe par Docker ; `make qualite` lance tout ce que lancera la CI.
+  - **Front : 2 vulnérabilités critiques corrigées** (`simple-git`, via `@nuxt/devtools`) en imposant `@nuxt/devtools` 3.4.3 (`overrides`).
+  - **Front : 11 vulnérabilités hautes acceptées**, faute de version corrigée publiée :
+    - `node-forge` ≤ 1.4.0 sert seulement au certificat HTTPS du serveur de développement, et la faille porte sur une vérification de signature que nous n'utilisons pas ;
+    - `braces` ≤ 3.0.3 et les paquets qui en dépendent : déni de service possible sur des motifs de fichiers, mais ces motifs sont écrits par nous et utilisés à la compilation, jamais saisis par un utilisateur.
+    - Aucun des deux n'est dans le serveur de production. À revoir à chaque `make audit`.
+- **Alternatives écartées** :
+  - `npm audit fix --force` : rétrograde Nuxt en 4.1.3 sans corriger ces deux paquets.
+  - Une baseline PHPStan : inutile pour 16 erreurs, et elle cacherait la dette au lieu de la montrer.
+  - `php:8.6-rc-zts-alpine3.24`, proposée par Snyk : version candidate de PHP 8.6, en mode multi-thread inutile ici.
+  - Garder Debian en mettant les paquets à jour : 220 failles sur 288 n'ont pas de correction.
+  - **Snyk** est branché sur le dépôt GitHub (branche `develop`), sans les PR de correction automatiques : elles contourneraient le Gitflow (`feature/…` vers `develop`) et le journal.
+  - **Image PHP sur Alpine** (`php:8.4-fpm-alpine` au lieu de `php:8.4-fpm`). Snyk relevait 288 failles dans le système Debian de l'image (3 critiques dans `perl`, 23 hautes), dont 220 sans correction publiée ; Trivy en compte 2 critiques et 124 hautes. Avec Alpine, Trivy n'en trouve plus que 2 moyennes, pour la même version de PHP. `www-data` garde l'identifiant 33 pour que les volumes existants restent utilisables.
+- **IA** : l'assistant a installé et configuré les outils, corrigé les erreurs, lancé axe-core sur les écrans et rédigé l'audit ; les vulnérabilités acceptées sont un choix de l'étudiant.

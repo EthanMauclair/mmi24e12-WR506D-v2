@@ -37,7 +37,7 @@ final class ArticleProvider implements ProviderInterface
     }
 
     /** @return ArticleRessource|list<ArticleRessource> */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array
     {
         if ($operation instanceof CollectionOperationInterface) {
             return isset($uriVariables['pseudo'])

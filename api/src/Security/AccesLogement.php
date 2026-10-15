@@ -40,7 +40,7 @@ final class AccesLogement
         return $utilisateur;
     }
 
-    /** @param LogementVoter::* $droit */
+    /** @param LogementVoter::VOIR|LogementVoter::AJOUTER|LogementVoter::MODIFIER|LogementVoter::SUPPRIMER $droit */
     public function logement(mixed $id, string $droit = LogementVoter::VOIR): Logement
     {
         $logement = $this->logements->find($this->entier($id));
@@ -48,7 +48,7 @@ final class AccesLogement
         return $this->verifier($logement, $droit);
     }
 
-    /** @param LogementVoter::* $droit */
+    /** @param LogementVoter::VOIR|LogementVoter::AJOUTER|LogementVoter::MODIFIER|LogementVoter::SUPPRIMER $droit */
     public function piece(mixed $id, string $droit = LogementVoter::VOIR): Piece
     {
         $piece = $this->pieces->find($this->entier($id));
@@ -57,7 +57,7 @@ final class AccesLogement
         return $piece;
     }
 
-    /** @param LogementVoter::* $droit */
+    /** @param LogementVoter::VOIR|LogementVoter::AJOUTER|LogementVoter::MODIFIER|LogementVoter::SUPPRIMER $droit */
     public function stockage(mixed $id, string $droit = LogementVoter::VOIR): Stockage
     {
         $stockage = $this->stockages->find($this->entier($id));
