@@ -67,6 +67,8 @@ final class ArticleProvider implements ProviderInterface
             couleur: self::texte($filtres, 'couleur'),
             marque: self::texte($filtres, 'marque'),
             page: max(1, self::entier($filtres, 'page') ?? 1),
+            piece: self::entier($filtres, 'piece'),
+            stockage: self::entier($filtres, 'stockage'),
         );
 
         return array_map(static fn ($article) => ArticleRessource::depuis($article, vueMembre: true), $trouves);

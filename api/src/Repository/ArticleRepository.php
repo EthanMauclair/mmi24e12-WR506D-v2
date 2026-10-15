@@ -38,6 +38,8 @@ class ArticleRepository extends ServiceEntityRepository
         ?string $couleur = null,
         ?string $marque = null,
         int $page = 1,
+        ?int $piece = null,
+        ?int $stockage = null,
     ): array {
         $requete = $this->requetePaginee($page)
             ->join('l.membres', 'm', 'WITH', 'm.utilisateur = :moi AND m.statut = :accepte')
@@ -50,6 +52,12 @@ class ArticleRepository extends ServiceEntityRepository
         }
         if (null !== $logement) {
             $requete->andWhere('l.id = :logement')->setParameter('logement', $logement);
+        }
+        if (null !== $piece) {
+            $requete->andWhere('p.id = :piece')->setParameter('piece', $piece);
+        }
+        if (null !== $stockage) {
+            $requete->andWhere('s.id = :stockage')->setParameter('stockage', $stockage);
         }
         if (null !== $categorie) {
             $requete->andWhere('c.id = :categorie')->setParameter('categorie', $categorie);
