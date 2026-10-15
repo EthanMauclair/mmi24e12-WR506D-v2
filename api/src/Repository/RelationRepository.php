@@ -49,6 +49,12 @@ class RelationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** F-04 : abonnés et amis acceptés ; une demande en attente ne compte pas. */
+    public function nombreAbonnes(Utilisateur $suivi): int
+    {
+        return $this->count(['suivi' => $suivi, 'statut' => StatutRelation::Acceptee]);
+    }
+
     /** @return list<Relation> mes abonnés et mes amis acceptés, par pseudo */
     public function accepteesVers(Utilisateur $suivi, ?NiveauRelation $niveau = null): array
     {

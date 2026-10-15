@@ -13,21 +13,15 @@ interface Entree {
   vers: string | null
 }
 
-// « Mes logements » est l'accueil : il listera les logements à l'étape suivante.
 const entrees: Entree[] = [
-  { libelle: 'Mes logements', icone: 'logement', vers: '/' },
+  { libelle: 'Mes logements', icone: 'logement', vers: null },
   { libelle: 'Rechercher', icone: 'recherche', vers: null },
   { libelle: 'Mes tenues', icone: 'tenue', vers: null },
-  { libelle: 'Mon profil', icone: 'profil', vers: null },
+  { libelle: 'Mon profil', icone: 'profil', vers: '/profil' },
 ]
 const ajout: string | null = null
 
-const { moi, deconnecter } = useSession()
-
-async function seDeconnecter() {
-  await deconnecter()
-  await navigateTo('/connexion')
-}
+const { moi } = useSession()
 </script>
 
 <template>
@@ -49,15 +43,17 @@ async function seDeconnecter() {
 
       <div class="compte">
         <span v-if="moi" class="pseudo">@{{ moi.pseudo }}</span>
-        <button type="button" class="lien-menu" @click="seDeconnecter">Se déconnecter</button>
+        <NuxtLink to="/profil/parametres" class="lien-menu lien-parametres">
+          <Icone nom="reglages" :taille="20" /> Paramètres
+        </NuxtLink>
       </div>
     </nav>
 
     <header class="entete-mobile">
       <NuxtLink to="/" class="logo">Penderie</NuxtLink>
-      <button type="button" class="bouton-icone" aria-label="Se déconnecter" @click="seDeconnecter">
-        <Icone nom="deconnexion" :taille="22" />
-      </button>
+      <NuxtLink to="/profil/parametres" class="bouton-icone" aria-label="Paramètres du compte">
+        <Icone nom="reglages" :taille="22" />
+      </NuxtLink>
     </header>
 
     <main class="contenu">
@@ -155,7 +151,7 @@ async function seDeconnecter() {
   color: var(--texte-doux);
 }
 
-.onglet.router-link-exact-active {
+.onglet.router-link-active {
   color: var(--bordeaux);
 }
 
@@ -230,10 +226,14 @@ async function seDeconnecter() {
     cursor: pointer;
   }
 
-  .lien-menu.router-link-exact-active {
+  .lien-menu.router-link-active {
     background: var(--bordeaux-clair);
     color: var(--bordeaux);
     font-weight: 700;
+  }
+
+  .lien-parametres {
+    gap: 10px;
   }
 
   .compte {

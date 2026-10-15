@@ -350,3 +350,33 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Un second champ « confirmer le mot de passe » : il double la saisie ; l'affichage en clair permet la même vérification.
 - **Conséquences** : les canevas de maquettes gardent l'ancienne police, le front fait foi (docs/09-maquettes.md).
 - **IA** : demandé par moi après essai ; l'assistant a proposé la police et écrit le composant.
+
+## D-027 – Dépendances et cache gardés dans des volumes Docker
+
+- **Date** : 14/10/2026
+- **Statut** : Validée
+- **Contexte** : sous Windows, chaque requête à l'API prenait **plus de 10 s** et le front Nuxt presque 2 min pour démarrer. Mesure : la même requête, sur une copie du projet placée à l'intérieur du conteneur, prend 0,3 s. En mode dev, Symfony vérifie à chaque requête que son cache est à jour, en relisant la date de milliers de fichiers (`vendor/`, `src/`, `config/`) ; à travers le partage de fichiers Windows de Docker Desktop, chaque lecture est lente.
+- **Décision** : `api/vendor/`, `api/var/` et `front/node_modules/` deviennent des **volumes Docker** ; seul le code qu'on modifie reste partagé avec Windows. Le conteneur PHP tourne en `www-data` (l'utilisateur de PHP-FPM), pour que le cache et les photos écrits en ligne de commande restent modifiables par l'application.
+- **Alternatives écartées** :
+  - Désactiver le mode debug en dev : rapide, mais chaque modification demanderait de vider le cache à la main.
+  - Mettre tout le projet dans WSL 2 : la vraie solution sous Windows, mais elle change l'installation de chaque poste ; hors de portée maintenant.
+  - Faire tourner PHP-FPM en root : règle les droits, mais un processus web en root n'est pas défendable, même en local.
+- **Conséquences** :
+  - Requêtes de l'API : **de 11 s à 1-2 s** ; suite de tests : **de 4 min à 30 s** ; démarrage du front : **de 1 min 48 à 10 s**.
+  - Les dépendances s'installent uniquement dans les conteneurs ; les dossiers `vendor/` et `node_modules/` de la machine ne servent plus (l'éditeur peut perdre l'autocomplétion des bibliothèques).
+  - Les fichiers de `var/` (cache, `phpunit.txt`, photos) se lisent par `docker compose exec php …`. `docker compose down -v` efface aussi ces volumes.
+- **IA** : l'assistant a mesuré la lenteur et proposé la correction ; les 93 tests passent après le changement.
+
+## D-028 – Profil et paramètres du compte
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : après la connexion, le front affichait directement l'e-mail et la date de naissance. Les maquettes mènent au profil (écran 4), et ces informations relèvent des réglages du compte. Le profil attendait `GET /api/utilisateurs/{pseudo}` (F-04), pas encore codé.
+- **Décisions** :
+  - **API F-04** : `GET /api/utilisateurs/{pseudo}` renvoie le pseudo, la visibilité, le nombre d'abonnés (abonnés et amis acceptés) et, si je suis connecté, ma relation avec ce compte. Accessible sans compte, jamais d'e-mail ni de date de naissance (S-05).
+  - **`nombreAbonnes` est toujours visible**, même pour un compte privé : il ne dit rien du contenu.
+  - **`nombreArticles` (ajouté au contrat) suit A-03** : absent si je ne peux pas voir les articles de la personne, pour que le compteur ne révèle pas ce que la liste cache. La règle est écrite une seule fois (`AccesProfil`) et partagée avec `GET /api/utilisateurs/{pseudo}/articles`.
+  - **Front** : la connexion mène à `/profil` (écran 4). L'e-mail, la date de naissance, la visibilité, le mot de passe et la déconnexion passent dans **`/profil/parametres`**, ouvert par l'icône des réglages (mobile) ou « Paramètres » (desktop), comme sur les maquettes. Seuls les champs modifiés sont envoyés à `PATCH /api/moi`.
+  - **Tenues** : le compteur affiche 0 et l'onglet annonce la fonction, en attendant F-23.
+- **Dette assumée** : changer son mot de passe ou son e-mail ne demande pas le mot de passe actuel. Quelqu'un qui trouve une session ouverte pourrait s'approprier le compte. À ajouter côté API (champ `motDePasseActuel` exigé pour ces deux changements).
+- **IA** : demandé par moi après essai ; l'assistant a écrit la route, ses tests et les deux écrans.

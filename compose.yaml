@@ -4,11 +4,14 @@
 services:
   php:
     build: ./docker/php
-    # Les photos sont écrites par PHP-FPM (utilisateur www-data), les tests par la ligne de commande (root) :
-    # le dossier de stockage est créé au démarrage et attribué à www-data, sinon le premier envoi échoue (500).
-    command: sh -c "mkdir -p var/storage/default var/storage/test && (chown -R www-data:www-data var/storage || true) && exec php-fpm"
+    # Au premier démarrage, le volume vendor est vide : on installe les dépendances dans le conteneur.
+    command: sh -c "([ -f vendor/autoload.php ] || composer install --no-interaction) && mkdir -p var/storage/default var/storage/test && exec php-fpm"
     volumes:
       - ./api:/var/www/api
+      # vendor/ et var/ restent dans Docker, hors du dossier partagé avec Windows : en mode dev, Symfony
+      # vérifie des milliers de fichiers à chaque requête, et le partage Windows les rend 50 fois plus lents.
+      - api_vendor:/var/www/api/vendor
+      - api_var:/var/www/api/var
     environment:
       DATABASE_URL: "mysql://${MYSQL_USER:-penderie}:${MYSQL_PASSWORD:-penderie}@database:3306/${MYSQL_DATABASE:-penderie}?serverVersion=8.4&charset=utf8mb4"
       MAILER_DSN: "smtp://mailer:1025"
@@ -57,6 +60,8 @@ services:
       - "3000:3000"
     volumes:
       - ./front:/app
+      # Même raison que vendor/ côté API : les dépendances restent dans Docker.
+      - front_node_modules:/app/node_modules
     environment:
       # Rendu serveur : l'API est jointe par le réseau Docker. Navigateur : par le port publié.
       NUXT_API_BASE_SERVEUR: "http://nginx"
@@ -65,3 +70,6 @@ services:
 
 volumes:
   database_data:
+  api_vendor:
+  api_var:
+  front_node_modules:

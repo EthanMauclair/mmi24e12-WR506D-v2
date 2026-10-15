@@ -1087,7 +1087,10 @@ components:
         - type: object
           properties:
             estPrive: { type: boolean }
-            nombreAbonnes: { type: integer }
+            nombreAbonnes: { type: integer, description: Abonnés et amis acceptés. }
+            nombreArticles:
+              type: integer
+              description: Articles non personnels. Absent si je ne peux pas les voir (compte privé sans relation acceptée, A-03).
             maRelation:
               description: Ma relation avec ce compte, si je suis connecté.
               oneOf:
