@@ -1,13 +1,19 @@
-FROM php:8.4-fpm
+# Alpine plutôt que Debian : même PHP 8.4, mais un système réduit au strict nécessaire.
+# Analyse Trivy du 15/10/2026 : 2 failles moyennes, contre 2 critiques et 124 hautes pour php:8.4-fpm (D-033).
+FROM php:8.4-fpm-alpine
 
 # Outil officieux mais standard pour installer les extensions PHP
 COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
 # pdo_mysql : MySQL ; intl : Symfony ; gd + exif : redimensionnement et nettoyage des photos (D-015)
 RUN install-php-extensions pdo_mysql intl zip opcache apcu gd exif
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends git unzip \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache git unzip
+
+# Même identifiant que www-data sous Debian (33) : les volumes vendor/ et var/ déjà créés restent utilisables.
+RUN apk add --no-cache --virtual .modif-utilisateur shadow \
+    && groupmod -g 33 www-data \
+    && usermod -u 33 -g 33 www-data \
+    && apk del .modif-utilisateur
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
