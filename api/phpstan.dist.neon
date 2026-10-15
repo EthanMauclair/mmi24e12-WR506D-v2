@@ -1,0 +1,15 @@
+# Analyse statique (séance 15) : niveau 6, sur le code et les tests.
+# Le niveau 6 exige les types de tous les paramètres et retours, y compris le contenu des tableaux.
+parameters:
+    level: 6
+    paths:
+        - src
+        - tests
+    excludePaths:
+        - tests/bootstrap.php
+    # Le conteneur compilé permet à PHPStan de connaître le type des services.
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+    # Le gestionnaire d'entités permet de vérifier les requêtes DQL et le mapping Doctrine.
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
