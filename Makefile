@@ -7,7 +7,7 @@ PHP = $(DC) exec -T php
 
 .DEFAULT_GOAL := aide
 .PHONY: aide demarrer front arreter installer migrer fixtures cache \
-        tests tests-unitaires tests-fonctionnels tests-integration couverture \
+        tests tests-unitaires tests-fonctionnels tests-integration couverture e2e \
         phpstan cs cs-corriger lint audit qualite
 
 ## —— Projet ————————————————————————————————————————————
@@ -54,6 +54,9 @@ tests-integration: ## Lance les tests d'intégration (Symfony et base de test, s
 
 couverture: ## Mesure la couverture des tests (rapport HTML : api/coverage/index.html)
 	$(PHP) php -d pcov.enabled=1 bin/phpunit --coverage-text --coverage-html=coverage
+
+e2e: ## Tests de bout en bout Cypress, depuis le poste (prérequis : make front et make fixtures, Node installé)
+	cd e2e && npm install --no-audit --no-fund && npx cypress run
 
 ## —— Qualité ————————————————————————————————————————————
 phpstan: ## Analyse statique PHPStan, niveau 6

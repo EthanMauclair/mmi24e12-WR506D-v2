@@ -1,0 +1,12 @@
+{
+  "name": "penderie-e2e",
+  "private": true,
+  "description": "Tests de bout en bout de PENDERIE (Cypress), lancés contre http://localhost:3000",
+  "scripts": {
+    "test": "cypress run",
+    "ouvrir": "cypress open"
+  },
+  "devDependencies": {
+    "cypress": "13.17.0"
+  }
+}
