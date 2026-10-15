@@ -280,6 +280,34 @@ final class ArticleApiTest extends ApiTestCase
     }
 
     #[Test]
+    public function f26_je_filtre_par_piece_et_par_rangement_sans_voir_ceux_des_autres(): void
+    {
+        $maintenant = new \DateTimeImmutable();
+        $studio = Logement::creer('Studio de Nora', $this->nora, $maintenant);
+        $salon = $studio->ajouterPiece('Salon');
+        $etagere = $salon->ajouterStockage('Étagère');
+        $this->em->persist($studio);
+        $this->em->persist(Article::creer($this->nora, $etagere, $this->categorie('Vinyle'), 'photos/test.jpg', $maintenant));
+        $this->em->flush();
+        $chambre = $this->armoire->getPiece()->getId();
+
+        $dansArmoire = $this->article($this->camille);
+        $dansCommode = $this->article($this->camille);
+        $this->relire($dansCommode)->deplacerVers($this->em->find(Stockage::class, $this->commode->getId()));
+        $this->em->flush();
+        $jeton = $this->jetonDe($this->leo);
+
+        $this->json('GET', '/api/articles?piece='.$chambre, null, $jeton);
+        self::assertEqualsCanonicalizing([$dansArmoire->getId(), $dansCommode->getId()], array_column($this->reponse(), 'id'));
+
+        $this->json('GET', '/api/articles?stockage='.$this->commode->getId(), null, $jeton);
+        self::assertSame([$dansCommode->getId()], array_column($this->reponse(), 'id'));
+
+        $this->json('GET', '/api/articles?piece='.$salon->getId(), null, $jeton);
+        self::assertSame([], $this->reponse(), 'La pièce d\'un logement dont je ne suis pas membre ne renvoie rien (A-01).');
+    }
+
+    #[Test]
     public function f21_un_visiteur_voit_les_articles_non_personnels_d_un_compte_public(): void
     {
         $pull = $this->article($this->camille);
