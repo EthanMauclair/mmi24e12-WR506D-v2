@@ -66,6 +66,8 @@ services:
       # Rendu serveur : l'API est jointe par le réseau Docker. Navigateur : par le port publié.
       NUXT_API_BASE_SERVEUR: "http://nginx"
       NUXT_PUBLIC_API_BASE: "http://localhost:8080"
+      # Relire les fichiers régulièrement : sous Windows, les changements n'arrivent pas jusqu'au conteneur.
+      SCRUTATION_FICHIERS: "1"
     profiles: ["front"]
 
 volumes:
