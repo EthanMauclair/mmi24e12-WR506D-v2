@@ -6,7 +6,7 @@ DC  = docker compose
 PHP = $(DC) exec -T php
 
 .DEFAULT_GOAL := aide
-.PHONY: aide demarrer front arreter installer migrer cache \
+.PHONY: aide demarrer front arreter installer migrer fixtures cache \
         tests tests-unitaires tests-fonctionnels couverture \
         phpstan cs cs-corriger lint audit qualite
 
@@ -31,6 +31,9 @@ installer: ## Installe les dépendances de l'API
 migrer: ## Applique les migrations (base de dev et base de test)
 	$(PHP) php bin/console doctrine:migrations:migrate --no-interaction
 	$(PHP) php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+fixtures: ## Recharge le jeu de démonstration (1 000 articles, mot de passe : penderie-demo)
+	$(PHP) php bin/console doctrine:fixtures:load --no-interaction --purge-exclusions=categorie
 
 cache: ## Vide le cache de l'API (dev et test)
 	$(PHP) rm -rf var/cache/dev var/cache/test
