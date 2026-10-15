@@ -147,7 +147,7 @@ onBeforeUnmount(() => {
 
 // ---------- Étape 2 : la fiche ----------
 
-const [{ data: categories }, { data: logements }] = await Promise.all([
+const [{ data: categories }, { data: logements, refresh: relireLogements }] = await Promise.all([
   useAsyncData('categories', () => api<{ id: number, nom: string }[]>('/api/categories')),
   useAsyncData('logements-rangements', async () => {
     const liste = await api<Logement[]>('/api/logements')
@@ -155,12 +155,43 @@ const [{ data: categories }, { data: logements }] = await Promise.all([
   }),
 ])
 
-/** Les rangements, regroupés par « Logement › Pièce » (D-010 : on choisit où ranger après la photo). */
+/**
+ * Les rangements, regroupés par « Logement › Pièce » (D-010 : on choisit où ranger après la photo).
+ * Toutes les pièces sont listées, même sans rangement : on peut alors en créer un ici (D-032).
+ */
 const groupesRangements = computed(() => (logements.value ?? []).flatMap(logement =>
-  (logement.pieces ?? [])
-    .filter(piece => piece.stockages.length > 0)
-    .map(piece => ({ libelle: `${logement.nom} › ${piece.nom}`, stockages: piece.stockages })),
+  (logement.pieces ?? []).map(piece => ({ pieceId: piece.id, libelle: `${logement.nom} › ${piece.nom}`, stockages: piece.stockages })),
 ))
+const aucunRangement = computed(() => groupesRangements.value.every(groupe => groupe.stockages.length === 0))
+
+// Création d'un rangement depuis la fiche, sans perdre la photo ni la saisie.
+const nouveauRangement = reactive({ ouvert: false, piece: null as number | null, nom: '' })
+const erreurRangement = ref<string | null>(null)
+
+function ouvrirNouveauRangement() {
+  nouveauRangement.ouvert = true
+  nouveauRangement.nom = ''
+  // On propose d'emblée la première pièce sans rangement, la plus probable.
+  nouveauRangement.piece = (groupesRangements.value.find(g => g.stockages.length === 0) ?? groupesRangements.value[0])?.pieceId ?? null
+}
+
+async function creerRangement() {
+  erreurRangement.value = null
+  const nom = nouveauRangement.nom.trim()
+  if (!nouveauRangement.piece || !nom) {
+    erreurRangement.value = 'Choisissez une pièce et donnez un nom au rangement.'
+    return
+  }
+  try {
+    const cree = await api<{ id: number }>(`/api/pieces/${nouveauRangement.piece}/stockages`, { method: 'POST', body: { nom } })
+    await relireLogements()
+    fiche.stockage = cree.id
+    nouveauRangement.ouvert = false
+  }
+  catch (e) {
+    erreurRangement.value = lireErreur(e).general ?? 'Nom trop long (80 caractères maximum).'
+  }
+}
 
 const fiche = reactive({
   categorie: null as number | null,
@@ -334,15 +365,37 @@ async function enregistrer() {
           <div class="champ">
             <label for="rangement">Où le ranger ?</label>
             <p v-if="groupesRangements.length === 0" class="alerte">
-              Aucun rangement pour l'instant. <NuxtLink to="/logements/nouveau">Créez votre logement</NuxtLink>, ses pièces et leurs rangements.
+              Aucune pièce pour l'instant. <NuxtLink to="/logements/nouveau">Créez votre logement</NuxtLink> et ses pièces.
             </p>
-            <select v-else id="rangement" v-model="fiche.stockage" :aria-invalid="!!erreurs.stockage" aria-describedby="rangement-erreur">
-              <option :value="null" disabled>Choisir un rangement…</option>
-              <optgroup v-for="groupe in groupesRangements" :key="groupe.libelle" :label="groupe.libelle">
-                <option v-for="stockage in groupe.stockages" :key="stockage.id" :value="stockage.id">{{ groupe.libelle }} › {{ stockage.nom }}</option>
-              </optgroup>
-            </select>
-            <span v-if="erreurs.stockage" id="rangement-erreur" class="message-champ">{{ erreurs.stockage }}</span>
+            <template v-else>
+              <select id="rangement" v-model="fiche.stockage" :aria-invalid="!!erreurs.stockage" aria-describedby="rangement-erreur">
+                <option :value="null" disabled>{{ aucunRangement ? 'Aucun rangement : créez-en un ci-dessous' : 'Choisir un rangement…' }}</option>
+                <optgroup v-for="groupe in groupesRangements" :key="groupe.pieceId" :label="groupe.libelle">
+                  <option v-for="stockage in groupe.stockages" :key="stockage.id" :value="stockage.id">{{ groupe.libelle }} › {{ stockage.nom }}</option>
+                  <option v-if="groupe.stockages.length === 0" disabled>{{ groupe.libelle }} : aucun rangement</option>
+                </optgroup>
+              </select>
+              <span v-if="erreurs.stockage" id="rangement-erreur" class="message-champ">{{ erreurs.stockage }}</span>
+
+              <div v-if="nouveauRangement.ouvert" class="nouveau-rangement">
+                <div class="champ">
+                  <label for="piece-rangement">Dans la pièce</label>
+                  <select id="piece-rangement" v-model="nouveauRangement.piece">
+                    <option v-for="groupe in groupesRangements" :key="groupe.pieceId" :value="groupe.pieceId">{{ groupe.libelle }}</option>
+                  </select>
+                </div>
+                <div class="champ">
+                  <label for="nom-rangement">Nom du rangement</label>
+                  <input id="nom-rangement" v-model="nouveauRangement.nom" maxlength="80" placeholder="ex. Grande armoire" @keydown.enter.prevent="creerRangement">
+                </div>
+                <p v-if="erreurRangement" class="message-champ" role="alert">{{ erreurRangement }}</p>
+                <div class="nouveau-rangement-actions">
+                  <button type="button" class="lien-action" @click="nouveauRangement.ouvert = false">Annuler</button>
+                  <button type="button" class="bouton-contour-petit" @click="creerRangement">Créer le rangement</button>
+                </div>
+              </div>
+              <button v-else type="button" class="lien-action ajouter-rangement" @click="ouvrirNouveauRangement">+ Nouveau rangement</button>
+            </template>
           </div>
 
           <div class="champ">
@@ -662,6 +715,46 @@ async function enregistrer() {
 .champ textarea:focus {
   outline: 2px solid var(--bordeaux);
   outline-offset: 1px;
+}
+
+.nouveau-rangement {
+  display: grid;
+  gap: 12px;
+  margin-top: 4px;
+  padding: 14px;
+  border: 1px dashed #b8a9ac;
+  border-radius: var(--rayon);
+}
+
+.nouveau-rangement-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.lien-action {
+  min-height: var(--zone-tactile);
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--bordeaux);
+  font: 700 14px var(--police-texte);
+  cursor: pointer;
+}
+
+.ajouter-rangement {
+  justify-self: start;
+}
+
+.bouton-contour-petit {
+  min-height: var(--zone-tactile);
+  padding: 0 16px;
+  border: 1px solid var(--bordeaux);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--bordeaux);
+  font: 700 14px var(--police-texte);
+  cursor: pointer;
 }
 
 .facultatif {
