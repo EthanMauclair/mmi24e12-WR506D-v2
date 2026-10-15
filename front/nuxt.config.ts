@@ -1,7 +1,21 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+// Docker Desktop sous Windows ne prévient pas le conteneur quand un fichier change (git pull, changement
+// de branche) : Nuxt continuerait de servir les anciennes pages. Avec SCRUTATION_FICHIERS=1 (compose.yaml),
+// il relit lui-même les fichiers toutes les demi-secondes (D-031).
+const scrutation = process.env.SCRUTATION_FICHIERS === '1'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
+  experimental: scrutation ? { watcher: 'chokidar' } : {},
+  watchers: {
+    chokidar: { usePolling: scrutation, interval: 500 },
+  },
+  vite: {
+    server: { watch: scrutation ? { usePolling: true, interval: 500 } : {} },
+  },
 
   css: ['~/assets/css/principal.css'],
 
