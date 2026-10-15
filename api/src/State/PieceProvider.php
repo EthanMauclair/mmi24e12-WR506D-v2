@@ -21,7 +21,7 @@ final class PieceProvider implements ProviderInterface
     ) {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): PieceRessource
     {
         return PieceRessource::depuis($this->acces->piece($uriVariables['id']));
     }

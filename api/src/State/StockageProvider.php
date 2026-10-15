@@ -21,7 +21,7 @@ final class StockageProvider implements ProviderInterface
     ) {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): StockageRessource
     {
         return StockageRessource::depuis($this->acces->stockage($uriVariables['id']));
     }

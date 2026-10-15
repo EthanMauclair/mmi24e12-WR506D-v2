@@ -75,7 +75,7 @@ abstract class ApiTestCase extends WebTestCase
         $this->client->request($methode, $url, [], [], $entetes, null === $corps ? null : json_encode($corps, \JSON_THROW_ON_ERROR));
     }
 
-    /** @return array<string, mixed> */
+    /** @return array<mixed> un objet JSON (clés texte) ou une liste (clés numériques) */
     protected function reponse(): array
     {
         return json_decode((string) $this->client->getResponse()->getContent(), true, 512, \JSON_THROW_ON_ERROR);

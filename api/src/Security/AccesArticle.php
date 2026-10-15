@@ -25,7 +25,7 @@ final class AccesArticle
     ) {
     }
 
-    /** @param ArticleVoter::* $droit */
+    /** @param ArticleVoter::VOIR|ArticleVoter::MODIFIER $droit */
     public function article(mixed $id, string $droit = ArticleVoter::VOIR): Article
     {
         $article = is_numeric($id) ? $this->articles->find((int) $id) : null;
