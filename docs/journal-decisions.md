@@ -407,3 +407,15 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Dette assumée** : une photo envoyée puis abandonnée (fiche annulée) reste dans le stockage sans article. À nettoyer par une tâche planifiée (photos de plus de 24 h sans article).
 - **Limite connue** : la caméra intégrée exige HTTPS ou `localhost`. Depuis un téléphone sur le réseau local, il faudra un certificat (et ouvrir le CORS à cette adresse) ; en attendant, le repli sur l'appareil photo du téléphone fonctionne.
 - **IA** : l'assistant a écrit les deux étapes d'après la maquette ; essai complet dans le navigateur (photo déposée, fiche, article visible sur le profil avec sa photo).
+
+## D-031 – Le front relit lui-même ses fichiers sous Docker
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : après la fusion des PR #26 et #27 et un `git pull`, `/logements` et `/logements/nouveau` répondaient 404 alors que les fichiers étaient bien dans `develop`. Docker Desktop sous Windows ne transmet pas au conteneur les événements « fichier modifié » du dossier partagé : le serveur Nuxt ne voyait pas les nouvelles pages et servait l'état d'avant le `git pull`.
+- **Décision** : avec `SCRUTATION_FICHIERS=1` (posé dans `compose.yaml`), Nuxt et Vite relisent les fichiers toutes les demi-secondes (`usePolling`), au lieu d'attendre une notification.
+- **Alternatives écartées** :
+  - Redémarrer le conteneur après chaque `git pull` : facile à oublier, et c'est ce qui a fait croire que les écrans n'étaient pas codés.
+  - Placer le projet dans WSL 2 : règle aussi la lenteur (D-027), mais change l'installation du poste.
+- **Conséquences** : un peu de processeur en plus pendant le développement ; une page ajoutée ou modifiée apparaît sans redémarrer.
+- **IA** : l'assistant avait contourné le problème pendant ses essais en redémarrant le conteneur, sans le corriger ni le signaler. Corrigé après le retour de l'étudiant.
