@@ -19,7 +19,7 @@ const entrees: Entree[] = [
   { libelle: 'Mes tenues', icone: 'tenue', vers: null },
   { libelle: 'Mon profil', icone: 'profil', vers: '/profil' },
 ]
-const ajout: string | null = null
+const ajout: string | null = '/ajout'
 
 const { moi } = useSession()
 </script>
