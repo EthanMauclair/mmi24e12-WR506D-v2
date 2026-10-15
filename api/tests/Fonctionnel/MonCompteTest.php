@@ -98,4 +98,34 @@ final class MonCompteTest extends ApiTestCase
         $this->em->clear();
         self::assertSame(0, $this->em->getRepository(Utilisateur::class)->count([]));
     }
+
+    #[Test]
+    public function f01_je_change_mon_e_mail_s_il_n_est_pas_deja_pris(): void
+    {
+        $camille = $this->creerMajeur('camille');
+        $this->creerMajeur('leo');
+        $jeton = $this->jetonDe($camille);
+
+        $this->json('PATCH', '/api/moi', ['email' => 'Leo@exemple.fr'], $jeton);
+        self::assertResponseStatusCodeSame(409, 'Sans tenir compte des majuscules.');
+
+        $this->json('PATCH', '/api/moi', ['email' => 'Camille.Martin@Exemple.fr'], $jeton);
+        self::assertResponseIsSuccessful();
+        self::assertSame('camille.martin@exemple.fr', $this->reponse()['email']);
+    }
+
+    #[Test]
+    public function f01_apres_un_changement_de_mot_de_passe_l_ancien_ne_marche_plus(): void
+    {
+        $camille = $this->creerMajeur('camille');
+
+        $this->json('PATCH', '/api/moi', ['motDePasse' => 'un-nouveau-mot-de-passe'], $this->jetonDe($camille));
+        self::assertResponseIsSuccessful();
+
+        $this->json('POST', '/api/auth/connexion', ['identifiant' => 'camille', 'motDePasse' => self::MOT_DE_PASSE]);
+        self::assertResponseStatusCodeSame(401);
+
+        $this->json('POST', '/api/auth/connexion', ['identifiant' => 'camille', 'motDePasse' => 'un-nouveau-mot-de-passe']);
+        self::assertResponseIsSuccessful();
+    }
 }

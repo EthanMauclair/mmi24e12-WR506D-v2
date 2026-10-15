@@ -248,4 +248,48 @@ final class LogementApiTest extends ApiTestCase
         $this->json('DELETE', '/api/membres/'.$membreCamille, null, $this->jetonDe($this->camille));
         self::assertResponseStatusCodeSame(403);
     }
+
+    #[Test]
+    public function f05_sans_co_proprietaire_le_logement_supprime_disparait(): void
+    {
+        $studio = Logement::creer('Studio', $this->nina, new \DateTimeImmutable());
+        $this->em->persist($studio);
+        $this->em->flush();
+        $id = $studio->getId();
+        $jeton = $this->jetonDe($this->nina);
+
+        $this->json('DELETE', '/api/logements/'.$id, null, $jeton);
+        self::assertResponseStatusCodeSame(204);
+
+        $this->json('GET', '/api/logements/'.$id, null, $jeton);
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    #[Test]
+    public function s01_un_identifiant_qui_n_est_pas_un_nombre_repond_404(): void
+    {
+        $this->json('GET', '/api/logements/abc', null, $this->jetonDe($this->camille));
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    #[Test]
+    public function f11_on_n_invite_pas_un_pseudo_inconnu(): void
+    {
+        $this->json('POST', '/api/logements/'.$this->appartement->getId().'/membres', ['pseudo' => 'personne'], $this->jetonDe($this->camille));
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    #[Test]
+    public function h13_seule_la_personne_invitee_accepte_l_invitation(): void
+    {
+        $this->creerMajeur('suzanne');
+        $this->json('POST', '/api/logements/'.$this->appartement->getId().'/membres', ['pseudo' => 'suzanne'], $this->jetonDe($this->leo));
+        $invitation = $this->reponse()['id'];
+
+        $this->json('POST', '/api/membres/'.$invitation.'/acceptation', null, $this->jetonDe($this->camille));
+
+        self::assertResponseStatusCodeSame(403, 'Camille voit l\'invitation (membre du logement) mais n\'accepte pas à la place de Suzanne.');
+    }
 }

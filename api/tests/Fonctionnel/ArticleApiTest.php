@@ -8,6 +8,8 @@ use App\Entity\Article;
 use App\Entity\Logement;
 use App\Entity\Stockage;
 use App\Entity\Utilisateur;
+use App\Service\PhotoArticles;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -355,6 +357,132 @@ final class ArticleApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
+    #[Test]
+    public function f26_je_filtre_par_couleur_par_marque_et_par_logement(): void
+    {
+        $bleu = $this->article($this->camille);
+        $noir = $this->article($this->camille);
+        $this->relire($noir)->decrire($this->categorie('Pull'), 'Zara', 'Noir', null);
+        $this->em->flush();
+        $jeton = $this->jetonDe($this->leo);
+
+        $this->json('GET', '/api/articles?couleur=bleu', null, $jeton);
+        self::assertSame([$bleu->getId()], array_column($this->reponse(), 'id'));
+
+        $this->json('GET', '/api/articles?marque=zar', null, $jeton);
+        self::assertSame([$noir->getId()], array_column($this->reponse(), 'id'));
+
+        $this->json('GET', '/api/articles?logement='.$this->appartement->getId(), null, $jeton);
+        self::assertCount(2, $this->reponse());
+
+        $this->json('GET', '/api/articles?logement=999999', null, $jeton);
+        self::assertSame([], $this->reponse());
+    }
+
+    #[Test]
+    public function f27_on_filtre_les_articles_d_une_personne_par_logement(): void
+    {
+        $pull = $this->article($this->camille);
+
+        $this->json('GET', '/api/utilisateurs/camille/articles?logement='.$this->appartement->getId());
+        self::assertSame([$pull->getId()], array_column($this->reponse(), 'id'));
+
+        $this->json('GET', '/api/utilisateurs/camille/articles?logement=999999');
+        self::assertSame([], $this->reponse());
+    }
+
+    #[Test]
+    public function f09_on_change_la_categorie_d_un_article(): void
+    {
+        $article = $this->article($this->camille);
+
+        $this->json('PATCH', '/api/articles/'.$article->getId(), ['categorie' => $this->categorie('Vinyle')->getId()], $this->jetonDe($this->camille));
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('Vinyle', $this->reponse()['categorie']['nom']);
+    }
+
+    #[Test]
+    public function f07_une_photo_absente_trop_lourde_ou_mal_recue_est_refusee(): void
+    {
+        $jeton = $this->jetonDe($this->leo);
+        $fichier = (string) tempnam(sys_get_temp_dir(), 'photo');
+
+        $this->envoyer([], $jeton);
+        self::assertResponseStatusCodeSame(422);
+
+        $this->envoyer(['photo' => new UploadedFile($fichier, 'photo.jpg', 'image/jpeg', \UPLOAD_ERR_INI_SIZE, true)], $jeton);
+        self::assertResponseStatusCodeSame(413);
+
+        $this->envoyer(['photo' => new UploadedFile($fichier, 'photo.jpg', 'image/jpeg', \UPLOAD_ERR_PARTIAL, true)], $jeton);
+        self::assertResponseStatusCodeSame(422);
+        self::assertStringContainsString('pas pu être reçue', $this->reponse()['detail']);
+    }
+
+    #[Test]
+    public function f07_les_photos_png_et_webp_sont_converties_en_jpg(): void
+    {
+        $jeton = $this->jetonDe($this->leo);
+        foreach (['png' => 'imagepng', 'webp' => 'imagewebp'] as $format => $ecrire) {
+            $fichier = (string) tempnam(sys_get_temp_dir(), 'photo');
+            $ecrire(imagecreatetruecolor(300, 200), $fichier);
+
+            $this->envoyer(['photo' => new UploadedFile($fichier, 'photo.'.$format, 'image/'.$format, null, true)], $jeton);
+
+            self::assertResponseStatusCodeSame(201, $format);
+            $infos = getimagesizefromstring($this->photoEnregistree($this->reponse()['photo']));
+            self::assertIsArray($infos);
+            self::assertSame([300, 200, 'image/jpeg'], [$infos[0], $infos[1], $infos['mime']], $format);
+        }
+    }
+
+    /** @return \Generator<string, array{int, int, int, string}> orientation EXIF => dimensions attendues et couleur du coin en haut à gauche */
+    public static function orientations(): \Generator
+    {
+        yield 'retournée (3)' => [3, 200, 100, 'bleu'];
+        yield 'tournée vers la droite (6)' => [6, 100, 200, 'rouge'];
+        yield 'tournée vers la gauche (8)' => [8, 100, 200, 'bleu'];
+    }
+
+    #[Test]
+    #[DataProvider('orientations')]
+    public function f07_une_photo_prise_de_travers_est_redressee(int $orientation, int $largeur, int $hauteur, string $coinHautGauche): void
+    {
+        // Moitié gauche rouge, moitié droite bleue, et l'orientation notée par le téléphone.
+        $image = imagecreatetruecolor(200, 100);
+        imagefilledrectangle($image, 0, 0, 99, 99, (int) imagecolorallocate($image, 255, 0, 0));
+        imagefilledrectangle($image, 100, 0, 199, 99, (int) imagecolorallocate($image, 0, 0, 255));
+        ob_start();
+        imagejpeg($image, null, 95);
+        $fichier = (string) tempnam(sys_get_temp_dir(), 'photo');
+        file_put_contents($fichier, self::avecOrientation((string) ob_get_clean(), $orientation));
+
+        $this->envoyer(['photo' => new UploadedFile($fichier, 'photo.jpg', 'image/jpeg', null, true)], $this->jetonDe($this->leo));
+
+        self::assertResponseStatusCodeSame(201);
+        $redressee = imagecreatefromstring($this->photoEnregistree($this->reponse()['photo']));
+        self::assertInstanceOf(\GdImage::class, $redressee);
+        self::assertSame([$largeur, $hauteur], [imagesx($redressee), imagesy($redressee)]);
+        $pixel = (int) imagecolorat($redressee, 5, 5);
+        self::assertSame($coinHautGauche, ($pixel >> 16 & 255) > ($pixel & 255) ? 'rouge' : 'bleu');
+    }
+
+    #[Test]
+    public function supprimer_un_article_supprime_aussi_sa_photo(): void
+    {
+        $jeton = $this->jetonDe($this->camille);
+        $photo = $this->envoyerPhoto($jeton);
+        $this->json('POST', '/api/articles', ['photo' => $photo, 'stockage' => $this->armoire->getId(), 'categorie' => $this->categorie('Pull')->getId()], $jeton);
+        $id = $this->reponse()['id'];
+
+        $this->json('DELETE', '/api/articles/'.$id, null, $jeton);
+
+        self::assertResponseStatusCodeSame(204);
+        $camille = $this->em->find(Utilisateur::class, $this->camille->getId());
+        self::assertNotNull($camille);
+        self::assertFalse(static::getContainer()->get(PhotoArticles::class)->appartientA($photo, $camille), 'Plus de photo orpheline dans le stockage.');
+    }
+
     /**
      * Après chaque requête, Symfony vide le gestionnaire d'entités : on recharge l'auteur et le
      * rangement pour pouvoir créer un article à tout moment du test.
@@ -394,5 +522,30 @@ final class ArticleApiTest extends ApiTestCase
         ]);
 
         return $this->reponse()['photo'] ?? '';
+    }
+
+    /** @param array<string, UploadedFile> $fichiers */
+    private function envoyer(array $fichiers, string $jeton): void
+    {
+        $this->client->getCookieJar()->clear();
+        $this->client->request('POST', '/api/reconnaissances', [], $fichiers, [
+            'HTTP_AUTHORIZATION' => 'Bearer '.$jeton,
+            'HTTP_ACCEPT' => 'application/json',
+        ]);
+    }
+
+    private function photoEnregistree(string $chemin): string
+    {
+        return static::getContainer()->get(PhotoArticles::class)->lire($chemin);
+    }
+
+    /** Ajoute un bloc EXIF minimal (une seule étiquette : Orientation), comme le ferait un téléphone. */
+    private static function avecOrientation(string $jpeg, int $orientation): string
+    {
+        $entree = pack('nnN', 0x0112, 3, 1).pack('n', $orientation)."\x00\x00";
+        $tiff = 'MM'."\x00\x2A".pack('N', 8).pack('n', 1).$entree.pack('N', 0);
+        $app1 = "Exif\x00\x00".$tiff;
+
+        return substr($jpeg, 0, 2)."\xFF\xE1".pack('n', \strlen($app1) + 2).$app1.substr($jpeg, 2);
     }
 }

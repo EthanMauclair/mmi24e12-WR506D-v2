@@ -280,6 +280,20 @@ final class RelationApiTest extends ApiTestCase
         self::assertSame(['nora'], array_column(array_column($this->reponse(), 'suiveur'), 'pseudo'));
     }
 
+    #[Test]
+    public function f17_la_personne_suivie_fait_d_un_abonne_un_ami(): void
+    {
+        $this->preparer(camillePrivee: false);
+        $this->json('POST', '/api/utilisateurs/camille/abonnement', null, $this->jetonDe($this->nora));
+        $relation = $this->reponse()['id'];
+
+        $this->json('PATCH', '/api/relations/'.$relation, ['niveau' => 'AMI'], $this->jetonDe($this->camille));
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('AMI', $this->reponse()['niveau']);
+        self::assertSame('ACCEPTEE', $this->reponse()['statut']);
+    }
+
     /** Recharge l'auteur et le rangement : Symfony vide le gestionnaire d'entités après chaque requête. */
     private function article(Utilisateur $auteur): Article
     {
