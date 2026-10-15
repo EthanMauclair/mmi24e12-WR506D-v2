@@ -111,6 +111,21 @@ docker compose exec php php bin/phpunit
 
 Les tests utilisent la base `penderie_test` et lisent leurs secrets dans `api/.env.test.local` (non commité, mêmes valeurs que `api/.env.local`).
 
+### Qualité et raccourcis (Makefile)
+
+Les commandes courantes sont regroupées dans le [Makefile](Makefile) ; `make` seul les liste.
+
+```bash
+make qualite   # tout vérifier, comme la CI : linters, PHPStan, style, audit des dépendances, tests
+make phpstan   # analyse statique, niveau 6
+make cs        # style du code PHP (make cs-corriger pour corriger)
+make tests     # PHPUnit
+```
+
+Sous Windows, `make` n'est pas installé d'office : `winget install ezwinports.make`, puis rouvrir le terminal. Sans `make`, chaque commande du Makefile peut être copiée telle quelle.
+
+Résultats et analyse : [audit.md](audit.md).
+
 ### Versions
 
 | Outil | Version |
