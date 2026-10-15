@@ -480,3 +480,26 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Désactiver les boutons jusqu'à l'hydratation : la page resterait inutilisable sans JavaScript, et l'adresse pourrait toujours être construite par une autre voie.
   - Faire attendre les tests un délai fixe : lent, et fragile.
 - **IA** : défaut révélé par les tests Cypress écrits par l'assistant (échecs aléatoires analysés) ; l'assistant a proposé la correction.
+
+## D-036 – Fixtures, couverture et tests de bout en bout
+
+- **Date** : 15/10/2026
+- **Statut** : Validée (branche `feature/test`, non fusionnée dans `develop` comme le demande la séance 16)
+- **Contexte** : séances 16 à 21. Détail dans [coverage.md](../coverage.md) et [ci.md](../ci.md).
+- **Décisions** :
+  - **Fixtures** (`make fixtures`) :
+    - les personnes des parcours, 20 comptes générés et 1 000 articles avec de vraies photos dans le stockage ;
+    - un fournisseur Faker propre au domaine : catégories pondérées, marques et couleurs par catégorie, rangement plausible selon la catégorie ;
+    - une graine fixe : les mêmes données à chaque chargement, vérifié par une somme de contrôle ;
+    - la table `categorie` n'est pas vidée (`--purge-exclusions`), car elle vient d'une migration ;
+    - mot de passe de démonstration commun : `penderie-demo`.
+  - **Couverture à 100 %** (PCOV, désactivé hors mesure) :
+    - fixtures et `Kernel.php` sont hors mesure ;
+    - deux lignes inatteignables sont exclues, avec leur justification dans le code ;
+    - les trous de la première mesure étaient des **routes jamais testées** (rangements, pièces, compte, photos), pas des lignes à faire monter.
+  - **Les tests PHP n'utilisent pas les fixtures** : chacun crée les 2 ou 3 objets dont il a besoin, pour ne pas casser au moindre changement du jeu de démonstration.
+  - **Cypress sur le poste**, dans `e2e/`, contre l'application lancée par Docker, avec le compte de démonstration. Les tests attendent la fin de l'hydratation (D-035).
+- **Alternatives écartées** :
+  - Fixtures avec `--purge-with-truncate` pour remettre les identifiants à zéro : MySQL refuse de vider une table référencée par une clé étrangère.
+  - Cypress dans Docker (`cypress/included`) : image de plus de 2 Go, réservée à la CI.
+- **IA** : l'assistant a écrit les fixtures, les tests et la configuration. La mesure de couverture et les échecs de Cypress ont révélé des oublis du code écrit avec l'assistant : routes jamais testées, mot de passe dans l'adresse (D-035).
