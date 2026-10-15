@@ -314,3 +314,39 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **A-03** : un non-membre voit un article non personnel si le compte de son auteur est public **ou** s'il a une relation acceptée (abonné ou ami) avec cet auteur. Une demande en attente ne donne rien. On suit une personne, pas un logement (D-013).
 - **À confirmer** : un compte **mineur** gère lui-même ses demandes d'abonnement (comme Jules dans les tests). Faut-il que son référent les valide à sa place ?
 - **IA** : l'assistant a proposé ces choix pendant l'implémentation.
+
+## D-025 – Front : session, accès aux pages et mise en page
+
+- **Date** : 14/10/2026
+- **Statut** : Validée
+- **Contexte** : premiers écrans du front Nuxt (écrans 1 et 2 des maquettes), branchés sur l'authentification de l'API (D-015).
+- **Décisions** :
+  - **Le front ne lit jamais le jeton.** Il reste dans le cookie httpOnly `BEARER`. Pour savoir qui est connecté, le front demande `GET /api/moi` ; un 401 veut dire « personne ». Le jeton renvoyé aussi dans la réponse de connexion (pour Postman) est ignoré.
+  - **Deux adresses pour l'API** : pendant le rendu serveur, Nuxt joint l'API par le réseau Docker (`http://nginx`) et recopie l'en-tête `Cookie` du navigateur ; dans le navigateur, il appelle `http://localhost:8080` avec `credentials: 'include'`. Le front (port 3000) et l'API (port 8080) sont sur le **même site** (`localhost`) : le cookie `SameSite=Lax` est donc bien envoyé.
+  - **Pages réservées par défaut**, comme l'API (D-014) : un middleware global renvoie vers la connexion, sauf pour les pages marquées `public` (profils publics, liens de partage, à venir) ou `invite` (connexion, inscription). Ce n'est qu'un confort : la protection reste l'API.
+  - **Retour après connexion** : la page demandée est passée dans `?retour=`, et seul un chemin interne est accepté, pour ne pas servir de redirection vers un autre site.
+  - **Connexion refusée** : un seul message (« identifiant ou mot de passe incorrect »), qui ne dit pas si le compte existe.
+  - **CSS écrit à la main**, sans bibliothèque de composants : six écrans, une couleur, deux polices ; une bibliothèque ajouterait du poids sans rien apporter.
+  - **Navigation complète dès maintenant** : les entrées qui arrivent avec les prochaines branches (recherche, tenues, profil, ajout) sont affichées mais inactives, pour ne pas changer la mise en page à chaque étape. « Mes logements » sert d'accueil.
+  - **Fidèle au canevas « Maquettes PENDERIE »**, avec trois écarts volontaires :
+    - « Photographiez un article, il se range tout seul » devient « rangez-le dans le bon placard » : en V1, la photo ne remplit rien (D-023) et c'est la personne qui choisit le rangement (D-010) ;
+    - le lien « Découvrir sans compte » n'est pas affiché : il mène aux profils publics (F-21), pas encore construits ;
+    - l'icône « réglages » de l'en-tête mobile est remplacée par « se déconnecter », seule action de compte disponible pour l'instant.
+- **Conséquences** :
+  - Les messages de validation par défaut de Symfony (longueur, e-mail…) sont en anglais : le formulaire d'inscription vérifie donc les mêmes règles en français avant l'envoi. Traduire les messages de l'API reste à faire.
+  - Un jeton expiré dans le cookie fait répondre 401 à toutes les routes, même publiques, tant que le navigateur garde le cookie. Le cookie et le jeton ont la même durée (1 h), donc le cas reste rare ; il sera réglé avec `/api/auth/rafraichir`.
+- **IA** : l'assistant a proposé et écrit ces choix ; les essais ont été faits dans le navigateur (inscription, connexion, rendu serveur, déconnexion, mauvais mot de passe, mobile et desktop).
+
+## D-026 – Police sans empattements et mot de passe visible
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : à l'essai du front, les titres en Cormorant Garamond (police avec empattements, fine) étaient jugés peu lisibles. Rien ne permettait non plus de vérifier le mot de passe saisi, ce qui est pénible au téléphone.
+- **Décisions** :
+  - **Une seule police, Atkinson Hyperlegible**, pour les titres comme pour le texte. Elle est dessinée par le Braille Institute pour les personnes malvoyantes : chaque lettre se distingue des autres (l, I, 1, O, 0). Elle n'existe qu'en deux graisses (normale et grasse), ce qui simplifie aussi la hiérarchie. Les tailles des titres sont réduites, une police sans empattements en gras paraissant plus grande.
+  - **Bouton « Afficher le mot de passe »** sur la connexion et l'inscription (composant `ChampMotDePasse`), avec un libellé lu par les lecteurs d'écran et l'état `aria-pressed`. Le mot de passe reste masqué par défaut.
+- **Alternatives écartées** :
+  - Garder Manrope seule : sans empattements aussi, mais ses lettres « l » et « I » se confondent.
+  - Un second champ « confirmer le mot de passe » : il double la saisie ; l'affichage en clair permet la même vérification.
+- **Conséquences** : les canevas de maquettes gardent l'ancienne police, le front fait foi (docs/09-maquettes.md).
+- **IA** : demandé par moi après essai ; l'assistant a proposé la police et écrit le composant.

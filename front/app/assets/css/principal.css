@@ -1,0 +1,204 @@
+/*
+ * Styles communs de PENDERIE, repris du canevas « Maquettes PENDERIE » (docs/09-maquettes.md).
+ * Mobile d'abord : les règles de base visent un téléphone, la mise en page desktop
+ * s'ajoute à partir de 1024 px.
+ */
+
+:root {
+  --bordeaux: #6e1a2b;
+  --bordeaux-fonce: #4a101c;
+  --bordeaux-clair: #f5e9ec;
+  --fond: #faf8f7;
+  --surface: #ffffff;
+  --texte: #1f1517;
+  --texte-doux: #5c4e51;
+  --texte-aide: #6b5d60;
+  --bordure: #d9cfd1;
+  --ligne: #e6dddf;
+  --erreur: #b3261e;
+
+  /* Une seule police, sans empattements, pour les titres comme pour le texte (D-026). */
+  --police-titre: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --police-texte: 'Atkinson Hyperlegible', system-ui, sans-serif;
+
+  --rayon: 12px;
+  --rayon-bouton: 14px;
+  --zone-tactile: 44px;
+  --largeur-menu: 260px;
+  --hauteur-barre: 76px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: var(--police-texte);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--police-titre);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+h2 {
+  font-size: 1.35rem;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--bordeaux);
+}
+
+a:hover {
+  color: var(--bordeaux-fonce);
+}
+
+:focus-visible {
+  outline: 3px solid var(--bordeaux);
+  outline-offset: 2px;
+}
+
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Boutons ---------- */
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 52px;
+  padding: 0 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--rayon-bouton);
+  font: 700 1rem var(--police-texte);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bouton-principal {
+  background: var(--bordeaux);
+  color: #fff;
+}
+
+.bouton-principal:hover {
+  background: var(--bordeaux-fonce);
+}
+
+.bouton-secondaire {
+  min-height: var(--zone-tactile);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-color: var(--bordure);
+  color: var(--texte);
+}
+
+.bouton-secondaire:hover {
+  border-color: var(--bordeaux);
+}
+
+.bouton[disabled] {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.bouton-large {
+  width: 100%;
+}
+
+/* ---------- Formulaires ---------- */
+
+.formulaire {
+  display: grid;
+  gap: 1rem;
+}
+
+.champ {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.champ label,
+.champ legend {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.champ input {
+  height: 50px;
+  min-width: 0;
+  padding: 0 14px;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--texte);
+  font: inherit;
+  font-size: 15px;
+}
+
+.champ input:focus {
+  outline: 2px solid var(--bordeaux);
+  outline-offset: 1px;
+}
+
+.champ input[aria-invalid='true'] {
+  border-color: var(--erreur);
+}
+
+.aide {
+  color: var(--texte-aide);
+  font-size: 12px;
+}
+
+.message-champ {
+  color: var(--erreur);
+  font-size: 12px;
+}
+
+.alerte {
+  padding: 0.75rem 1rem;
+  border-radius: var(--rayon);
+  background: #fbeaea;
+  color: var(--erreur);
+  font-size: 0.95rem;
+}
+
+.carte {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 1.25rem;
+}
