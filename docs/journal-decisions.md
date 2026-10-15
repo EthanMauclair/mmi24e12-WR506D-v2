@@ -380,3 +380,30 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **Tenues** : le compteur affiche 0 et l'onglet annonce la fonction, en attendant F-23.
 - **Dette assumée** : changer son mot de passe ou son e-mail ne demande pas le mot de passe actuel. Quelqu'un qui trouve une session ouverte pourrait s'approprier le compte. À ajouter côté API (champ `motDePasseActuel` exigé pour ces deux changements).
 - **IA** : demandé par moi après essai ; l'assistant a écrit la route, ses tests et les deux écrans.
+
+## D-029 – Création guidée du logement (écran 3)
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : écran 3 des maquettes (F-05, F-06, D-010) ; branche `feature/front-logement`.
+- **Décisions** :
+  - **Tout est préparé dans la page, puis envoyé à la validation** : le logement, puis chaque pièce, puis chaque rangement (`POST /logements`, `/logements/{id}/pieces`, `/pieces/{id}/stockages`). On peut ajouter, renommer et retirer avant d'enregistrer, sans appel à l'API.
+  - **Un nouvel essai ne recrée rien** : si une requête échoue en cours de route, ce qui est déjà enregistré est retenu et sauté au nouvel essai, pour ne pas créer deux fois le même logement.
+  - **Parcours guidé seulement pour le premier logement** : l'inscription y mène (D-010), avec « Étape 1 sur 2 », « Plus tard » et « Photographier un premier article ». Pour un logement suivant, l'écran devient « Nouveau logement » avec « Créer le logement ».
+  - **« Mes logements »** liste chaque logement avec ses pièces et rangements (un appel `GET /logements/{id}` par logement : la liste ne contient pas les pièces).
+- **Conséquences** : une pièce ou un rangement ne se renomme ou ne se supprime pas encore depuis « Mes logements » (les routes existent : à brancher).
+- **IA** : l'assistant a écrit l'écran d'après la maquette ; essais dans le navigateur (création complète, nom vide refusé, desktop et mobile).
+
+## D-030 – Ajout d'un article par photo (écrans 5 et 6)
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : écrans 5 et 6 des maquettes (F-07, F-08, F-10, P2) ; branche `feature/front-ajout-article`. Le remplissage automatique est reporté (D-023).
+- **Décisions** :
+  - **Une seule page `/ajout` en deux étapes** (photo, puis fiche) : la photo et son aperçu ne se perdent pas entre deux pages, et « Changer de photo » revient simplement à l'étape 1.
+  - **Photo** : sur téléphone, la caméra s'ouvre dans la page (`getUserMedia`) ; si elle est refusée ou indisponible, le déclencheur ouvre l'appareil photo du téléphone (`<input capture>`). Sur ordinateur : glisser-déposer, choix d'un fichier, ou webcam. Formats et taille vérifiés avant l'envoi (JPG, PNG, WebP, 10 Mo), comme l'API.
+  - **Fiche saisie à la main** (D-023) : le bandeau « Proposition automatique » de la maquette devient « Fiche de l'article ». Le lien « Saisir à la main, sans photo » n'est pas repris : l'API exige une photo pour créer un article (P2 : la photo est toujours gardée, seule la reconnaissance peut échouer).
+  - **Rangement** choisi après la photo (D-010), dans une liste « Logement › Pièce › Rangement » ; s'il n'y en a aucun, la fiche renvoie vers la création du logement.
+- **Dette assumée** : une photo envoyée puis abandonnée (fiche annulée) reste dans le stockage sans article. À nettoyer par une tâche planifiée (photos de plus de 24 h sans article).
+- **Limite connue** : la caméra intégrée exige HTTPS ou `localhost`. Depuis un téléphone sur le réseau local, il faudra un certificat (et ouvrir le CORS à cette adresse) ; en attendant, le repli sur l'appareil photo du téléphone fonctionne.
+- **IA** : l'assistant a écrit les deux étapes d'après la maquette ; essai complet dans le navigateur (photo déposée, fiche, article visible sur le profil avec sa photo).
