@@ -87,6 +87,18 @@ class ArticleRepository extends ServiceEntityRepository
         return $requete->getQuery()->getResult();
     }
 
+    /** F-04 : nombre d'articles non personnels dont cette personne est l'auteur (mêmes règles que visiblesDe). */
+    public function nombreVisiblesDe(Utilisateur $auteur): int
+    {
+        return (int) $this->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->andWhere('a.auteur = :auteur')
+            ->andWhere('a.estPersonnel = false')
+            ->setParameter('auteur', $auteur)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     /** Une photo ne sert qu'à un seul article. */
     public function photoDejaUtilisee(string $photo): bool
     {

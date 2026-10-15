@@ -10,10 +10,10 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ArticleRessource;
 use App\Entity\Utilisateur;
 use App\Repository\ArticleRepository;
-use App\Repository\RelationRepository;
 use App\Repository\UtilisateurRepository;
 use App\Security\AccesArticle;
 use App\Security\AccesLogement;
+use App\Security\AccesProfil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -32,7 +32,7 @@ final class ArticleProvider implements ProviderInterface
         private readonly ArticleRepository $articles,
         private readonly Security $securite,
         private readonly UtilisateurRepository $utilisateurs,
-        private readonly RelationRepository $relations,
+        private readonly AccesProfil $accesProfil,
     ) {
     }
 
@@ -85,9 +85,7 @@ final class ArticleProvider implements ProviderInterface
     {
         $auteur = $this->utilisateurs->findOneBy(['pseudo' => $pseudo])
             ?? throw new NotFoundHttpException('Ressource introuvable.');
-        $moi = $this->securite->getUser();
-        if ($auteur->estPrive() && $moi !== $auteur
-            && !($moi instanceof Utilisateur && $this->relations->estAcceptee($moi, $auteur))) {
+        if (!$this->accesProfil->voitLesArticlesDe($auteur)) {
             return [];
         }
 
