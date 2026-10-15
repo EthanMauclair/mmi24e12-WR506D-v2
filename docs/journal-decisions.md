@@ -419,3 +419,17 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Placer le projet dans WSL 2 : règle aussi la lenteur (D-027), mais change l'installation du poste.
 - **Conséquences** : un peu de processeur en plus pendant le développement ; une page ajoutée ou modifiée apparaît sans redémarrer.
 - **IA** : l'assistant avait contourné le problème pendant ses essais en redémarrant le conteneur, sans le corriger ni le signaler. Corrigé après le retour de l'étudiant.
+
+## D-032 – Voir les articles d'une pièce et compléter la saisie des rangements
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : retour de l'étudiant après un essai du parcours P1 et P2 :
+  - les pièces de « Mes logements » n'étaient pas cliquables, on ne pouvait pas voir ce qu'elles contiennent (P3 : « où est ma veste ? ») ;
+  - la fiche d'un nouvel article ne proposait pas un logement tout juste créé. Ses pièces n'avaient pas de rangement, et la fiche ne listait que les pièces qui en ont un. Aucun message ne l'expliquait, et le modèle exige un rangement pour chaque article.
+- **Décisions** :
+  - **API** : `GET /api/articles` accepte `?piece=` et `?stockage=` (contrat mis à jour), toujours limités aux logements dont je suis membre (A-01). On filtre côté serveur et non dans le navigateur : la liste est paginée par 30.
+  - **Page d'une pièce** (`/logements/{id}/pieces/{piece}`) : ses articles, personnels compris, avec leur rangement ; filtre par rangement repris dans l'adresse (`?rangement=`), pour qu'un clic sur un rangement dans « Mes logements » y mène ; « Voir plus » au-delà de 30.
+  - **Ajouter un rangement là où il manque** : depuis la page de la pièce (« + Rangement ») et depuis la fiche d'un nouvel article, sans quitter l'ajout.
+  - **La fiche liste toutes les pièces**, y compris celles sans rangement (non sélectionnables, avec une invitation à en créer un).
+- **IA** : le défaut de la fiche venait du code écrit par l'assistant (filtre silencieux sur les pièces sans rangement) ; reproduit puis corrigé.
