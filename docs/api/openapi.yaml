@@ -645,6 +645,8 @@ paths:
       parameters:
         - { name: q, in: query, schema: { type: string }, description: 'Mot cherché dans la marque, la couleur ou la note' }
         - { name: logement, in: query, schema: { type: integer } }
+        - { name: piece, in: query, schema: { type: integer }, description: 'Articles d''une pièce (tous ses rangements)' }
+        - { name: stockage, in: query, schema: { type: integer }, description: 'Articles d''un rangement' }
         - { name: categorie, in: query, schema: { type: integer } }
         - { name: couleur, in: query, schema: { type: string } }
         - { name: marque, in: query, schema: { type: string } }
