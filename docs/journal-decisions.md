@@ -451,5 +451,8 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 - **Alternatives écartées** :
   - `npm audit fix --force` : rétrograde Nuxt en 4.1.3 sans corriger ces deux paquets.
   - Une baseline PHPStan : inutile pour 16 erreurs, et elle cacherait la dette au lieu de la montrer.
-- **À faire** : brancher Snyk sur le dépôt GitHub. Il faut un compte, à créer par l'étudiant.
+  - `php:8.6-rc-zts-alpine3.24`, proposée par Snyk : version candidate de PHP 8.6, en mode multi-thread inutile ici.
+  - Garder Debian en mettant les paquets à jour : 220 failles sur 288 n'ont pas de correction.
+  - **Snyk** est branché sur le dépôt GitHub (branche `develop`), sans les PR de correction automatiques : elles contourneraient le Gitflow (`feature/…` vers `develop`) et le journal.
+  - **Image PHP sur Alpine** (`php:8.4-fpm-alpine` au lieu de `php:8.4-fpm`). Snyk relevait 288 failles dans le système Debian de l'image (3 critiques dans `perl`, 23 hautes), dont 220 sans correction publiée ; Trivy en compte 2 critiques et 124 hautes. Avec Alpine, Trivy n'en trouve plus que 2 moyennes, pour la même version de PHP. `www-data` garde l'identifiant 33 pour que les volumes existants restent utilisables.
 - **IA** : l'assistant a installé et configuré les outils, corrigé les erreurs, lancé axe-core sur les écrans et rédigé l'audit ; les vulnérabilités acceptées sont un choix de l'étudiant.

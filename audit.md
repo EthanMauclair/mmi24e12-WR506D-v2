@@ -16,7 +16,8 @@
 | `doctrine:schema:validate` | Mapping et schéma de la base | ✅ synchronisés | `make lint` |
 | `composer audit` | Vulnérabilités des dépendances PHP | ✅ aucune | `make audit` |
 | `npm audit` | Vulnérabilités des dépendances du front | ⚠️ 14 au départ (2 critiques, 12 hautes) → **11 hautes**, sans correctif publié, argumentées ci-dessous | `make audit` |
-| Snyk | Failles de sécurité, suivi continu | ⏳ à brancher sur le dépôt GitHub (compte à créer par l'étudiant) | – |
+| Snyk (dépôt GitHub, branche `develop`) | Dépendances, image Docker, code source | ✅ code source (Snyk Code) : 0 ; `composer.lock` : 0 ; front : voir § 3 ; image Docker : 288 failles → **image remplacée**, voir § 4 | app.snyk.io |
+| Trivy 0.58 | Failles du système de l'image Docker | `php:8.4-fpm` : 2 critiques, 124 hautes → `php:8.4-fpm-alpine` : **0 critique, 0 haute**, 2 moyennes | voir § 4 |
 | axe-core 4.10 (WCAG 2.1 AA) | Accessibilité des écrans | ✅ 0 défaut après correction (1 défaut corrigé) | dans le navigateur |
 | Build de production Nuxt | Poids des ressources | 95 Ko de JS et 7 Ko de CSS (gzip) pour toute l'application | `npx nuxt build` |
 | PHPUnit | Fonctionnement | ✅ 98 tests, 391 assertions | `make tests` |
@@ -75,7 +76,17 @@ Incident rencontré : `npm` 10 plantait (`Cannot read properties of null (readin
 
 **À revoir à chaque `make audit`** : dès qu'une version corrigée de `node-forge` ou de `braces` paraît, l'imposer de la même façon.
 
-## 4. Accessibilité numérique (A11Y)
+## 4. Image Docker de l'API
+
+Snyk a été branché sur le dépôt GitHub (branche `develop`). Il analyse aussi `docker/php/Dockerfile` : l'image de base `php:8.4-fpm` (Debian 13) contenait **288 failles** selon Snyk (3 critiques, 23 hautes, 8 moyennes, 254 faibles), et 1 985 selon Trivy (2 critiques, 124 hautes).
+
+- Elles viennent du **système Debian** embarqué, pas de notre code : les 3 critiques concernent `perl`, que l'application n'utilise pas ; les hautes, `libssh2`, `pcre2`, `sqlite3`, `gzip`…
+- 220 sur 288 n'ont aucune correction publiée : mettre les paquets à jour ne suffisait pas.
+- Snyk proposait `php:8.6-rc-zts-alpine3.24` : écarté, c'est une version **candidate** de PHP 8.6, en mode multi-thread (ZTS) dont nous n'avons pas besoin.
+
+**Décision** : passer à `php:8.4-fpm-alpine`, avec **la même version de PHP** (8.4) et un système Alpine réduit au strict nécessaire. Résultat Trivy : **0 critique, 0 haute, 2 moyennes**. `www-data` garde l'identifiant 33 de Debian, pour que les volumes `vendor/` et `var/` déjà créés restent utilisables sans manipulation. Vérifié après le changement : 98 tests verts (dont la réduction des photos avec GD), PHPStan, linters, API et front.
+
+## 5. Accessibilité numérique (A11Y)
 
 Outil : **axe-core 4.10.2**, règles WCAG 2.0 A et AA, WCAG 2.1 AA et bonnes pratiques, lancé dans le navigateur sur chaque écran (compte connecté, la barre de Nuxt DevTools exclue car absente en production).
 
@@ -103,7 +114,7 @@ Points vérifiés à la main (ce qu'un outil automatique ne voit pas) :
 
 **Non vérifié** : l'écran Inscription et l'étape « fiche » de l'ajout n'ont pas été passés à axe ; à faire avec Cypress (séances 16-21).
 
-## 5. Écoconception
+## 6. Écoconception
 
 | Mesure | Valeur | Commentaire |
 |---|---|---|
@@ -118,7 +129,7 @@ Points vérifiés à la main (ce qu'un outil automatique ne voit pas) :
 
 **Non mesuré** : Lighthouse et EcoIndex demandent un navigateur Chrome hors de Docker ; à lancer depuis le poste (onglet Lighthouse des outils de développement) sur `http://localhost:3000`.
 
-## 6. Expérience utilisateur (UX)
+## 7. Expérience utilisateur (UX)
 
 Constats issus du **test du parcours P1 et P2 par l'étudiant** (15/10/2026), tous corrigés :
 
@@ -133,7 +144,7 @@ Bonnes pratiques en place : retour visible à chaque action (« Enregistrement�
 
 **À améliorer** : supprimer ou renommer une pièce et un rangement après leur création (les routes de l'API existent) ; confirmation avant les actions irréversibles.
 
-## 7. Testabilité et fiabilité (séances 16 à 21)
+## 8. Testabilité et fiabilité (séances 16 à 21)
 
 - **Existant** : 98 tests PHPUnit (unitaires sur les entités, fonctionnels sur chaque route : cas nominal, erreurs, autorisations), base de test remise à zéro à chaque test (DAMADoctrineTestBundle).
 - **À faire** : fixtures Faker volumineuses et à graine fixe, mesure de la couverture (`coverage.md`), tests de bout en bout Cypress, CI GitHub Actions lançant `make qualite`, synthèse `ci.md`.
