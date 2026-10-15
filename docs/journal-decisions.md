@@ -467,3 +467,16 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **`ioredis` accepté**, comme `node-forge` et `braces` (D-033). `unstorage` ne s'en sert que pour son connecteur Redis, que l'application n'utilise pas, et il n'existe pas de version compatible avec Nuxt.
 - **Conséquences** : reconstruire l'image régulièrement (`docker compose build php`) suffit à récupérer les correctifs suivants. Côté front, Snyk liste 3 failles hautes et 1 moyenne, toutes héritées de Nuxt et sans correctif.
 - **IA** : l'assistant a lu les résultats de Snyk, vérifié l'image construite avec Trivy et relancé les 98 tests.
+
+## D-035 – Formulaires sensibles en POST et attente de l'hydratation
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : premiers tests Cypress (séance 16). En mode développement, la page arrive du serveur quelques secondes avant que Vue prenne la main dans le navigateur (hydratation). Un clic sur « Se connecter » pendant ce délai envoyait le formulaire comme un formulaire HTML ordinaire, **en GET** : l'identifiant et le **mot de passe partaient dans l'adresse** (`/connexion?identifiant=…&motDePasse=…`), donc dans l'historique du navigateur et dans les journaux du serveur. Une vraie personne peut le provoquer sur une connexion lente.
+- **Décisions** :
+  - Les formulaires qui contiennent un mot de passe ou un e-mail (connexion, inscription, paramètres) déclarent **`method="post"`**. Un envoi trop tôt ne met plus jamais ces données dans l'adresse. Une fois Vue prêt, rien ne change : l'envoi passe toujours par l'API.
+  - Un plugin client pose **`data-pret`** sur `<html>` quand l'hydratation est terminée ; les tests de bout en bout l'attendent avant d'agir.
+- **Alternatives écartées** :
+  - Désactiver les boutons jusqu'à l'hydratation : la page resterait inutilisable sans JavaScript, et l'adresse pourrait toujours être construite par une autre voie.
+  - Faire attendre les tests un délai fixe : lent, et fragile.
+- **IA** : défaut révélé par les tests Cypress écrits par l'assistant (échecs aléatoires analysés) ; l'assistant a proposé la correction.
