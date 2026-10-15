@@ -336,3 +336,17 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Les messages de validation par défaut de Symfony (longueur, e-mail…) sont en anglais : le formulaire d'inscription vérifie donc les mêmes règles en français avant l'envoi. Traduire les messages de l'API reste à faire.
   - Un jeton expiré dans le cookie fait répondre 401 à toutes les routes, même publiques, tant que le navigateur garde le cookie. Le cookie et le jeton ont la même durée (1 h), donc le cas reste rare ; il sera réglé avec `/api/auth/rafraichir`.
 - **IA** : l'assistant a proposé et écrit ces choix ; les essais ont été faits dans le navigateur (inscription, connexion, rendu serveur, déconnexion, mauvais mot de passe, mobile et desktop).
+
+## D-026 – Police sans empattements et mot de passe visible
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : à l'essai du front, les titres en Cormorant Garamond (police avec empattements, fine) étaient jugés peu lisibles. Rien ne permettait non plus de vérifier le mot de passe saisi, ce qui est pénible au téléphone.
+- **Décisions** :
+  - **Une seule police, Atkinson Hyperlegible**, pour les titres comme pour le texte. Elle est dessinée par le Braille Institute pour les personnes malvoyantes : chaque lettre se distingue des autres (l, I, 1, O, 0). Elle n'existe qu'en deux graisses (normale et grasse), ce qui simplifie aussi la hiérarchie. Les tailles des titres sont réduites, une police sans empattements en gras paraissant plus grande.
+  - **Bouton « Afficher le mot de passe »** sur la connexion et l'inscription (composant `ChampMotDePasse`), avec un libellé lu par les lecteurs d'écran et l'état `aria-pressed`. Le mot de passe reste masqué par défaut.
+- **Alternatives écartées** :
+  - Garder Manrope seule : sans empattements aussi, mais ses lettres « l » et « I » se confondent.
+  - Un second champ « confirmer le mot de passe » : il double la saisie ; l'affichage en clair permet la même vérification.
+- **Conséquences** : les canevas de maquettes gardent l'ancienne police, le front fait foi (docs/09-maquettes.md).
+- **IA** : demandé par moi après essai ; l'assistant a proposé la police et écrit le composant.

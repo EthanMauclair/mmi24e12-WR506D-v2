@@ -38,7 +38,7 @@ Conséquence technique : le front Nuxt doit être **responsive** avec deux mises
 |---|---|
 | **Bordeaux** (`#6E1A2B`) comme couleur principale | Demande de la cliente (échange du 13/10/2026). Contraste suffisant avec le blanc pour les boutons. |
 | Fond blanc cassé, texte presque noir | Laisser la place aux photos des articles. |
-| Titres en Cormorant Garamond, texte en Manrope | Une touche « mode » pour les titres, un texte courant lisible sur petit écran. |
+| **Atkinson Hyperlegible** pour les titres et le texte (police sans empattements) | Remplace Cormorant Garamond et Manrope le 15/10/2026 (D-026) : la police avec empattements des titres était moins lisible. Atkinson Hyperlegible est dessinée pour distinguer les lettres qui se ressemblent (l, I, 1, O, 0). Les canevas de maquettes gardent l'ancienne police. |
 | Boutons et zones tactiles ≥ 44 px | Utilisation au pouce. |
 
 ## Reste à faire
