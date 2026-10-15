@@ -160,7 +160,7 @@ async function sInscrire() {
             autocomplete="new-password"
             :aria-invalid="!!erreurs.motDePasse"
             aria-describedby="mot-de-passe-aide"
-          >
+          />
           <span v-if="erreurs.motDePasse" id="mot-de-passe-aide" class="message-champ">{{ erreurs.motDePasse }}</span>
           <span v-else id="mot-de-passe-aide" class="aide">12 caractères minimum</span>
         </div>
@@ -199,8 +199,8 @@ async function sInscrire() {
 
 .marque-nom {
   font-family: var(--police-titre);
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
 }
 
 .etapes-bloc {
@@ -212,9 +212,9 @@ async function sInscrire() {
 .etapes-titre {
   margin: 0;
   font-family: var(--police-titre);
-  font-size: 56px;
-  font-weight: 600;
-  line-height: 1.02;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
 .etapes {
@@ -290,8 +290,8 @@ async function sInscrire() {
 
 h1 {
   margin: 12px 0 6px;
-  font-size: 36px;
-  line-height: 1.05;
+  font-size: 28px;
+  line-height: 1.15;
   color: var(--bordeaux);
 }
 
@@ -405,7 +405,7 @@ h1 {
 
   h1 {
     margin: 0 0 6px;
-    font-size: 40px;
+    font-size: 32px;
   }
 
   .paire {

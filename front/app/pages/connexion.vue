@@ -93,7 +93,7 @@ async function seConnecter() {
             name="motDePasse"
             autocomplete="current-password"
             required
-          >
+          />
         </div>
 
         <button type="submit" class="bouton bouton-principal bouton-large envoyer" :disabled="envoi">
@@ -130,8 +130,8 @@ async function seConnecter() {
 
 .marque-nom {
   font-family: var(--police-titre);
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
 }
 
 .promesse {
@@ -143,9 +143,9 @@ async function seConnecter() {
 .promesse-titre {
   margin: 0;
   font-family: var(--police-titre);
-  font-size: 64px;
-  font-weight: 600;
-  line-height: 1;
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
 .promesse-texte {
@@ -199,9 +199,9 @@ async function seConnecter() {
 .logo-titre {
   margin: 8px 0 0;
   font-family: var(--police-titre);
-  font-size: 44px;
-  font-weight: 600;
-  line-height: 1;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
   color: var(--bordeaux);
 }
 
@@ -259,7 +259,7 @@ async function seConnecter() {
 
   .entete-desktop h1 {
     margin: 0;
-    font-size: 40px;
+    font-size: 32px;
     color: var(--bordeaux);
   }
 

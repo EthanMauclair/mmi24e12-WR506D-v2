@@ -90,8 +90,8 @@ async function seDeconnecter() {
 <style scoped>
 .logo {
   font-family: var(--police-titre);
-  font-size: 26px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--bordeaux);
   text-decoration: none;
 }
@@ -197,7 +197,7 @@ async function seDeconnecter() {
 
   .menu-lateral .logo {
     padding: 0 12px 20px;
-    font-size: 30px;
+    font-size: 24px;
   }
 
   .ajouter {
@@ -224,7 +224,7 @@ async function seDeconnecter() {
     border-radius: 10px;
     background: transparent;
     color: #4a3d40;
-    font: 500 15px var(--police-texte);
+    font: 400 15px var(--police-texte);
     text-align: left;
     text-decoration: none;
     cursor: pointer;
