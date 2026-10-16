@@ -60,7 +60,10 @@ docker compose run --rm --no-deps php composer install
 #      JWT_PASSPHRASE=<une phrase secrète>
 #    (fichier : api/.env.local)
 
-#    Copier aussi ces deux valeurs dans api/.env.test.local (pour les tests)
+#    Facultatif : RECONNAISSANCE_CLE=<clé Google AI Studio> pour préremplir la fiche à partir de la photo (D-040).
+#    Sans clé, la fiche se remplit à la main.
+
+#    Copier aussi APP_SECRET et JWT_PASSPHRASE dans api/.env.test.local (pour les tests)
 
 # 4. Générer les clés de signature des jetons JWT (stockées dans api/config/jwt/, jamais commitées)
 docker compose run --rm --no-deps php php bin/console lexik:jwt:generate-keypair

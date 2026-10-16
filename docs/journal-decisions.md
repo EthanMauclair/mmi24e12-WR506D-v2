@@ -287,7 +287,7 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 ## D-023 – Remplissage automatique par photo reporté après la V1
 
 - **Date** : 14/10/2026
-- **Statut** : Validée (à annoncer à la cliente)
+- **Statut** : Remplacée par D-040 (16/10/2026)
 - **Contexte** : F-07 prévoit que la catégorie, la marque et la couleur soient remplies automatiquement à partir de la photo (docs/07-choix-techniques.md, § 7). Le branchement sur OpenRouter a été écrit et testé, mais l'essai réel avec le modèle gratuit `google/gemma-4-31b-it:free` a échoué : le fournisseur (Google AI Studio) renvoie « 429 temporarily rate-limited upstream » sur le quota partagé des modèles gratuits, indépendamment de notre compte.
 - **Décision** : en V1, l'ajout par photo s'arrête au **scan** : `POST /api/reconnaissances` enregistre la photo (réduite, redressée, sans métadonnées) et renvoie `proposition: null` ; l'utilisateur remplit catégorie, marque et couleur **à la main** avant `POST /api/articles`. Le contrat d'API ne change pas : le front gère déjà la proposition vide (P2).
 - **Alternatives écartées** :
@@ -558,3 +558,29 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Supprimer une pièce avec ses articles : contraire à I-10, un article est toujours rangé.
 - **Conséquences** : le front du lot 1 est complet. Reste hors lot 1 : ajouter une pièce à un logement existant (la création guidée ne sert qu'au premier logement).
 - **IA** : composant écrit par l'assistant, vérifié dans le navigateur (compte de démonstration, mobile et desktop, refus I-10 sur une pièce pleine) et avec axe-core.
+
+## D-040 – Remplissage automatique par photo, avec Google AI Studio
+
+- **Date** : 16/10/2026
+- **Statut** : Validée (remplace D-023 ; à annoncer à la cliente)
+- **Contexte** : le scan est le cœur de P2 (« je prends une photo, l'application remplit »). Le branchement écrit le 14/10 puis mis de côté (D-023) est repris sur la branche `feature/remplissage-photo`. L'étudiant a d'abord choisi de rester sur OpenRouter avec le modèle gratuit Gemma.
+- **Ce que les essais du 16/10/2026 ont montré** :
+  - **Gemma gratuit via OpenRouter** : 429 à chaque essai. Le quota gratuit de Google, partagé entre tous les utilisateurs d'OpenRouter, est épuisé (`upstream_provider_shared_pool`), alors que notre compte n'avait rien consommé. Les autres modèles gratuits qui lisent les images ont répondu vide, 502 ou 403.
+  - **Clé Google personnelle confiée à OpenRouter** (« bring your own key ») : Gemma gratuit abandonné au bout de 10 s (504). Tout modèle non gratuit est refusé : OpenRouter exige un compte qui a déjà acheté du crédit, même quand la clé Google paie.
+  - **Google AI Studio en direct**, avec la clé personnelle de l'étudiant (niveau sans frais) : Gemma 4 « réfléchit » avant de répondre et dépasse la longueur ou le délai ; Gemini 2.5 Flash-Lite n'est plus ouvert aux nouveaux comptes ; Gemini 3.1 Flash-Lite était saturé (503). **Gemini 3.5 Flash-Lite** a reconnu correctement 3 vraies photos (veste en jean, pull, baskets Vans) **12 fois sur 12** avec un nouvel essai sur 503, en 6 à 15 s.
+- **Décisions** :
+  - L'API appelle **Google AI Studio directement**, par son adresse compatible « chat/completions », avec le modèle **`gemini-3.5-flash-lite`**.
+  - Adresse, clé et modèle se règlent par `RECONNAISSANCE_URL`, `RECONNAISSANCE_CLE` et `RECONNAISSANCE_MODELE` : revenir à OpenRouter, ou changer de modèle, ne demande aucun changement de code.
+  - Délai de 15 s (20 s au plus) et **un seul nouvel essai** sur 429 ou 503, qui arrivent vite. Au-delà, la saisie à la main prend le relais : l'article n'est jamais perdu (P2).
+  - `POST /api/reconnaissances` renvoie la **proposition** : catégorie prise dans la liste fixe (« Autre » sinon), marque, couleur. Elle n'est jamais enregistrée telle quelle (H6).
+  - **Front** : la fiche arrive **préremplie**, avec le bandeau « Remplie à partir de la photo. Vérifiez… » (maquette 6) ; sans proposition, elle reste à remplir à la main, et ce qui a déjà été saisi n'est pas effacé. Le message d'attente annonce jusqu'à 20 secondes.
+  - **Tests** : le modèle est simulé (`ModeleSimule`), aucun appel réel pendant les tests ni en CI. Le double garde ses réponses en mémoire statique, pour que PHPStan, qui lit le conteneur de dev, n'ait pas à le trouver.
+- **Alternatives écartées** :
+  - Rester sur Gemma gratuit via OpenRouter : inutilisable lors des essais.
+  - Acheter du crédit OpenRouter (environ 5 $) : possible, mais Google en direct donne le même résultat sans dépense.
+  - Gemma 4 chez Google : trop lent, et sa réponse commence par son raisonnement.
+- **Conséquences** :
+  - **Données** : les photos (sans position GPS) partent chez Google. Sur le niveau sans frais, Google peut utiliser les contenus reçus pour améliorer ses services : acceptable pour la démonstration, à revoir avant de vraies utilisatrices (niveau payant ou politique de confidentialité, encore à écrire). L'écran de photo le signale sur ordinateur ; sur téléphone, l'appareil photo occupe tout l'écran et la mention n'apparaît pas.
+  - **Clé** : clé Google AI Studio du compte personnel de l'étudiant, dans `api/.env.local` (`RECONNAISSANCE_CLE`), jamais dans le dépôt. Sans clé, ou si elle est révoquée, la saisie se fait à la main.
+  - **Fiabilité** : Google renvoie parfois 503 aux heures chargées ; un essai sur deux peut alors tomber en saisie manuelle. À surveiller avant le pitch 2.
+- **IA** : l'assistant a repris le branchement, mesuré les modèles sur de vraies photos et proposé l'appel direct à Google ; l'étudiant a choisi cette solution et créé la clé.
