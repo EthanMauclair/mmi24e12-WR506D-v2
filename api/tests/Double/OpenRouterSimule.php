@@ -12,24 +12,34 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * aucun appel réel, et chaque test choisit la réponse du modèle.
  *
  * Sans réponse prévue, OpenRouter est « indisponible » (503) : la proposition est alors vide.
+ *
+ * Les réponses et les requêtes sont statiques : Symfony crée lui-même l'instance, et le test n'a pas à
+ * la chercher dans le conteneur, que PHPStan lit en environnement de dev, où ce double n'existe pas.
  */
 final class OpenRouterSimule
 {
     /** @var list<ResponseInterface> */
-    private array $reponses = [];
+    private static array $reponses = [];
 
     /** @var list<array{methode: string, url: string, options: array<string, mixed>}> */
-    public array $requetes = [];
+    public static array $requetes = [];
 
-    public function prevoir(ResponseInterface $reponse): void
+    /** À appeler avant chaque test : aucune réponse prévue, aucune requête reçue. */
+    public static function reinitialiser(): void
     {
-        $this->reponses[] = $reponse;
+        self::$reponses = [];
+        self::$requetes = [];
+    }
+
+    public static function prevoir(ResponseInterface $reponse): void
+    {
+        self::$reponses[] = $reponse;
     }
 
     /** Réponse du modèle au format chat/completions, avec le texte donné. */
-    public function prevoirTexte(string $texte): void
+    public static function prevoirTexte(string $texte): void
     {
-        $this->prevoir(new MockResponse(json_encode([
+        self::prevoir(new MockResponse(json_encode([
             'choices' => [['message' => ['role' => 'assistant', 'content' => $texte]]],
         ], \JSON_THROW_ON_ERROR)));
     }
@@ -37,8 +47,8 @@ final class OpenRouterSimule
     /** @param array<string, mixed> $options */
     public function __invoke(string $methode, string $url, array $options): ResponseInterface
     {
-        $this->requetes[] = ['methode' => $methode, 'url' => $url, 'options' => $options];
+        self::$requetes[] = ['methode' => $methode, 'url' => $url, 'options' => $options];
 
-        return array_shift($this->reponses) ?? new MockResponse('', ['http_code' => 503]);
+        return array_shift(self::$reponses) ?? new MockResponse('', ['http_code' => 503]);
     }
 }
