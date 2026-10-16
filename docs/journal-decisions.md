@@ -480,3 +480,21 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Désactiver les boutons jusqu'à l'hydratation : la page resterait inutilisable sans JavaScript, et l'adresse pourrait toujours être construite par une autre voie.
   - Faire attendre les tests un délai fixe : lent, et fragile.
 - **IA** : défaut révélé par les tests Cypress écrits par l'assistant (échecs aléatoires analysés) ; l'assistant a proposé la correction.
+
+## D-037 – Recherche et fiche d'un article
+
+- **Date** : 16/10/2026
+- **Statut** : Validée
+- **Contexte** : fin du lot 1 (F-09, F-10, F-26, parcours P3) ; branche `feature/recherche-fiche-article`. Les maquettes n'ont pas d'écran de recherche ni de fiche d'article : on reprend les composants des écrans 4 et 6 (grille, fiche, puces, boutons). Dans P3, Camille cherche « veste », qui est une **catégorie** : la recherche par texte ne regardait que la marque, la couleur et la note, et ne trouvait donc rien.
+- **Décisions** :
+  - Le texte de `GET /api/articles?q=` porte aussi sur le **nom de la catégorie**.
+  - Écran **Rechercher** (`/recherche`) : un champ de texte et six filtres (logement, pièce, rangement, catégorie, couleur, marque). Tous les critères sont **dans l'adresse** : la recherche se retrouve telle quelle au retour de la fiche, et se partage. Le texte part après une pause de 350 ms dans la frappe ; les listes déroulantes, dès le choix. Sur téléphone, les filtres sont repliés derrière un bouton « Filtres (n) ».
+  - Pagination par **30**, avec « Page précédente » et « Page suivante ». L'API ne renvoie pas de total : une page pleine annonce une page suivante (au pire, la dernière est vide).
+  - **Fiche d'un article** (`/articles/{id}`) : photo, catégorie, marque, couleur, note et **emplacement** (logement › pièce › rangement, avec des liens vers la pièce). Actions : **Déplacer** (liste des rangements de tous mes logements), **Modifier** (champ vidé = information retirée), interrupteur **Article personnel** (enregistré aussitôt), **Supprimer** (confirmation dans une fenêtre `<dialog>`). Les droits restent à l'API (A-10, A-11) : un refus s'affiche tel quel.
+  - Les vignettes de la page d'une pièce et du profil mènent à la fiche.
+  - Les zones utiles aux tests de bout en bout portent un attribut **`data-cy`** (barre du bas, menu latéral, grilles, recherche, fiche) : les tests ne dépendent plus des classes CSS.
+- **Alternatives écartées** :
+  - Défilement infini : moins accessible (le pied de page devient inatteignable, on perd sa place) ; le bouton « Voir plus » de la page d'une pièce reste, il s'agit d'une liste courte.
+  - Ajouter un total à la réponse de l'API (format JSON-LD ou en-tête) : changement de contrat inutile pour la V1.
+- **Conséquences** : l'entrée « Rechercher » du menu est active ; seule « Mes tenues » reste grisée. Restent du lot 1 : renommer et supprimer une pièce ou un rangement.
+- **IA** : écrans, extension de la recherche et test fonctionnel écrits par l'assistant, vérifiés dans le navigateur (compte de démonstration, mobile et desktop) et avec axe-core.
