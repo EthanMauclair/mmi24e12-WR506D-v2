@@ -195,6 +195,55 @@ final class LogementTest extends TestCase
     }
 
     #[Test]
+    public function i10_une_piece_dont_un_rangement_contient_un_article_ne_se_supprime_pas(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+        $chambre = $logement->ajouterPiece('Chambre');
+        Article::creer($this->camille, $chambre->ajouterStockage('Armoire'), new Categorie('Pull'), 'photos/1.jpg', $this->aujourdhui);
+
+        try {
+            $logement->retirerPiece($chambre);
+            self::fail('I-10 : une pièce non vide ne se supprime pas.');
+        } catch (RegleMetierException $e) {
+            self::assertSame('I-10', $e->invariant);
+        }
+        self::assertSame([$chambre], $logement->getPieces()->getValues(), 'La pièce est toujours là.');
+    }
+
+    #[Test]
+    public function i06_un_mineur_arrive_en_premier_ne_devient_jamais_proprietaire(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+        $logement->inviter($this->jules, $this->camille, $this->aujourdhui)->accepter(new \DateTimeImmutable('2026-01-01'));
+        $logement->inviter($this->leo, $this->camille, $this->aujourdhui)->accepter(new \DateTimeImmutable('2026-06-01'));
+
+        self::assertSame($this->leo, $logement->retirerProprietaire($this->aujourdhui), 'Le plus ancien majeur, pas le plus ancien tout court.');
+        self::assertSame($this->leo, $logement->getProprietaire());
+        self::assertSame(RoleMembre::Coproprietaire, $logement->membreDe($this->jules)?->getRole());
+    }
+
+    #[Test]
+    public function a15_le_proprietaire_ne_quitte_son_logement_qu_en_le_supprimant(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+        $proprietaire = $logement->membreDe($this->camille);
+        self::assertNotNull($proprietaire);
+
+        $this->expectExceptionMessage('A-15');
+        $logement->retirerMembre($proprietaire, $this->camille);
+    }
+
+    #[Test]
+    public function f05_on_renomme_le_logement(): void
+    {
+        $logement = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui);
+
+        $logement->renommer('Appartement Paris');
+
+        self::assertSame('Appartement Paris', $logement->getNom());
+    }
+
+    #[Test]
     public function f06_on_renomme_une_piece_et_un_rangement(): void
     {
         $chambre = Logement::creer('Appartement Lyon', $this->camille, $this->aujourdhui)->ajouterPiece('Chambre');

@@ -42,6 +42,18 @@ final class ArticleTest extends TestCase
     }
 
     #[Test]
+    public function f10_un_article_se_marque_personnel_puis_se_rend_de_nouveau_visible(): void
+    {
+        $article = Article::creer($this->camille, $this->armoire, $this->pull, 'photos/1.jpg', $this->aujourdhui);
+
+        $article->marquerPersonnel(true);
+        self::assertTrue($article->estPersonnel());
+
+        $article->marquerPersonnel(false);
+        self::assertFalse($article->estPersonnel());
+    }
+
+    #[Test]
     public function i11_on_ne_range_pas_un_article_chez_les_autres(): void
     {
         $this->expectExceptionMessage('I-11');
