@@ -614,11 +614,11 @@ paths:
   /api/reconnaissances:
     post:
       tags: [Articles]
-      summary: Envoyer une photo et obtenir une proposition (F-07)
+      summary: Envoyer une photo (F-07)
       description: |
         Étape 1 de l'ajout par photo (P2). L'image est réduite, convertie en JPG, débarrassée de ses
-        métadonnées, stockée, puis envoyée à un modèle de vision (Google AI Studio). La catégorie proposée est toujours prise
-        dans la liste fixe. Si la reconnaissance échoue, `proposition` est vide : la saisie se fait à la main.
+        métadonnées et stockée. La réponse arrive tout de suite : la proposition se demande ensuite
+        avec POST /api/reconnaissances/proposition (D-041).
       requestBody:
         required: true
         content:
@@ -630,12 +630,39 @@ paths:
                 photo: { type: string, format: binary, description: 'JPG, PNG ou WebP, 10 Mo maximum (D-022)' }
       responses:
         '201':
-          description: Photo enregistrée, proposition éventuelle
+          description: Photo enregistrée
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Reconnaissance' }
         '413': { description: Image trop lourde }
         '422': { $ref: '#/components/responses/Invalide' }
+
+  /api/reconnaissances/proposition:
+    post:
+      tags: [Articles]
+      summary: Obtenir une proposition pour une photo envoyée (F-07)
+      description: |
+        Un modèle de vision (Google AI Studio, D-040) lit la photo et propose catégorie, marque et couleur.
+        La catégorie est toujours prise dans la liste fixe (« Autre » sinon). Quelques secondes à plusieurs
+        dizaines selon la charge de Google : le front n'attend pas cette réponse pour ouvrir la fiche (D-041).
+        Seulement pour ses propres photos : celle d'un autre est introuvable (404, D-014).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [photo]
+              properties:
+                photo: { type: string, description: Identifiant renvoyé par POST /api/reconnaissances }
+      responses:
+        '200':
+          description: Proposition, vide si la reconnaissance a échoué (saisie à la main)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Proposition' }
+        '401': { $ref: '#/components/responses/NonAuthentifie' }
+        '404': { $ref: '#/components/responses/Introuvable' }
 
   /api/articles:
     get:
@@ -1160,8 +1187,12 @@ components:
       type: object
       properties:
         photo: { type: string, description: Identifiant de la photo stockée, à renvoyer dans ArticleEntree }
+
+    Proposition:
+      type: object
+      properties:
         proposition:
-          description: Vide si la reconnaissance a échoué ; toujours vide en V1 (D-023).
+          description: Vide si la reconnaissance a échoué (D-040). Jamais enregistrée telle quelle (H6).
           oneOf:
             - type: object
               properties:

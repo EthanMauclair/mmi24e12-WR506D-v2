@@ -126,7 +126,7 @@ Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API
 
 **Précautions** : la clé d'API reste côté serveur, jamais dans le front ni dans le dépôt. Les photos envoyées à un service tiers devront être mentionnées dans la politique de confidentialité.
 
-**V1** (D-040, qui remplace D-023) : **Google AI Studio en direct**, modèle `gemini-3.5-flash-lite`, niveau sans frais. Le modèle gratuit d'OpenRouter, prévu au départ, était saturé (erreur 429). Adresse, clé et modèle se règlent par `RECONNAISSANCE_URL`, `RECONNAISSANCE_CLE` et `RECONNAISSANCE_MODELE`. La fiche arrive préremplie, à vérifier ; si Google ne répond pas (503 aux heures chargées), la saisie se fait à la main.
+**V1** (D-040, qui remplace D-023) : **Google AI Studio en direct**, modèle `gemini-3.5-flash-lite`, niveau sans frais. Le modèle gratuit d'OpenRouter, prévu au départ, était saturé (erreur 429). Adresse, clé et modèle se règlent par `RECONNAISSANCE_URL`, `RECONNAISSANCE_CLE` et `RECONNAISSANCE_MODELE`. La fiche s'ouvre sans attendre et se remplit à l'arrivée de la proposition (D-041), à vérifier ; un modèle de secours prend le relais si le premier refuse ou tarde, et si Google ne répond pas, la saisie se fait à la main.
 
 ## 8. Encore à décider
 

@@ -561,3 +561,24 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **Clé** : clé Google AI Studio du compte personnel de l'étudiant, dans `api/.env.local` (`RECONNAISSANCE_CLE`), jamais dans le dépôt. Sans clé, ou si elle est révoquée, la saisie se fait à la main.
   - **Fiabilité** : Google renvoie parfois 503 aux heures chargées ; un essai sur deux peut alors tomber en saisie manuelle. À surveiller avant le pitch 2.
 - **IA** : l'assistant a repris le branchement, mesuré les modèles sur de vraies photos et proposé l'appel direct à Google ; l'étudiant a choisi cette solution et créé la clé.
+
+## D-041 – Le scan sans attente : fiche ouverte tout de suite, modèle de secours
+
+- **Date** : 16/10/2026
+- **Statut** : Validée
+- **Contexte** : à l'essai, l'étudiant trouve le scan trop long : 6 à 20 s d'attente avant que la fiche s'ouvre (D-040). Branche `feature/scan-plus-rapide`.
+- **Mesures du 16/10/2026** :
+  - La taille de la photo ne change rien : Google compte **1 137 jetons** pour l'image, qu'elle fasse 960 ou 384 px. Le modèle ne « réfléchit » pas (20 à 25 jetons de réponse) : le temps se passe dans **la file d'attente de Google**, qui varie avec sa charge.
+  - Gemini 3.5 Flash répond en 3 à 4 s quand Google est calme, mais en 30 à 40 s aux heures chargées ; son niveau gratuit est limité à **5 photos par minute**. Flash-Lite : 5 à 15 s, avec des 503.
+  - Aucun réglage de notre côté ne rend l'attente courte de façon fiable sur le niveau gratuit.
+- **Décisions** :
+  - **Deux appels** : `POST /api/reconnaissances` enregistre la photo et répond tout de suite ; `POST /api/reconnaissances/proposition` demande la proposition, seulement pour ses propres photos (404 sinon, D-014).
+  - **Front** : la fiche s'ouvre dès que la photo est enregistrée (**0,3 s** mesuré). Le bandeau indique « Lecture de la photo… », et la personne peut déjà choisir le rangement ou écrire la note. À l'arrivée, la proposition ne remplit que les champs vides ou encore préremplis : ce qui a été tapé reste. Une réponse arrivée après un changement de photo est ignorée.
+  - **Deux modèles** : `gemini-3.5-flash` d'abord, puis `gemini-3.5-flash-lite` sur 429 (quota), 503 (surcharge) ou délai dépassé (`RECONNAISSANCE_MODELE_SECOURS`). Une autre erreur (clé invalide) ne passe pas au secours.
+  - Comme personne n'attend plus, chaque modèle dispose de **20 s**.
+- **Alternatives écartées** :
+  - Payer le niveau de Google : plus de priorité et moins de 503, mais il faut une carte bancaire ; possible plus tard sans changer le code.
+  - Réduire la photo envoyée : sans effet mesurable.
+  - Réessayer le même modèle : inutile contre un quota par minute.
+- **Conséquences** : le contrat d'API change (`proposition` quitte la réponse de `POST /api/reconnaissances`) ; le front est le seul client. Les tests Cypress de P2 (sur `feature/test`) sont à adapter à la nouvelle route.
+- **IA** : mesures, découpage de l'API et remplissage différé proposés et écrits par l'assistant ; l'étudiant a choisi de ne plus faire attendre plutôt que de payer Google.

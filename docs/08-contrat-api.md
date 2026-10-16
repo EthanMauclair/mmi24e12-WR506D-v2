@@ -36,7 +36,8 @@ C'est la réponse au défaut n°5 de la séance 8-9 (« il y a dans la réponse 
 
 ## 3. L'ajout par photo en deux temps
 
-1. `POST /api/reconnaissances` : envoi de la photo. Le serveur la réduit, la convertit en JPG, retire ses métadonnées, la stocke, puis demande une proposition à un modèle de vision (Google AI Studio, D-040). Réponse : l'identifiant de la photo et une proposition (catégorie, marque, couleur), **vide** si le modèle ne répond pas : la saisie se fait alors à la main.
+1. `POST /api/reconnaissances` : envoi de la photo. Le serveur la réduit, la convertit en JPG, retire ses métadonnées et la stocke. Réponse immédiate : l'identifiant de la photo.
+   `POST /api/reconnaissances/proposition` (`{"photo": …}`) : un modèle de vision (Google AI Studio, D-040) lit la photo et propose catégorie, marque et couleur, **vide** si le modèle ne répond pas. Cela prend de quelques secondes à plusieurs dizaines : le front ouvre la fiche sans attendre et la remplit à l'arrivée de la proposition (D-041).
 2. `POST /api/articles` : l'utilisateur a vérifié et corrigé la proposition, et choisi le rangement. L'article est créé.
 
 **Pourquoi deux temps** : c'est le parcours P2 (photo d'abord, rangement ensuite, D-010), et la proposition de l'IA n'est jamais enregistrée sans validation humaine (H6).
@@ -51,7 +52,7 @@ C'est la réponse au défaut n°5 de la séance 8-9 (« il y a dans la réponse 
 | F-04 Profil | `GET /api/utilisateurs/{pseudo}`, `/tenues` |
 | F-05 Logements | `GET, POST /api/logements`, `GET, PATCH, DELETE /api/logements/{id}` |
 | F-06 Pièces, stockages | `POST /api/logements/{id}/pieces`, `PATCH, DELETE /api/pieces/{id}`, `POST /api/pieces/{id}/stockages`, `PATCH, DELETE /api/stockages/{id}` |
-| F-07, F-08 Ajout par photo, note | `POST /api/reconnaissances`, `POST /api/articles` |
+| F-07, F-08 Ajout par photo, note | `POST /api/reconnaissances`, `POST /api/reconnaissances/proposition`, `POST /api/articles` |
 | F-09, F-10 Modifier, déplacer, personnel | `PATCH, DELETE /api/articles/{id}` |
 | F-11 Co-propriétaires | `GET, POST /api/logements/{id}/membres`, `DELETE /api/membres/{id}`, `POST /api/membres/{id}/acceptation`, `GET /api/moi/invitations` |
 | F-12 Compte mineur | `GET, POST /api/moi/comptes-mineurs` |
