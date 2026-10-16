@@ -14,7 +14,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * Proposition de catégorie, marque et couleur à partir de la photo (F-07, docs/07-choix-techniques.md, § 7, D-023).
  *
- * Le modèle d'OpenRouter reçoit la photo déjà réduite et nettoyée de ses métadonnées. Sa réponse
+ * Le modèle (Google AI Studio, D-040) reçoit la photo déjà réduite et nettoyée de ses métadonnées. Sa réponse
  * n'est qu'une proposition : elle est renvoyée au front, jamais enregistrée sans validation (H6).
  * Toute panne (clé absente, réseau, délai, 429, réponse illisible) donne une proposition vide :
  * la saisie se fait alors à la main et la photo reste enregistrée (P2).
@@ -25,12 +25,12 @@ final class ReconnaissanceArticles
     private const COULEUR_MAX = 40;
 
     public function __construct(
-        private readonly HttpClientInterface $openrouterClient,
+        private readonly HttpClientInterface $reconnaissanceClient,
         private readonly CategorieRepository $categories,
         private readonly LoggerInterface $logger,
-        #[Autowire(env: 'OPENROUTER_API_KEY')]
+        #[Autowire(env: 'RECONNAISSANCE_CLE')]
         private readonly string $cle,
-        #[Autowire(env: 'OPENROUTER_MODELE')]
+        #[Autowire(env: 'RECONNAISSANCE_MODELE')]
         private readonly string $modele,
     ) {
     }
@@ -49,9 +49,8 @@ final class ReconnaissanceArticles
         $categories = $this->categories->parNom();
 
         try {
-            $reponse = $this->openrouterClient->request('POST', 'chat/completions', [
+            $reponse = $this->reconnaissanceClient->request('POST', 'chat/completions', [
                 'auth_bearer' => $this->cle,
-                'headers' => ['X-Title' => 'Penderie'],
                 'json' => [
                     'model' => $this->modele,
                     'temperature' => 0,

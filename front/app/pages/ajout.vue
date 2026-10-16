@@ -3,7 +3,7 @@
  * Écrans 5 et 6 – Ajouter un article (F-07, F-08, F-10, P2), en deux étapes sur la même page :
  * 1. la photo (caméra, galerie, glisser-déposer ou webcam), envoyée à POST /api/reconnaissances ;
  * 2. la fiche (catégorie, marque, couleur, rangement, note, personnel), envoyée à POST /api/articles.
- * La photo est lue par un modèle d'OpenRouter, qui propose catégorie, marque et couleur (D-040) :
+ * La photo est lue par un modèle de vision de Google, qui propose catégorie, marque et couleur (D-040) :
  * la fiche arrive préremplie, à vérifier (H6). Si le modèle ne répond pas, elle reste à remplir à la main.
  */
 useHead({ title: 'Ajouter un article – Penderie' })
@@ -319,7 +319,7 @@ async function enregistrer() {
             <li>Cadrez-le en entier, en pleine lumière.</li>
             <li>Une photo par article.</li>
           </ol>
-          <p class="note-gps">La position GPS de la photo est supprimée avant l'enregistrement. La photo est ensuite lue par un service d'IA (OpenRouter) pour préremplir la fiche, que vous vérifiez.</p>
+          <p class="note-gps">La position GPS de la photo est supprimée avant l'enregistrement. La photo est ensuite lue par un service d'IA (Google) pour préremplir la fiche, que vous vérifiez.</p>
         </aside>
       </div>
 

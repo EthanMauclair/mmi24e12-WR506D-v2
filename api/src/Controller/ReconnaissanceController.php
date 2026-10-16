@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  * POST /api/reconnaissances (F-07, étape 1 du parcours P2) : la photo est enregistrée et son
  * identifiant renvoyé, à reprendre dans POST /api/articles.
  *
- * La proposition (catégorie, marque, couleur) vient d'OpenRouter (D-023). Elle n'est pas
+ * La proposition (catégorie, marque, couleur) vient d'un modèle de vision (D-040). Elle n'est pas
  * enregistrée (H6) et reste vide si la reconnaissance échoue : la saisie se fait alors à la main.
  */
 final class ReconnaissanceController

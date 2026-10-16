@@ -7,7 +7,7 @@ namespace App\Tests\Fonctionnel;
 use App\Entity\Utilisateur;
 use App\Repository\CategorieRepository;
 use App\Service\ReconnaissanceArticles;
-use App\Tests\Double\OpenRouterSimule;
+use App\Tests\Double\ModeleSimule;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * POST /api/reconnaissances avec OpenRouter simulé (D-023) : la proposition est renvoyée sans
+ * POST /api/reconnaissances avec le modèle simulé (D-040) : la proposition est renvoyée sans
  * être enregistrée (H6), et toute panne donne une proposition vide sans perdre la photo (P2).
  */
 final class ReconnaissanceApiTest extends ApiTestCase
@@ -26,13 +26,13 @@ final class ReconnaissanceApiTest extends ApiTestCase
     {
         parent::setUp();
         $this->leo = $this->creerMajeur('leo');
-        OpenRouterSimule::reinitialiser();
+        ModeleSimule::reinitialiser();
     }
 
     #[Test]
     public function la_proposition_du_modele_est_renvoyee(): void
     {
-        OpenRouterSimule::prevoirTexte('{"categorie": "Pull", "marque": "Uniqlo", "couleur": "bleu marine"}');
+        ModeleSimule::prevoirTexte('{"categorie": "Pull", "marque": "Uniqlo", "couleur": "bleu marine"}');
 
         $this->envoyerPhoto();
 
@@ -47,18 +47,18 @@ final class ReconnaissanceApiTest extends ApiTestCase
     #[Test]
     public function la_requete_envoie_la_photo_reduite_et_la_liste_des_categories(): void
     {
-        OpenRouterSimule::prevoirTexte('{"categorie": "Pull", "marque": null, "couleur": null}');
+        ModeleSimule::prevoirTexte('{"categorie": "Pull", "marque": null, "couleur": null}');
 
         $this->envoyerPhoto();
 
-        self::assertCount(1, OpenRouterSimule::$requetes);
-        $requete = OpenRouterSimule::$requetes[0];
+        self::assertCount(1, ModeleSimule::$requetes);
+        $requete = ModeleSimule::$requetes[0];
         self::assertSame('POST', $requete['methode']);
-        self::assertSame('https://openrouter.ai/api/v1/chat/completions', $requete['url']);
+        self::assertSame('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', $requete['url']);
         self::assertContains('Authorization: Bearer cle-de-test', $requete['options']['headers']);
 
         $corps = json_decode($requete['options']['body'], true, 512, \JSON_THROW_ON_ERROR);
-        self::assertSame('google/gemma-4-31b-it:free', $corps['model']);
+        self::assertSame('modele-de-test', $corps['model']);
         [$texte, $image] = $corps['messages'][0]['content'];
         self::assertStringContainsString('Vinyle', $texte['text']);
         self::assertStringContainsString('"Autre"', $texte['text']);
@@ -72,7 +72,7 @@ final class ReconnaissanceApiTest extends ApiTestCase
     #[Test]
     public function une_categorie_hors_liste_devient_autre(): void
     {
-        OpenRouterSimule::prevoirTexte('{"categorie": "Doudoune", "marque": "", "couleur": "Noir"}');
+        ModeleSimule::prevoirTexte('{"categorie": "Doudoune", "marque": "", "couleur": "Noir"}');
 
         $this->envoyerPhoto();
 
@@ -86,7 +86,7 @@ final class ReconnaissanceApiTest extends ApiTestCase
     #[Test]
     public function la_categorie_est_reconnue_sans_casse_ni_accents_et_le_texte_autour_est_ignore(): void
     {
-        OpenRouterSimule::prevoirTexte("Voici :\n```json\n{\"categorie\": \"echarpe\", \"marque\": null, \"couleur\": \"rouge\"}\n```");
+        ModeleSimule::prevoirTexte("Voici :\n```json\n{\"categorie\": \"echarpe\", \"marque\": null, \"couleur\": \"rouge\"}\n```");
 
         $this->envoyerPhoto();
 
@@ -96,7 +96,7 @@ final class ReconnaissanceApiTest extends ApiTestCase
     #[Test]
     public function une_reponse_illisible_donne_une_proposition_vide(): void
     {
-        OpenRouterSimule::prevoirTexte('Je pense que c\'est un pull bleu.');
+        ModeleSimule::prevoirTexte('Je pense que c\'est un pull bleu.');
 
         $this->envoyerPhoto();
 
@@ -115,7 +115,7 @@ final class ReconnaissanceApiTest extends ApiTestCase
         ];
 
         foreach ($pannes as $panne) {
-            OpenRouterSimule::prevoir($panne);
+            ModeleSimule::prevoir($panne);
             $photo = $this->envoyerPhoto();
 
             self::assertResponseStatusCodeSame(201);

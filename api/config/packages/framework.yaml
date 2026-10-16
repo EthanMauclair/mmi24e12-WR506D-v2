@@ -8,8 +8,8 @@ framework:
     # Reconnaissance des photos (D-023) : délais courts, la saisie à la main prend le relais.
     http_client:
         scoped_clients:
-            openrouter.client:
-                base_uri: 'https://openrouter.ai/api/v1/'
+            reconnaissance.client:
+                base_uri: '%env(RECONNAISSANCE_URL)%'
                 timeout: 10
                 max_duration: 20
 
@@ -21,6 +21,6 @@ when@test:
         test: true
         session:
             storage_factory_id: session.storage.factory.mock_file
-        # Aucun appel réel à OpenRouter pendant les tests.
+        # Aucun appel réel au modèle pendant les tests.
         http_client:
-            mock_response_factory: App\Tests\Double\OpenRouterSimule
+            mock_response_factory: App\Tests\Double\ModeleSimule

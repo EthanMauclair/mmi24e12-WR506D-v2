@@ -8,15 +8,15 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * Remplace OpenRouter pendant les tests (framework.http_client.mock_response_factory) :
+ * Remplace le modèle de vision (Google AI Studio) pendant les tests (framework.http_client.mock_response_factory) :
  * aucun appel réel, et chaque test choisit la réponse du modèle.
  *
- * Sans réponse prévue, OpenRouter est « indisponible » (503) : la proposition est alors vide.
+ * Sans réponse prévue, le modèle est « indisponible » (503) : la proposition est alors vide.
  *
  * Les réponses et les requêtes sont statiques : Symfony crée lui-même l'instance, et le test n'a pas à
  * la chercher dans le conteneur, que PHPStan lit en environnement de dev, où ce double n'existe pas.
  */
-final class OpenRouterSimule
+final class ModeleSimule
 {
     /** @var list<ResponseInterface> */
     private static array $reponses = [];
