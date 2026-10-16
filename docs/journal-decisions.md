@@ -287,7 +287,7 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
 ## D-023 – Remplissage automatique par photo reporté après la V1
 
 - **Date** : 14/10/2026
-- **Statut** : Validée (à annoncer à la cliente)
+- **Statut** : Remplacée par D-040 (16/10/2026)
 - **Contexte** : F-07 prévoit que la catégorie, la marque et la couleur soient remplies automatiquement à partir de la photo (docs/07-choix-techniques.md, § 7). Le branchement sur OpenRouter a été écrit et testé, mais l'essai réel avec le modèle gratuit `google/gemma-4-31b-it:free` a échoué : le fournisseur (Google AI Studio) renvoie « 429 temporarily rate-limited upstream » sur le quota partagé des modèles gratuits, indépendamment de notre compte.
 - **Décision** : en V1, l'ajout par photo s'arrête au **scan** : `POST /api/reconnaissances` enregistre la photo (réduite, redressée, sans métadonnées) et renvoie `proposition: null` ; l'utilisateur remplit catégorie, marque et couleur **à la main** avant `POST /api/articles`. Le contrat d'API ne change pas : le front gère déjà la proposition vide (P2).
 - **Alternatives écartées** :
@@ -535,3 +535,25 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Supprimer une pièce avec ses articles : contraire à I-10, un article est toujours rangé.
 - **Conséquences** : le front du lot 1 est complet. Reste hors lot 1 : ajouter une pièce à un logement existant (la création guidée ne sert qu'au premier logement).
 - **IA** : composant écrit par l'assistant, vérifié dans le navigateur (compte de démonstration, mobile et desktop, refus I-10 sur une pièce pleine) et avec axe-core.
+
+## D-040 – Remplissage automatique par photo activé, avec Gemma gratuit
+
+- **Date** : 16/10/2026
+- **Statut** : Validée (remplace D-023 ; à annoncer à la cliente)
+- **Contexte** : le scan est le cœur de P2 (« je prends une photo, l'application remplit »). Le branchement sur OpenRouter, écrit le 14/10 puis mis de côté (D-023), est repris sur la branche `feature/remplissage-photo`.
+- **Décisions** :
+  - **Modèle** : `google/gemma-4-31b-it:free`, gratuit, via OpenRouter (choix de l'étudiant). Il se change sans toucher au code (`OPENROUTER_MODELE`).
+  - `POST /api/reconnaissances` renvoie la **proposition** du modèle : catégorie prise dans la liste fixe (« Autre » sinon), marque, couleur. Elle n'est jamais enregistrée telle quelle (H6).
+  - **Front** : la fiche arrive **préremplie**, avec le bandeau « Remplie à partir de la photo. Vérifiez… » (maquette 6). Sans proposition, la fiche reste à remplir à la main, et ce qui a déjà été saisi n'est pas effacé.
+  - **Pannes** (clé absente, délai de 20 s dépassé, 429, réponse illisible) : proposition vide, photo enregistrée, saisie à la main. L'article n'est jamais perdu (P2).
+  - **Tests** : OpenRouter est simulé (`OpenRouterSimule`), aucun appel réel pendant les tests ni en CI. Le double garde ses réponses en mémoire statique, pour que PHPStan, qui lit le conteneur de dev, n'ait pas à le trouver.
+  - **Transparence** : l'écran de photo indique que la photo, sans sa position GPS, est lue par un service d'IA.
+- **Mesure du 16/10/2026** : le compte OpenRouter est en règle (0 requête utilisée sur les 50 gratuites par jour), mais les deux modèles Gemma gratuits répondent **429 à chaque essai** (`upstream_provider_shared_pool` : le quota gratuit de Google AI Studio, partagé entre tous les utilisateurs d'OpenRouter, est épuisé). Les autres modèles gratuits capables de lire une image ont répondu vide, 502 ou 403.
+- **Alternatives écartées** :
+  - Garder le scan désactivé (D-023) : la fonction est prête et sans risque pour l'article ; elle marche dès que le quota le permet.
+  - Basculer automatiquement vers d'autres modèles gratuits : aucun n'a donné de réponse exploitable lors de la mesure.
+- **Conséquences** :
+  - Tant que le quota partagé est saturé, la fiche reste souvent à remplir à la main. **Correctif sans code** : ajouter sa propre clé Google AI Studio dans OpenRouter (Settings › Integrations, « bring your own key ») ; Gemma gratuit passe alors par le quota personnel de cette clé. Autre solution : un modèle payant (une fraction de centime par photo).
+  - Les photos sont envoyées à un service tiers (OpenRouter, puis Google) : à inscrire dans la politique de confidentialité, encore à écrire. Sur téléphone, l'appareil photo occupe tout l'écran et la mention n'apparaît pas.
+  - Clé à mettre dans `api/.env.local` (`OPENROUTER_API_KEY`), jamais dans le dépôt ; sans clé, la saisie se fait à la main.
+- **IA** : l'assistant a repris le branchement, mesuré la disponibilité des modèles et écrit le préremplissage ; le choix du modèle gratuit est celui de l'étudiant.

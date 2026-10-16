@@ -126,7 +126,7 @@ Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API
 
 **Précautions** : la clé d'API reste côté serveur, jamais dans le front ni dans le dépôt. Les photos envoyées à un service tiers devront être mentionnées dans la politique de confidentialité.
 
-**V1** (D-023) : le remplissage automatique est **reporté**. Le modèle gratuit essayé (`google/gemma-4-31b-it:free`) était saturé chez son fournisseur (erreur 429) : la photo est enregistrée et la saisie se fait à la main. Le branchement est conservé sur la branche `feature/reconnaissance-ia`.
+**V1** (D-040, qui remplace D-023) : modèle gratuit `google/gemma-4-31b-it:free` ; la fiche arrive préremplie, à vérifier. Son quota gratuit étant partagé et souvent saturé (erreur 429), la saisie à la main prend fréquemment le relais ; une clé Google AI Studio personnelle ajoutée dans OpenRouter le rend fiable, sans changer le code.
 
 ## 8. Encore à décider
 
@@ -134,4 +134,4 @@ Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API
 |---|---|
 | Envoi d'e-mails (invitation d'un co-propriétaire, mot de passe oublié) : Symfony Mailer avec Mailpit en développement ; prestataire en production à choisir | Avant le lot 6 |
 | Hébergement de production | Avant le pitch 2 |
-| Remplissage automatique par photo : modèle OpenRouter fiable (payant, clé Google personnelle ou autre modèle gratuit), D-023 | Après la V1 |
+| Remplissage automatique par photo : fiabilité du modèle gratuit (clé Google personnelle dans OpenRouter ou modèle payant), D-040 | Avant le pitch 2 |
