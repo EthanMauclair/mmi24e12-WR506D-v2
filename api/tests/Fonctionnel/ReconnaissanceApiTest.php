@@ -105,6 +105,31 @@ final class ReconnaissanceApiTest extends ApiTestCase
     }
 
     #[Test]
+    public function des_accolades_sans_json_valide_donnent_une_proposition_vide(): void
+    {
+        ModeleSimule::prevoirTexte('{categorie: Pull, couleur: bleu}');
+
+        $this->envoyerPhoto();
+
+        self::assertResponseStatusCodeSame(201);
+        self::assertNull($this->reponse()['proposition']);
+    }
+
+    #[Test]
+    public function sans_categorie_autre_une_categorie_inconnue_donne_une_proposition_vide(): void
+    {
+        // Garde-fou : « Autre » vient d'une migration ; si elle manquait, on ne propose rien plutôt qu'une catégorie fausse.
+        $this->em->remove($this->categorie('Autre'));
+        $this->em->flush();
+        ModeleSimule::prevoirTexte('{"categorie": "Doudoune", "marque": null, "couleur": "noir"}');
+
+        $this->envoyerPhoto();
+
+        self::assertResponseStatusCodeSame(201);
+        self::assertNull($this->reponse()['proposition']);
+    }
+
+    #[Test]
     public function une_panne_ne_bloque_pas_l_ajout(): void
     {
         $pannes = [
