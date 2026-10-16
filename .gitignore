@@ -26,3 +26,9 @@ docker-compose.override.yml
 /.vscode/
 .DS_Store
 Thumbs.db
+
+# Tests de bout en bout (Cypress) : dépendances, captures et vidéos produites à chaque passage
+/e2e/node_modules/
+/e2e/cypress/screenshots/
+/e2e/cypress/videos/
+/e2e/cypress/downloads/
