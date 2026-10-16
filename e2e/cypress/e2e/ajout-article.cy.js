@@ -25,7 +25,7 @@ describe('Ajout d\'un article par photo', () => {
     cy.contains('h1', 'Chambre')
     cy.contains('button', 'Grande armoire').click()
     cy.location('search').should('match', /rangement=\d+/)
-    cy.get('.grille li').first().should('contain', marque)
+    cy.get('[data-cy=articles] li').first().should('contain', marque)
   })
 
   it('exige une catégorie et un rangement', () => {

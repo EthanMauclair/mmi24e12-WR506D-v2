@@ -35,10 +35,10 @@ describe('Mobile', () => {
 
   it('affiche la barre du bas avec le bouton photo au centre, qui mène à l\'ajout', () => {
     cy.visiter('/profil')
-    cy.get('.barre-bas').should('be.visible')
-    cy.get('.menu-lateral').should('not.be.visible')
+    cy.get('[data-cy=barre-bas]').should('be.visible')
+    cy.get('[data-cy=menu-lateral]').should('not.be.visible')
 
-    cy.get('.barre-bas a[aria-label="Ajouter un article en photo"]').click()
+    cy.get('[data-cy=barre-bas] a[aria-label="Ajouter un article en photo"]').click()
 
     cy.location('pathname').should('eq', '/ajout')
     cy.contains('h1', 'Ajouter un article').should('be.visible')
