@@ -122,6 +122,8 @@ make cs        # style du code PHP (make cs-corriger pour corriger)
 make tests     # PHPUnit
 ```
 
+**Intégration continue** : GitHub Actions lance `make qualite` à chaque push et à chaque PR ([`.github/workflows/qualite.yml`](.github/workflows/qualite.yml), D-038), dans les mêmes conteneurs Docker que sur le poste. Une PR dont la vérification est rouge ne se fusionne pas.
+
 Sous Windows, `make` n'est pas installé d'office : `winget install ezwinports.make`, puis rouvrir le terminal. Sans `make`, chaque commande du Makefile peut être copiée telle quelle.
 
 Résultats et analyse : [audit.md](audit.md).

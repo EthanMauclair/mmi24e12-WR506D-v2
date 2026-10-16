@@ -22,3 +22,7 @@
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
+
+###> rapport de couverture (make couverture) ###
+/coverage/
+###< rapport de couverture ###
