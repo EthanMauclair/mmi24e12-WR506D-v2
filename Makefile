@@ -63,8 +63,8 @@ lint: ## Vérifie le conteneur, les YAML, Twig, composer.json et le mapping Doct
 	$(PHP) composer validate --strict
 	$(PHP) php bin/console doctrine:schema:validate
 
-audit: ## Cherche les vulnérabilités connues des dépendances (API et front)
+audit: ## Cherche les vulnérabilités connues des dépendances (API et front, failles acceptées exclues)
 	$(PHP) composer audit
-	$(DC) exec -T front npm audit --omit=dev
+	$(DC) run --rm --no-deps front node scripts/audit-npm.mjs
 
 qualite: lint phpstan cs audit tests ## Lance toutes les vérifications, comme la CI
