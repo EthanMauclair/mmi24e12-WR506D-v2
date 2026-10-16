@@ -51,5 +51,7 @@ export function lireErreur(erreur: unknown): { general: string | null, champs: R
     return { general: null, champs }
   }
 
-  return { general: donnees.detail ?? donnees.message ?? 'Une erreur est survenue.', champs }
+  // Les règles métier arrivent préfixées de leur code (« [I-10] Videz d'abord… ») : utile dans Postman, pas à l'écran.
+  const message: string = donnees.detail ?? donnees.message ?? 'Une erreur est survenue.'
+  return { general: message.replace(/^\[[A-Z0-9-]+\]\s*/, ''), champs }
 }
