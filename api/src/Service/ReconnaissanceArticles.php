@@ -9,6 +9,8 @@ use App\Repository\CategorieRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -18,11 +20,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * n'est qu'une proposition : elle est renvoyée au front, jamais enregistrée sans validation (H6).
  * Toute panne (clé absente, réseau, délai, 429, réponse illisible) donne une proposition vide :
  * la saisie se fait alors à la main et la photo reste enregistrée (P2).
+ *
+ * Deux modèles (D-041) : le principal, rapide mais limité à quelques photos par minute sur le niveau
+ * gratuit, puis le modèle de secours si le premier refuse (quota, 429), est surchargé (503) ou ne
+ * répond pas à temps.
  */
 final class ReconnaissanceArticles
 {
     private const MARQUE_MAX = 80;
     private const COULEUR_MAX = 40;
+    /** Large : le modèle principal « réfléchit » avant de répondre, et ces jetons comptent. */
+    private const JETONS_MAX = 1500;
+    /** Statuts qui justifient d'essayer le modèle de secours. */
+    private const STATUTS_SECOURS = [429, 503];
 
     public function __construct(
         private readonly HttpClientInterface $reconnaissanceClient,
@@ -32,6 +42,8 @@ final class ReconnaissanceArticles
         private readonly string $cle,
         #[Autowire(env: 'RECONNAISSANCE_MODELE')]
         private readonly string $modele,
+        #[Autowire(env: 'RECONNAISSANCE_MODELE_SECOURS')]
+        private readonly string $modeleSecours = '',
     ) {
     }
 
@@ -47,28 +59,20 @@ final class ReconnaissanceArticles
         }
 
         $categories = $this->categories->parNom();
+        $modeles = array_values(array_unique(array_filter([trim($this->modele), trim($this->modeleSecours)])));
 
-        try {
-            $reponse = $this->reconnaissanceClient->request('POST', 'chat/completions', [
-                'auth_bearer' => $this->cle,
-                'json' => [
-                    'model' => $this->modele,
-                    'temperature' => 0,
-                    'max_tokens' => 200,
-                    'messages' => [[
-                        'role' => 'user',
-                        'content' => [
-                            ['type' => 'text', 'text' => $this->prompt($categories)],
-                            ['type' => 'image_url', 'image_url' => ['url' => 'data:image/jpeg;base64,'.base64_encode($jpeg)]],
-                        ],
-                    ]],
-                ],
-            ]);
-            $texte = $reponse->toArray()['choices'][0]['message']['content'] ?? null;
-        } catch (ExceptionInterface $exception) {
-            $this->logger->warning('Reconnaissance photo indisponible : {raison}', ['raison' => $exception->getMessage()]);
-
-            return null;
+        $texte = null;
+        foreach ($modeles as $rang => $modele) {
+            try {
+                $texte = $this->demander($modele, $categories, $jpeg);
+                break;
+            } catch (ExceptionInterface $exception) {
+                $this->logger->warning('Reconnaissance photo indisponible avec {modele} : {raison}', ['modele' => $modele, 'raison' => $exception->getMessage()]);
+                $dernier = $rang === \count($modeles) - 1;
+                if ($dernier || !self::justifieLeSecours($exception)) {
+                    return null;
+                }
+            }
         }
 
         $proposition = \is_string($texte) ? $this->lireJson($texte) : null;
@@ -88,6 +92,42 @@ final class ReconnaissanceArticles
             'marque' => $this->texte($proposition['marque'] ?? null, self::MARQUE_MAX),
             'couleur' => $this->texte($proposition['couleur'] ?? null, self::COULEUR_MAX),
         ];
+    }
+
+    /**
+     * @param list<Categorie> $categories
+     *
+     * @throws ExceptionInterface
+     */
+    private function demander(string $modele, array $categories, string $jpeg): mixed
+    {
+        $reponse = $this->reconnaissanceClient->request('POST', 'chat/completions', [
+            'auth_bearer' => $this->cle,
+            'json' => [
+                'model' => $modele,
+                'temperature' => 0,
+                'max_tokens' => self::JETONS_MAX,
+                'messages' => [[
+                    'role' => 'user',
+                    'content' => [
+                        ['type' => 'text', 'text' => $this->prompt($categories)],
+                        ['type' => 'image_url', 'image_url' => ['url' => 'data:image/jpeg;base64,'.base64_encode($jpeg)]],
+                    ],
+                ]],
+            ],
+        ]);
+
+        return $reponse->toArray()['choices'][0]['message']['content'] ?? null;
+    }
+
+    /** Quota atteint, modèle surchargé ou délai dépassé : le modèle de secours a ses chances. */
+    private static function justifieLeSecours(ExceptionInterface $exception): bool
+    {
+        if ($exception instanceof HttpExceptionInterface) {
+            return \in_array($exception->getResponse()->getStatusCode(), self::STATUTS_SECOURS, true);
+        }
+
+        return $exception instanceof TransportExceptionInterface;
     }
 
     /** @param list<Categorie> $categories */

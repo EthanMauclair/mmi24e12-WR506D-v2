@@ -16,16 +16,18 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 /**
- * POST /api/reconnaissances (F-07, étape 1 du parcours P2) : la photo est enregistrée et son
- * identifiant renvoyé, à reprendre dans POST /api/articles.
+ * Ajout par photo (F-07, parcours P2), en deux appels pour que personne n'attende le modèle (D-041) :
+ * - POST /api/reconnaissances : la photo est enregistrée et son identifiant renvoyé tout de suite,
+ *   à reprendre dans POST /api/articles ; la fiche s'ouvre aussitôt ;
+ * - POST /api/reconnaissances/proposition : un modèle de vision lit cette photo et propose catégorie,
+ *   marque et couleur (D-040). Cela prend quelques secondes, pendant lesquelles la fiche reste utilisable.
  *
- * La proposition (catégorie, marque, couleur) vient d'un modèle de vision (D-040). Elle n'est pas
- * enregistrée (H6) et reste vide si la reconnaissance échoue : la saisie se fait alors à la main.
+ * La proposition n'est jamais enregistrée (H6) ; elle est vide si la reconnaissance échoue.
  */
 final class ReconnaissanceController
 {
     #[Route('/api/reconnaissances', name: 'reconnaissance', methods: ['POST'])]
-    public function __invoke(#[CurrentUser] Utilisateur $moi, Request $requete, PhotoArticles $photos, ReconnaissanceArticles $reconnaissance): JsonResponse
+    public function envoyer(#[CurrentUser] Utilisateur $moi, Request $requete, PhotoArticles $photos): JsonResponse
     {
         $fichier = $requete->files->get('photo');
         if (!$fichier instanceof UploadedFile) {
@@ -45,10 +47,23 @@ final class ReconnaissanceController
             return $this->refus(Response::HTTP_UNPROCESSABLE_ENTITY, $exception->getMessage());
         }
 
-        return new JsonResponse(
-            ['photo' => $chemin, 'proposition' => $reconnaissance->proposer($photos->lire($chemin))],
-            Response::HTTP_CREATED,
-        );
+        return new JsonResponse(['photo' => $chemin], Response::HTTP_CREATED);
+    }
+
+    /** Seulement pour ses propres photos : celle d'un autre est introuvable (D-014). */
+    #[Route('/api/reconnaissances/proposition', name: 'reconnaissance_proposition', methods: ['POST'])]
+    public function proposer(#[CurrentUser] Utilisateur $moi, Request $requete, PhotoArticles $photos, ReconnaissanceArticles $reconnaissance): JsonResponse
+    {
+        $chemin = $requete->toArray()['photo'] ?? null;
+        if (!\is_string($chemin) || !$photos->appartientA($chemin, $moi)) {
+            return new JsonResponse(
+                ['title' => 'Photo introuvable', 'status' => Response::HTTP_NOT_FOUND, 'detail' => 'Envoyez d\'abord la photo avec POST /api/reconnaissances.'],
+                Response::HTTP_NOT_FOUND,
+                ['Content-Type' => 'application/problem+json'],
+            );
+        }
+
+        return new JsonResponse(['proposition' => $reconnaissance->proposer($photos->lire($chemin))]);
     }
 
     private function refus(int $statut, string $detail): JsonResponse

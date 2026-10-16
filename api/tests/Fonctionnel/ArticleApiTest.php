@@ -48,7 +48,7 @@ final class ArticleApiTest extends ApiTestCase
         $photo = $this->envoyerPhoto($jeton);
         self::assertResponseStatusCodeSame(201);
         self::assertMatchesRegularExpression('#^photos/\d+/[0-9a-f]{32}\.jpg$#', $photo);
-        self::assertNull($this->reponse()['proposition'], 'Modèle simulé indisponible : la saisie se fait à la main.');
+        self::assertArrayNotHasKey('proposition', $this->reponse(), 'La proposition se demande à part (D-041).');
 
         $this->json('POST', '/api/articles', [
             'photo' => $photo,

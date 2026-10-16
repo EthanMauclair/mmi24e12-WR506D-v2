@@ -3,8 +3,10 @@
  * Écrans 5 et 6 – Ajouter un article (F-07, F-08, F-10, P2), en deux étapes sur la même page :
  * 1. la photo (caméra, galerie, glisser-déposer ou webcam), envoyée à POST /api/reconnaissances ;
  * 2. la fiche (catégorie, marque, couleur, rangement, note, personnel), envoyée à POST /api/articles.
- * La photo est lue par un modèle de vision de Google, qui propose catégorie, marque et couleur (D-040) :
- * la fiche arrive préremplie, à vérifier (H6). Si le modèle ne répond pas, elle reste à remplir à la main.
+ * La photo est lue par un modèle de vision de Google, qui propose catégorie, marque et couleur (D-040).
+ * Cela prend quelques secondes : la fiche s'ouvre sans attendre, et se remplit quand la proposition
+ * arrive (POST /api/reconnaissances/proposition, D-041), à vérifier (H6). Si le modèle ne répond pas,
+ * elle reste à remplir à la main.
  */
 useHead({ title: 'Ajouter un article – Penderie' })
 
@@ -24,8 +26,8 @@ const etape = ref<'photo' | 'fiche'>('photo')
 const envoiPhoto = ref(false)
 const erreurPhoto = ref<string | null>(null)
 const photo = ref<string | null>(null)
-/** La fiche a été préremplie à partir de la photo : le bandeau invite à la vérifier. */
-const proposee = ref(false)
+/** Lecture de la photo par le modèle : en cours, terminée avec une proposition, ou sans résultat. */
+const lecture = ref<'en-cours' | 'proposee' | 'aucune' | null>(null)
 const apercu = ref<string | null>(null)
 
 const video = ref<HTMLVideoElement | null>(null)
@@ -110,9 +112,9 @@ async function envoyer(fichier: File) {
     const corps = new FormData()
     corps.append('photo', fichier)
     // L'API réduit la photo, la redresse et retire ses métadonnées (position GPS comprise).
-    const reponse = await api<{ photo: string, proposition: Proposition | null }>('/api/reconnaissances', { method: 'POST', body: corps })
+    const reponse = await api<{ photo: string }>('/api/reconnaissances', { method: 'POST', body: corps })
     photo.value = reponse.photo
-    preremplir(reponse.proposition)
+    lirePhoto(reponse.photo)
     if (apercu.value) {
       URL.revokeObjectURL(apercu.value)
     }
@@ -135,17 +137,47 @@ interface Proposition {
   couleur: string | null
 }
 
-/** Reprend la proposition du modèle ; sans proposition, ce que la personne a déjà saisi reste en place. */
+// Numéro de la dernière lecture demandée : une réponse arrivée après un changement de photo est ignorée.
+let derniereLecture = 0
+// Valeurs posées par le modèle : un champ qui les garde peut être remplacé, un champ modifié à la main non.
+const preremplies = { categorie: null as number | null, marque: '', couleur: '' }
+
+/** Demande la proposition sans bloquer la fiche, qui reste utilisable pendant la lecture. */
+async function lirePhoto(chemin: string) {
+  const numero = ++derniereLecture
+  lecture.value = 'en-cours'
+  let proposition: Proposition | null = null
+  try {
+    proposition = (await api<{ proposition: Proposition | null }>('/api/reconnaissances/proposition', { method: 'POST', body: { photo: chemin } })).proposition
+  }
+  catch {
+    // La lecture est un confort : en cas d'erreur, la saisie se fait à la main.
+  }
+  if (numero === derniereLecture) {
+    preremplir(proposition)
+  }
+}
+
+/** Reprend la proposition dans les champs encore vides ou préremplis ; ce que la personne a saisi reste. */
 function preremplir(proposition: Proposition | null) {
-  proposee.value = proposition !== null
-  if (proposition) {
-    fiche.categorie = proposition.categorie.id
-    fiche.marque = proposition.marque ?? ''
-    fiche.couleur = proposition.couleur ?? ''
+  lecture.value = proposition ? 'proposee' : 'aucune'
+  if (!proposition) {
+    return
+  }
+  if (fiche.categorie === null || fiche.categorie === preremplies.categorie) {
+    fiche.categorie = preremplies.categorie = proposition.categorie.id
+  }
+  if (fiche.marque.trim() === '' || fiche.marque === preremplies.marque) {
+    fiche.marque = preremplies.marque = proposition.marque ?? ''
+  }
+  if (fiche.couleur.trim() === '' || fiche.couleur === preremplies.couleur) {
+    fiche.couleur = preremplies.couleur = proposition.couleur ?? ''
   }
 }
 
 function changerDePhoto() {
+  derniereLecture++
+  lecture.value = null
   etape.value = 'photo'
   demarrerSurTelephone()
 }
@@ -324,7 +356,7 @@ async function enregistrer() {
       </div>
 
       <p v-if="erreurPhoto" class="alerte" role="alert">{{ erreurPhoto }}</p>
-      <p v-if="envoiPhoto" class="envoi" role="status">Envoi et lecture de la photo… (jusqu'à 20 secondes)</p>
+      <p v-if="envoiPhoto" class="envoi" role="status">Envoi de la photo…</p>
 
       <div class="commandes">
         <button type="button" class="bouton-galerie" aria-label="Choisir une photo dans la galerie" :disabled="envoiPhoto" @click="champGalerie?.click()">
@@ -357,9 +389,11 @@ async function enregistrer() {
         </div>
 
         <form class="formulaire colonne-formulaire" novalidate @submit.prevent="enregistrer">
-          <div class="bandeau" data-cy="bandeau-fiche">
-            <Icone nom="etincelle" :taille="18" :epaisseur="2" class="bandeau-icone" />
-            <span v-if="proposee"><strong>Remplie à partir de la photo.</strong> Vérifiez la catégorie, la marque et la couleur, et corrigez-les si besoin.</span>
+          <div class="bandeau" role="status" data-cy="bandeau-fiche" :data-lecture="lecture ?? 'aucune'">
+            <Icone nom="etincelle" :taille="18" :epaisseur="2" class="bandeau-icone" :class="{ 'en-cours': lecture === 'en-cours' }" />
+            <span v-if="lecture === 'en-cours'"><strong>Lecture de la photo…</strong> La catégorie, la marque et la couleur arrivent dans quelques instants. Choisissez déjà où ranger l'article.</span>
+            <span v-else-if="lecture === 'proposee'"><strong>Remplie à partir de la photo.</strong> Vérifiez la catégorie, la marque et la couleur, et corrigez-les si besoin.</span>
+            <span v-else-if="lecture === 'aucune'"><strong>Photo non reconnue.</strong> Indiquez la catégorie, la marque et la couleur.</span>
             <span v-else><strong>Fiche de l'article.</strong> Indiquez la catégorie, la marque et la couleur.</span>
           </div>
 
@@ -696,6 +730,23 @@ async function enregistrer() {
 .bandeau-icone {
   flex-shrink: 0;
   color: var(--bordeaux);
+}
+
+/* Pendant la lecture, l'étincelle tourne doucement (immobile si l'animation est réduite). */
+.bandeau-icone.en-cours {
+  animation: lecture 1.6s linear infinite;
+}
+
+@keyframes lecture {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bandeau-icone.en-cours {
+    animation: none;
+  }
 }
 
 .colonne-formulaire > :not(.bandeau) {

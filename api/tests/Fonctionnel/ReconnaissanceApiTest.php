@@ -15,7 +15,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * POST /api/reconnaissances avec le modèle simulé (D-040) : la proposition est renvoyée sans
+ * POST /api/reconnaissances, puis POST /api/reconnaissances/proposition (D-041), avec le modèle
+ * simulé (D-040) : la proposition est renvoyée sans
  * être enregistrée (H6), et toute panne donne une proposition vide sans perdre la photo (P2).
  */
 final class ReconnaissanceApiTest extends ApiTestCase
@@ -34,9 +35,9 @@ final class ReconnaissanceApiTest extends ApiTestCase
     {
         ModeleSimule::prevoirTexte('{"categorie": "Pull", "marque": "Uniqlo", "couleur": "bleu marine"}');
 
-        $this->envoyerPhoto();
+        $this->analyserPhoto();
 
-        self::assertResponseStatusCodeSame(201);
+        self::assertResponseIsSuccessful();
         self::assertSame([
             'categorie' => ['id' => $this->categorie('Pull')->getId(), 'nom' => 'Pull'],
             'marque' => 'Uniqlo',
@@ -49,7 +50,7 @@ final class ReconnaissanceApiTest extends ApiTestCase
     {
         ModeleSimule::prevoirTexte('{"categorie": "Pull", "marque": null, "couleur": null}');
 
-        $this->envoyerPhoto();
+        $this->analyserPhoto();
 
         self::assertCount(1, ModeleSimule::$requetes);
         $requete = ModeleSimule::$requetes[0];
@@ -74,7 +75,7 @@ final class ReconnaissanceApiTest extends ApiTestCase
     {
         ModeleSimule::prevoirTexte('{"categorie": "Doudoune", "marque": "", "couleur": "Noir"}');
 
-        $this->envoyerPhoto();
+        $this->analyserPhoto();
 
         self::assertSame([
             'categorie' => ['id' => $this->categorie('Autre')->getId(), 'nom' => 'Autre'],
@@ -88,7 +89,7 @@ final class ReconnaissanceApiTest extends ApiTestCase
     {
         ModeleSimule::prevoirTexte("Voici :\n```json\n{\"categorie\": \"echarpe\", \"marque\": null, \"couleur\": \"rouge\"}\n```");
 
-        $this->envoyerPhoto();
+        $this->analyserPhoto();
 
         self::assertSame('Écharpe', $this->reponse()['proposition']['categorie']['nom']);
     }
@@ -98,9 +99,34 @@ final class ReconnaissanceApiTest extends ApiTestCase
     {
         ModeleSimule::prevoirTexte('Je pense que c\'est un pull bleu.');
 
-        $this->envoyerPhoto();
+        $this->analyserPhoto();
 
-        self::assertResponseStatusCodeSame(201);
+        self::assertResponseIsSuccessful();
+        self::assertNull($this->reponse()['proposition']);
+    }
+
+    #[Test]
+    public function des_accolades_sans_json_valide_donnent_une_proposition_vide(): void
+    {
+        ModeleSimule::prevoirTexte('{categorie: Pull, couleur: bleu}');
+
+        $this->analyserPhoto();
+
+        self::assertResponseIsSuccessful();
+        self::assertNull($this->reponse()['proposition']);
+    }
+
+    #[Test]
+    public function sans_categorie_autre_une_categorie_inconnue_donne_une_proposition_vide(): void
+    {
+        // Garde-fou : « Autre » vient d'une migration ; si elle manquait, on ne propose rien plutôt qu'une catégorie fausse.
+        $this->em->remove($this->categorie('Autre'));
+        $this->em->flush();
+        ModeleSimule::prevoirTexte('{"categorie": "Doudoune", "marque": null, "couleur": "noir"}');
+
+        $this->analyserPhoto();
+
+        self::assertResponseIsSuccessful();
         self::assertNull($this->reponse()['proposition']);
     }
 
@@ -116,25 +142,47 @@ final class ReconnaissanceApiTest extends ApiTestCase
 
         foreach ($pannes as $panne) {
             ModeleSimule::prevoir($panne);
-            $photo = $this->envoyerPhoto();
+            $photo = $this->analyserPhoto();
 
-            self::assertResponseStatusCodeSame(201);
+            self::assertResponseIsSuccessful();
             self::assertNull($this->reponse()['proposition']);
             self::assertMatchesRegularExpression('#^photos/\d+/[0-9a-f]{32}\.jpg$#', $photo, 'La photo reste enregistrée.');
         }
     }
 
     #[Test]
-    public function une_surcharge_passagere_est_reessayee_une_fois(): void
+    public function le_modele_de_secours_prend_le_relais_si_le_principal_refuse_ou_tarde(): void
     {
-        ModeleSimule::prevoir(new MockResponse('', ['http_code' => 503]));
-        ModeleSimule::prevoirTexte('{"categorie": "Pull", "marque": null, "couleur": "bleu"}');
+        $refus = [
+            'quota atteint' => new MockResponse('{"error": {"message": "Quota exceeded"}}', ['http_code' => 429]),
+            'surcharge' => new MockResponse('', ['http_code' => 503]),
+            'délai dépassé' => new MockResponse('', ['error' => 'Délai dépassé']),
+        ];
 
-        $this->envoyerPhoto();
+        foreach ($refus as $cas => $reponse) {
+            ModeleSimule::reinitialiser();
+            ModeleSimule::prevoir($reponse);
+            ModeleSimule::prevoirTexte('{"categorie": "Pull", "marque": null, "couleur": "bleu"}');
 
-        self::assertResponseStatusCodeSame(201);
-        self::assertCount(2, ModeleSimule::$requetes, 'Un seul nouvel essai après le 503.');
-        self::assertSame('Pull', $this->reponse()['proposition']['categorie']['nom']);
+            $this->analyserPhoto();
+
+            self::assertResponseIsSuccessful();
+            self::assertSame('Pull', $this->reponse()['proposition']['categorie']['nom'], $cas);
+            $modeles = array_map(static fn (array $requete): string => json_decode($requete['options']['body'], true, 512, \JSON_THROW_ON_ERROR)['model'], ModeleSimule::$requetes);
+            self::assertSame(['modele-de-test', 'modele-de-secours'], $modeles, $cas);
+        }
+    }
+
+    #[Test]
+    public function une_requete_refusee_pour_une_autre_raison_ne_passe_pas_au_secours(): void
+    {
+        ModeleSimule::prevoir(new MockResponse('{"error": {"message": "API key not valid"}}', ['http_code' => 400]));
+
+        $this->analyserPhoto();
+
+        self::assertResponseIsSuccessful();
+        self::assertNull($this->reponse()['proposition']);
+        self::assertCount(1, ModeleSimule::$requetes, 'Une clé invalide le serait aussi pour le secours.');
     }
 
     #[Test]
@@ -148,6 +196,43 @@ final class ReconnaissanceApiTest extends ApiTestCase
     }
 
     /** POST /api/reconnaissances avec une image de 2400 × 1200 px ; renvoie le chemin de la photo. */
+    #[Test]
+    public function l_envoi_de_la_photo_n_attend_pas_le_modele(): void
+    {
+        $photo = $this->envoyerPhoto();
+
+        self::assertResponseStatusCodeSame(201);
+        self::assertSame(['photo' => $photo], $this->reponse(), 'Seulement la photo : la proposition se demande à part.');
+        self::assertCount(0, ModeleSimule::$requetes);
+    }
+
+    #[Test]
+    public function on_ne_demande_une_proposition_que_pour_sa_propre_photo(): void
+    {
+        $photoDeLeo = $this->envoyerPhoto();
+        $nora = $this->creerMajeur('nora');
+
+        $this->json('POST', '/api/reconnaissances/proposition', ['photo' => $photoDeLeo], $this->jetonDe($nora));
+        self::assertResponseStatusCodeSame(404);
+
+        $this->json('POST', '/api/reconnaissances/proposition', ['photo' => 'photos/'.$this->leo->getId().'/'.str_repeat('0', 32).'.jpg'], $this->jetonDe($this->leo));
+        self::assertResponseStatusCodeSame(404, 'Photo inexistante.');
+
+        $this->json('POST', '/api/reconnaissances/proposition', ['photo' => $photoDeLeo]);
+        self::assertResponseStatusCodeSame(401);
+
+        self::assertCount(0, ModeleSimule::$requetes, 'Le modèle n\'est jamais appelé pour une photo refusée.');
+    }
+
+    /** Les deux étapes : envoi de la photo, puis demande de proposition ; la réponse lue ensuite est la proposition. */
+    private function analyserPhoto(): string
+    {
+        $photo = $this->envoyerPhoto();
+        $this->json('POST', '/api/reconnaissances/proposition', ['photo' => $photo], $this->jetonDe($this->leo));
+
+        return $photo;
+    }
+
     private function envoyerPhoto(): string
     {
         $fichier = tempnam(sys_get_temp_dir(), 'photo');
