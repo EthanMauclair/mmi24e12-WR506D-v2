@@ -6,6 +6,7 @@ import type { NomIcone } from '~/components/Icone.vue'
  * - mobile : barre du bas à cinq icônes, bouton photo au centre, accessible partout (D-010) ;
  * - desktop : menu latéral, « Ajouter un article » en tête.
  * Les entrées sans `vers` arrivent avec les prochaines branches : affichées, mais inactives.
+ * Les attributs data-cy servent aux tests de bout en bout : ils ne bougent pas quand le style change.
  */
 interface Entree {
   libelle: string
@@ -15,7 +16,7 @@ interface Entree {
 
 const entrees: Entree[] = [
   { libelle: 'Mes logements', icone: 'logement', vers: '/logements' },
-  { libelle: 'Rechercher', icone: 'recherche', vers: null },
+  { libelle: 'Rechercher', icone: 'recherche', vers: '/recherche' },
   { libelle: 'Mes tenues', icone: 'tenue', vers: null },
   { libelle: 'Mon profil', icone: 'profil', vers: '/profil' },
 ]
@@ -26,7 +27,7 @@ const { moi } = useSession()
 
 <template>
   <div class="application">
-    <nav class="menu-lateral" aria-label="Navigation principale">
+    <nav class="menu-lateral" aria-label="Navigation principale" data-cy="menu-lateral">
       <NuxtLink to="/" class="logo">Penderie</NuxtLink>
 
       <NuxtLink v-if="ajout" :to="ajout" class="ajouter">
@@ -60,7 +61,7 @@ const { moi } = useSession()
       <slot />
     </main>
 
-    <nav class="barre-bas" aria-label="Navigation principale">
+    <nav class="barre-bas" aria-label="Navigation principale" data-cy="barre-bas">
       <template v-for="(entree, index) in entrees" :key="entree.libelle">
         <NuxtLink v-if="entree.vers" :to="entree.vers" class="onglet" :aria-label="entree.libelle">
           <Icone :nom="entree.icone" />
