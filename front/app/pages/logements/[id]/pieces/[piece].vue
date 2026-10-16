@@ -2,6 +2,7 @@
 /**
  * Une pièce et ses articles (F-26, P3) : tous ses rangements, ou un seul (?rangement=).
  * Vue membre : articles personnels compris (A-01), avec leur rangement.
+ * « Gérer la pièce » : la renommer ou la supprimer, et de même pour ses rangements (F-06, GestionPiece).
  */
 interface Logement {
   id: number
@@ -31,7 +32,7 @@ const piece = computed(() => logement.value?.pieces?.find(p => p.id === pieceId)
 if (error.value || !piece.value) {
   throw createError({ statusCode: 404, statusMessage: 'Pièce introuvable', fatal: true })
 }
-useHead({ title: `${piece.value.nom} – Penderie` })
+useHead({ title: () => `${piece.value?.nom ?? 'Pièce'} – Penderie` })
 
 // Filtre par rangement, repris de l'adresse pour qu'un clic sur un rangement dans « Mes logements » y mène directement.
 const filtre = ref<number | null>(Number(route.query.rangement) || null)
@@ -91,6 +92,20 @@ async function ajouterRangement() {
   }
 }
 
+// Gestion de la pièce et de ses rangements.
+const gestionOuverte = ref(false)
+
+async function apresModification(rangementSupprime?: number) {
+  if (rangementSupprime && filtre.value === rangementSupprime) {
+    filtre.value = null
+  }
+  await relireLogement()
+}
+
+function apresSuppression() {
+  navigateTo('/logements', { replace: true })
+}
+
 function photo(article: ArticleMembre): string {
   return `${config.public.apiBase}${article.photoUrl}`
 }
@@ -106,7 +121,21 @@ function details(article: ArticleMembre): string {
       <Icone nom="retour" :taille="20" :epaisseur="1.8" /> Mes logements
     </NuxtLink>
     <p class="fil">{{ logement.nom }}</p>
-    <h1>{{ piece.nom }}</h1>
+    <div class="titre-ligne">
+      <h1>{{ piece.nom }}</h1>
+      <button
+        type="button"
+        class="bouton-gerer"
+        :aria-expanded="gestionOuverte"
+        aria-controls="gestion-piece"
+        data-cy="gerer-piece"
+        @click="gestionOuverte = !gestionOuverte"
+      >
+        <Icone nom="crayon" :taille="18" /> {{ gestionOuverte ? 'Fermer' : 'Gérer la pièce' }}
+      </button>
+    </div>
+
+    <GestionPiece v-if="gestionOuverte" :piece="piece" @modifiee="apresModification" @supprimee="apresSuppression" />
 
     <div class="filtres" role="group" aria-label="Filtrer par rangement">
       <button v-if="piece.stockages.length" type="button" class="filtre" :aria-pressed="filtre === null" @click="filtre = null">Tous les rangements</button>
@@ -173,8 +202,36 @@ function details(article: ArticleMembre): string {
   font-size: 14px;
 }
 
+.titre-ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 16px;
+}
+
 h1 {
-  margin: 0 0 16px;
+  margin: 0;
+  color: var(--bordeaux);
+}
+
+.bouton-gerer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--zone-tactile);
+  padding: 0 14px;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--texte);
+  font: 700 14px var(--police-texte);
+  cursor: pointer;
+}
+
+.bouton-gerer[aria-expanded='true'] {
+  border-color: var(--bordeaux);
   color: var(--bordeaux);
 }
 
