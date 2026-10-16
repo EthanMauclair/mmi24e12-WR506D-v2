@@ -519,3 +519,19 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - La couverture et Cypress n'y sont pas encore : ils dépendent des fixtures et de pcov, qui sont sur `feature/test` (D-036). Ils seront ajoutés avec Thomas, comme prévu dans `ci.md`.
   - Vérifié en local avant le premier push : les étapes du workflow, rejouées sur une copie neuve du dépôt (volumes Docker vides, sans clés JWT), donnent `make qualite` vert.
 - **IA** : workflow, script d'audit et vérification sur une copie neuve écrits par l'assistant ; l'étudiant active la protection des branches sur GitHub.
+
+## D-039 – Renommer et supprimer une pièce ou un rangement
+
+- **Date** : 16/10/2026
+- **Statut** : Validée
+- **Contexte** : dernière fonction du lot 1 sans écran (F-06) ; l'API était faite et testée. Branche `feature/gerer-pieces-rangements`.
+- **Décisions** :
+  - Sur la page d'une pièce, un bouton **« Gérer la pièce »** ouvre un panneau : renommer la pièce, renommer ou supprimer chacun de ses rangements, supprimer la pièce. Chaque suppression demande une confirmation (`<dialog>`).
+  - Les règles restent à l'API : une pièce ou un rangement **ne se supprime que vide** (I-10, 409), et seuls les membres majeurs modifient (A-10, 403). Le panneau affiche son refus tel quel ; il prévient aussi qu'il faut d'abord déplacer les articles.
+  - Une pièce supprimée renvoie vers « Mes logements » ; un rangement supprimé qui servait de filtre ramène à « Tous les rangements ».
+  - Les messages d'erreur des règles métier s'affichent **sans leur code** (« [I-10] ») : le code reste dans la réponse de l'API, utile dans Postman et les tests, mais n'a pas de sens pour l'utilisatrice.
+- **Alternatives écartées** :
+  - Gérer pièces et rangements depuis « Mes logements » : la page deviendrait un formulaire, alors qu'elle sert d'abord à naviguer.
+  - Supprimer une pièce avec ses articles : contraire à I-10, un article est toujours rangé.
+- **Conséquences** : le front du lot 1 est complet. Reste hors lot 1 : ajouter une pièce à un logement existant (la création guidée ne sert qu'au premier logement).
+- **IA** : composant écrit par l'assistant, vérifié dans le navigateur (compte de démonstration, mobile et desktop, refus I-10 sur une pièce pleine) et avec axe-core.
