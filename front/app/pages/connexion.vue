@@ -67,7 +67,7 @@ async function seConnecter() {
         <p>Heureux de vous revoir.</p>
       </div>
 
-      <form class="formulaire" novalidate @submit.prevent="seConnecter">
+      <form class="formulaire" method="post" novalidate @submit.prevent="seConnecter">
         <p v-if="erreur" class="alerte" role="alert">{{ erreur }}</p>
 
         <div class="champ">

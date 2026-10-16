@@ -84,7 +84,7 @@ async function seDeconnecter() {
     </NuxtLink>
     <h1>Paramètres du compte</h1>
 
-    <form class="formulaire" novalidate @submit.prevent="enregistrer">
+    <form class="formulaire" method="post" novalidate @submit.prevent="enregistrer">
       <p v-if="erreurGenerale" class="alerte" role="alert">{{ erreurGenerale }}</p>
       <p v-if="succes" class="confirmation" role="status">{{ succes }}</p>
 
