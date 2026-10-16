@@ -456,3 +456,14 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - **Snyk** est branché sur le dépôt GitHub (branche `develop`), sans les PR de correction automatiques : elles contourneraient le Gitflow (`feature/…` vers `develop`) et le journal.
   - **Image PHP sur Alpine** (`php:8.4-fpm-alpine` au lieu de `php:8.4-fpm`). Snyk relevait 288 failles dans le système Debian de l'image (3 critiques dans `perl`, 23 hautes), dont 220 sans correction publiée ; Trivy en compte 2 critiques et 124 hautes. Avec Alpine, Trivy n'en trouve plus que 2 moyennes, pour la même version de PHP. `www-data` garde l'identifiant 33 pour que les volumes existants restent utilisables.
 - **IA** : l'assistant a installé et configuré les outils, corrigé les erreurs, lancé axe-core sur les écrans et rédigé l'audit ; les vulnérabilités acceptées sont un choix de l'étudiant.
+
+## D-034 – Correctifs de sécurité appliqués à la construction de l'image PHP
+
+- **Date** : 15/10/2026
+- **Statut** : Validée
+- **Contexte** : après le passage à `php:8.4-fpm-alpine` (D-033), Snyk relevait encore 22 failles dans l'image : 0 critique, 1 haute (`zlib`), 1 moyenne (`nghttp2`), 20 faibles (`curl`). Toutes sont corrigées dans des paquets Alpine publiés après l'image de base. Côté front, Snyk relève une faille haute de plus que `npm audit` : `ioredis`.
+- **Décisions** :
+  - Le Dockerfile lance **`apk upgrade`** à la construction. Trivy ne trouve plus **aucune faille** dans l'image construite. Snyk affiche toujours les 22 failles, parce qu'il analyse l'image de base déclarée, pas l'image construite.
+  - **`ioredis` accepté**, comme `node-forge` et `braces` (D-033). `unstorage` ne s'en sert que pour son connecteur Redis, que l'application n'utilise pas, et il n'existe pas de version compatible avec Nuxt.
+- **Conséquences** : reconstruire l'image régulièrement (`docker compose build php`) suffit à récupérer les correctifs suivants. Côté front, Snyk liste 3 failles hautes et 1 moyenne, toutes héritées de Nuxt et sans correctif.
+- **IA** : l'assistant a lu les résultats de Snyk, vérifié l'image construite avec Trivy et relancé les 98 tests.
