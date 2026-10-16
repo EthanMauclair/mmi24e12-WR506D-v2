@@ -77,6 +77,8 @@ Incident rencontré : `npm` 10 plantait (`Cannot read properties of null (readin
 
 **À revoir à chaque `make audit`** : dès qu'une version corrigée de `node-forge` ou de `braces` paraît, l'imposer de la même façon.
 
+**Dans `make audit` et la CI** (D-038) : `npm audit` passe par `front/scripts/audit-npm.mjs`, qui contient la liste des failles acceptées (identifiants GHSA de `node-forge` et `braces`). Toute autre faille haute ou critique fait échouer la commande, donc la CI ; une faille acceptée qui n'est plus signalée est indiquée, pour la retirer de la liste.
+
 ## 4. Image Docker de l'API
 
 Snyk a été branché sur le dépôt GitHub (branche `develop`). Il analyse aussi `docker/php/Dockerfile` : l'image de base `php:8.4-fpm` (Debian 13) contenait **288 failles** selon Snyk (3 critiques, 23 hautes, 8 moyennes, 254 faibles), et 1 985 selon Trivy (2 critiques, 124 hautes).
@@ -150,4 +152,5 @@ Bonnes pratiques en place : retour visible à chaque action (« Enregistrement�
 ## 8. Testabilité et fiabilité (séances 16 à 21)
 
 - **Existant** : 98 tests PHPUnit (unitaires sur les entités, fonctionnels sur chaque route : cas nominal, erreurs, autorisations), base de test remise à zéro à chaque test (DAMADoctrineTestBundle).
-- **À faire** : fixtures Faker volumineuses et à graine fixe, mesure de la couverture (`coverage.md`), tests de bout en bout Cypress, CI GitHub Actions lançant `make qualite`, synthèse `ci.md`.
+- **À faire** : fixtures Faker volumineuses et à graine fixe, mesure de la couverture (`coverage.md`), tests de bout en bout Cypress, synthèse `ci.md`.
+- **Fait** : CI GitHub Actions lançant `make qualite` à chaque push et à chaque PR (`.github/workflows/qualite.yml`, D-038).
