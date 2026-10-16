@@ -9,7 +9,6 @@ use App\Entity\Categorie;
 use App\Entity\Logement;
 use App\Entity\Utilisateur;
 use App\Enum\RoleMembre;
-use App\Exception\RegleMetierException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
