@@ -521,3 +521,24 @@ Statuts possibles : **Validée**, **Hypothèse** (en attente de confirmation du 
   - Ajouter un total à la réponse de l'API (format JSON-LD ou en-tête) : changement de contrat inutile pour la V1.
 - **Conséquences** : l'entrée « Rechercher » du menu est active ; seule « Mes tenues » reste grisée. Restent du lot 1 : renommer et supprimer une pièce ou un rangement.
 - **IA** : écrans, extension de la recherche et test fonctionnel écrits par l'assistant, vérifiés dans le navigateur (compte de démonstration, mobile et desktop) et avec axe-core.
+
+## D-038 – Intégration continue GitHub Actions
+
+- **Date** : 16/10/2026
+- **Statut** : Validée
+- **Contexte** : séances 17-18. À partir d'ici, la CI est bloquante : un workflow à chaque push et à chaque PR, `composer audit` compris, et une PR rouge ne se fusionne pas. Branche `feature/ci`.
+- **Décisions** :
+  - Un seul workflow, `.github/workflows/qualite.yml`, qui lance **`make qualite`** (linters, PHPStan, style, audit des dépendances, tests PHPUnit) **dans les mêmes conteneurs Docker que sur le poste**. Il tourne à chaque push, sur toutes les branches, et sur chaque PR vers `develop` ou `main`. Un nouveau push annule la vérification en cours sur la même branche.
+  - **Aucun secret stocké sur GitHub** : à chaque exécution, la CI tire au sort `APP_SECRET` et la phrase de passe JWT (`api/.env.local`, `api/.env.test.local`), puis génère des clés JWT jetables. Rien ne sort de la machine de CI, qui est détruite à la fin.
+  - **Audit du front** : `npm audit` passe par `front/scripts/audit-npm.mjs`, qui contient la liste des failles acceptées (D-033 : `node-forge`, `braces`, par leur identifiant GHSA). Toute autre faille haute ou critique fait échouer `make audit`, donc la CI. Accepter une nouvelle faille demande de l'ajouter à la liste **et** au journal.
+  - `make audit` lance `npm audit` dans un conteneur `front` temporaire (`docker compose run`) : il n'a plus besoin du front démarré, sur le poste comme en CI.
+  - Les règles `.gitignore` de `e2e/` et `api/coverage/` (jusqu'ici sur `feature/test` seulement) passent sur `develop`.
+- **Alternatives écartées** :
+  - `npm audit --audit-level=critical` : la CI passerait, mais une nouvelle faille haute passerait aussi, sans que personne ne la voie.
+  - Installer PHP et MySQL directement sur la machine de CI (`setup-php`, service MySQL) : plus rapide, mais une deuxième configuration à maintenir, qui pourrait différer de Docker. Avec les mêmes conteneurs, « ça passe sur mon poste » veut dire « ça passe en CI ».
+  - Stocker de vrais secrets dans les « secrets » GitHub : inutile pour des tests, et un secret de plus à protéger.
+- **Conséquences** :
+  - La règle « PR rouge non fusionnable » se règle sur GitHub, dans la protection des branches `develop` et `main` (vérification `make qualite` obligatoire).
+  - La couverture et Cypress n'y sont pas encore : ils dépendent des fixtures et de pcov, qui sont sur `feature/test` (D-036). Ils seront ajoutés avec Thomas, comme prévu dans `ci.md`.
+  - Vérifié en local avant le premier push : les étapes du workflow, rejouées sur une copie neuve du dépôt (volumes Docker vides, sans clés JWT), donnent `make qualite` vert.
+- **IA** : workflow, script d'audit et vérification sur une copie neuve écrits par l'assistant ; l'étudiant active la protection des branches sur GitHub.

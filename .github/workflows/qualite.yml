@@ -1,0 +1,63 @@
+# Intégration continue de PENDERIE (séances 17-18, D-038).
+# À chaque push et à chaque PR : la même commande que sur le poste, `make qualite`
+# (linters, PHPStan, style, audit des dépendances, tests PHPUnit), dans les mêmes conteneurs Docker.
+# Une PR dont ce workflow est rouge ne se fusionne pas (règle de protection de develop et main).
+name: Qualité
+
+on:
+  push:
+  pull_request:
+    branches: [develop, main]
+
+# Un nouveau push sur la même branche annule la vérification en cours, devenue inutile.
+concurrency:
+  group: qualite-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  qualite:
+    name: make qualite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      # Secrets propres à cette exécution, tirés au sort et jetés avec la machine :
+      # aucun secret du projet n'est stocké sur GitHub ni dans le dépôt.
+      - name: Créer les secrets locaux de la CI
+        run: |
+          secret=$(openssl rand -hex 16)
+          phrase=$(openssl rand -hex 24)
+          for fichier in api/.env.local api/.env.test.local; do
+            printf 'APP_SECRET=%s\nJWT_PASSPHRASE=%s\n' "$secret" "$phrase" > "$fichier"
+          done
+          # Le conteneur PHP tourne en www-data (identifiant 33), le code récupéré appartient à l'utilisateur
+          # de la CI : on ouvre l'écriture pour les clés JWT et le cache de PHP-CS-Fixer.
+          chmod -R a+rwX api
+
+      - name: Construire l'image PHP
+        run: docker compose build php
+
+      - name: Installer les dépendances de l'API
+        run: docker compose run --rm --no-deps php composer install --no-interaction --no-progress
+
+      - name: Générer les clés JWT
+        run: docker compose run --rm --no-deps php php bin/console lexik:jwt:generate-keypair
+
+      - name: Démarrer l'API et la base de données
+        run: docker compose up -d --wait
+
+      - name: Appliquer les migrations (base de dev et base de test)
+        run: make migrer
+
+      - name: make qualite
+        run: make qualite
+
+      - name: Journaux des conteneurs en cas d'échec
+        if: failure()
+        run: docker compose logs --tail=100
