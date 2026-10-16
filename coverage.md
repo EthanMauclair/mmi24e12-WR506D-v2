@@ -24,15 +24,15 @@ Le dépôt contient deux applications : l'API Symfony dans `api/` et le front Nu
 
 ## Résultat
 
-| Mesure | Avant (séance 15) | 15/10 | 16/10 |
+| Mesure | Avant (séance 15) | 15/10 | 16/10 (scan compris, D-040) |
 |---|---|---|---|
-| Tests PHPUnit | 98 (391 assertions) | 132 (508 assertions) | **192** (751 assertions) |
-| dont unitaires / intégration / fonctionnels | – | 40 / 2 / 90 | **57 / 45 / 90** |
-| Lignes couvertes | 93,44 % (827 / 885) | 100 % (883 / 883) | **100 %** (883 / 883) |
-| Méthodes couvertes | 87,55 % (204 / 233) | 100 % (232 / 232) | **100 %** (232 / 232) |
-| Classes entièrement couvertes | 67,24 % (39 / 58) | 100 % (58 / 58) | **100 %** (58 / 58) |
+| Tests PHPUnit | 98 (391 assertions) | 132 (508 assertions) | **202** (800 assertions) |
+| dont unitaires / intégration / fonctionnels | – | 40 / 2 / 90 | **57 / 45 / 100** |
+| Lignes couvertes | 93,44 % (827 / 885) | 100 % (883 / 883) | **100 %** (940 / 940) |
+| Méthodes couvertes | 87,55 % (204 / 233) | 100 % (232 / 232) | **100 %** (237 / 237) |
+| Classes entièrement couvertes | 67,24 % (39 / 58) | 100 % (58 / 58) | **100 %** (59 / 59) |
 
-Le 16/10, les 100 % ne changent pas, mais ils ne reposent plus sur les seuls tests fonctionnels : **chaque niveau couvre seul tout le métier qui le concerne** (voir « Couverture par niveau »).
+Le 16/10, les 100 % ne changent pas, mais ils ne reposent plus sur les seuls tests fonctionnels : **chaque niveau couvre seul tout le métier qui le concerne** (voir « Couverture par niveau »). Le scan (D-040) a ajouté le service de reconnaissance et 10 tests fonctionnels ; la première mesure après son arrivée donnait 99,68 % : deux cas n'étaient pas testés (« Autre » absente de la base, accolades sans JSON valide), ils le sont désormais.
 
 Pilote de mesure : **PCOV**, ajouté à l'image PHP et désactivé par défaut (`pcov.enabled = 0`) pour ne pas ralentir l'application ; `make couverture` l'active pour la mesure seulement.
 
@@ -79,7 +79,7 @@ Le code métier de l'API est réparti en couches. Chaque niveau de test vise la 
 |---|---|---|---|---|
 | **Unitaire** (57 tests) | `tests/Unit` | `TestCase` | Entités (`src/Entity`), voters (`src/Security/*Voter`), traduction des règles en statuts HTTP (`RegleMetierListener`) | Les invariants vivent dans les entités riches (D-018) et les droits dans les voters : du PHP pur, testable sans base ni HTTP. Toute la suite tourne en moins d'une seconde. |
 | **Intégration** (45 tests) | `tests/Integration` | `KernelTestCase` | Services d'accès (`AccesLogement`, `AccesArticle`, `AccesProfil`), dépôts (`src/Repository`), service photo (`PhotoArticles`), règles tenues par la base | Ce code n'a de sens qu'avec ses vraies dépendances : requêtes MySQL (interclassement sans accents, `LIKE`, tri), clés étrangères en cascade, contraintes d'unicité, GD et Flysystem. Les simuler reviendrait à tester les simulations. |
-| **Fonctionnel** (90 tests) | `tests/Fonctionnel` | `WebTestCase` | Les routes du contrat d'API : processeurs et fournisseurs API Platform (`src/State`), contrôleurs, DTO, format des réponses | Cette couche ne fait qu'assembler les deux autres derrière HTTP. Le vrai risque y est la **colle** : jeton JWT, désérialisation, champ en trop, statut HTTP, champ qui ne doit pas sortir (S-05). Seule une vraie requête le vérifie. |
+| **Fonctionnel** (100 tests) | `tests/Fonctionnel` | `WebTestCase` | Les routes du contrat d'API : processeurs et fournisseurs API Platform (`src/State`), contrôleurs, DTO, format des réponses | Cette couche ne fait qu'assembler les deux autres derrière HTTP. Le vrai risque y est la **colle** : jeton JWT, désérialisation, champ en trop, statut HTTP, champ qui ne doit pas sortir (S-05). Seule une vraie requête le vérifie. |
 
 ### Couverture par niveau
 
@@ -94,8 +94,9 @@ Mesurée en lançant **chaque suite seule** (commande dans l'en-tête), sur le c
 | Services d'accès (`AccesLogement`, `AccesArticle`, `AccesProfil`) | 38 | – | **100 %** | – |
 | Dépôts (`src/Repository`) | 117 | – | **100 %** | – |
 | Service photo (`PhotoArticles`) | 39 | – | **100 %** | – |
-| Routes de l'API (`src/State`, `src/Controller`, `src/ApiResource`) | 391 | – | – | **100 %** |
-| **Tout `api/src/`** (hors exclusions ci-dessus) | 883 | 26,6 % | 42,9 % | 98,1 % |
+| Service de reconnaissance (`ReconnaissanceArticles`, D-040) | 54 | – | – | **100 %** |
+| Routes de l'API (`src/State`, `src/Controller`, `src/ApiResource`) | 394 | – | – | **100 %** |
+| **Tout `api/src/`** (hors exclusions ci-dessus) | 940 | 25,0 % | 40,3 % | 98,2 % |
 
 Lecture :
 - **Unitaire.** Les tests unitaires couvrent **toutes les lignes de règles** des entités. Les 21 lignes restantes sont des accesseurs d'une ligne (`return $this->id;`) et l'enregistrement du mot de passe haché. Leur écrire un test unitaire gonflerait le chiffre sans rien vérifier. Ils sont exécutés, et leurs valeurs vérifiées, par les tests d'intégration et fonctionnels.
@@ -106,6 +107,7 @@ Lecture :
   - identifiant non numérique, et voter appelé sans compte.
 
   Ces garde-fous sont justement le rôle des tests unitaires et d'intégration, qui les couvrent.
+- **Reconnaissance (D-040).** Le service appelle un modèle de vision chez Google. Les tests fonctionnels remplacent cet appel par `ModeleSimule` (`framework.http_client.mock_response_factory`) : la requête complète (photo, jeton, route, réponse JSON) est vérifiée, sans dépendre du réseau ni du quota de Google. Chaque réponse possible du modèle a son test : proposition correcte, catégorie hors liste, texte autour du JSON, réponse illisible, accolades sans JSON valide, panne (429, 503, délai), nouvel essai après un 503, clé absente, catégorie « Autre » absente.
 
 ### Le test fonctionnel désigné
 
@@ -122,7 +124,7 @@ Pourquoi lui :
 - **Il vérifie des résultats, pas seulement un statut** : auteur imposé, catégorie, emplacement, photo réduite à 1600 × 800 et en JPG, refus de réutiliser une photo (422).
 - Aucun test unitaire ni d'intégration ne peut prouver que ces morceaux, chacun testé à part, **fonctionnent ensemble**.
 
-Les 89 autres tests fonctionnels vérifient les routes une à une : chaque route avec son cas nominal, ses erreurs et ses refus d'accès (401, 403, 404).
+Les 99 autres tests fonctionnels vérifient les routes une à une : chaque route avec son cas nominal, ses erreurs et ses refus d'accès (401, 403, 404).
 
 ### Chaque règle métier et son test
 

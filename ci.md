@@ -16,8 +16,8 @@ Chaque ligne se rejoue avec une commande du [Makefile](Makefile). Les captures s
 | Style du code PHP (`@Symfony`) | `make cs` | ✅ conforme | [cs.png](docs/captures/cs.png) |
 | Dépendances PHP et front | `make audit` | ✅ PHP : 0 ; front : 0 critique, 11 hautes acceptées faute de correctif (`node-forge`, `braces`), toute autre faille haute ou critique fait échouer la commande (D-033, D-038) | [audit.png](docs/captures/audit.png) |
 | Snyk (dépendances, image Docker, code) | app.snyk.io | ✅ 0 critique. Code : 0 ; PHP : 0 ; image : 1 haute, dans l'image de base, corrigée à la construction par `apk upgrade` (D-034) ; front : 3 hautes acceptées, héritées de Nuxt et sans correctif (D-033, D-034) | [snyk.png](docs/captures/snyk.png) |
-| Tests PHPUnit (unitaires, intégration, fonctionnels) | `make tests` | ✅ 192 tests, 752 assertions | [tests.png](docs/captures/tests.png) |
-| Couverture du code | `make couverture` | ✅ 100 % des lignes (883 / 883), des méthodes (232 / 232) et des classes (58 / 58) | [couverture.png](docs/captures/couverture.png) |
+| Tests PHPUnit (unitaires, intégration, fonctionnels) | `make tests` | ✅ 202 tests, 800 assertions | [tests.png](docs/captures/tests.png) |
+| Couverture du code | `make couverture` | ✅ 100 % des lignes (940 / 940), des méthodes (237 / 237) et des classes (59 / 59) | [couverture.png](docs/captures/couverture.png) |
 | Tests de bout en bout (Cypress) | `make e2e` | ✅ 14 tests, 5 fichiers, en 1 min 37 | [cypress.png](docs/captures/cypress.png) |
 | Intégration continue (GitHub Actions) | `make qualite`, à chaque push et à chaque PR | ✅ verte sur `develop` et `feature/test` | [onglet Actions](https://github.com/EthanMauclair/mmi24e12-WR506D-v2/actions) |
 | Jeu de démonstration | `make fixtures` | ✅ 1 000 articles, 25 comptes, 24 logements, 92 relations (comptés en base après le chargement) | [fixtures.png](docs/captures/fixtures.png) |
