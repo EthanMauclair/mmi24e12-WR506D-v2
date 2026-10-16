@@ -271,6 +271,9 @@ final class ArticleApiTest extends ApiTestCase
         $this->json('GET', '/api/articles?q=merinos', null, $jeton);
         self::assertSame([$pull->getId()], array_column($this->reponse(), 'id'), 'Sans tenir compte des accents.');
 
+        $this->json('GET', '/api/articles?q=vinyl', null, $jeton);
+        self::assertSame([$vinyle->getId()], array_column($this->reponse(), 'id'), 'Le texte cherche aussi dans la catégorie (P3 : « veste »).');
+
         $this->json('GET', '/api/articles?categorie='.$this->categorie('Vinyle')->getId(), null, $jeton);
         self::assertSame([$vinyle->getId()], array_column($this->reponse(), 'id'));
         self::assertSame('Grande armoire', $this->reponse()[0]['emplacement']['stockage']['nom'], 'On voit où il est rangé.');
