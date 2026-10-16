@@ -18,7 +18,7 @@ return (new PhpCsFixer\Config())
     ->setRules([
         '@Symfony' => true,
         // Les tests portent le numéro de la règle testée puis une phrase : f07_j_envoie_une_photo…
-        'php_unit_method_case' => ['case' => 'snake_case'],
+        'php_unit_method_casing' => ['case' => 'snake_case'],
         // Ne pas ajouter un point après une phrase qui finit déjà par « … ».
         'phpdoc_summary' => false,
     ])
