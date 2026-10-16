@@ -5,14 +5,15 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
-    # Reconnaissance des photos (D-040, D-041). Délais par modèle : le principal répond en 3 à 5 s ;
-    # s'il refuse ou tarde, le modèle de secours prend le relais (ReconnaissanceArticles).
+    # Reconnaissance des photos (D-040, D-041). La lecture se fait pendant que la fiche est déjà ouverte :
+    # on laisse donc à Google jusqu'à 20 s par modèle (3 à 40 s mesurés le 16/10/2026, selon sa charge).
+    # Si le principal refuse ou tarde, le modèle de secours prend le relais (ReconnaissanceArticles).
     http_client:
         scoped_clients:
             reconnaissance.client:
                 base_uri: '%env(RECONNAISSANCE_URL)%'
-                timeout: 8
-                max_duration: 10
+                timeout: 20
+                max_duration: 20
 
     #esi: true
     #fragments: true
