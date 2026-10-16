@@ -324,7 +324,7 @@ async function enregistrer() {
       </div>
 
       <p v-if="erreurPhoto" class="alerte" role="alert">{{ erreurPhoto }}</p>
-      <p v-if="envoiPhoto" class="envoi" role="status">Envoi et lecture de la photo…</p>
+      <p v-if="envoiPhoto" class="envoi" role="status">Envoi et lecture de la photo… (jusqu'à 20 secondes)</p>
 
       <div class="commandes">
         <button type="button" class="bouton-galerie" aria-label="Choisir une photo dans la galerie" :disabled="envoiPhoto" @click="champGalerie?.click()">

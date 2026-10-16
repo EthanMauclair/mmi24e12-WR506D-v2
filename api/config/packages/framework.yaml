@@ -5,13 +5,19 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
-    # Reconnaissance des photos (D-023) : délais courts, la saisie à la main prend le relais.
+    # Reconnaissance des photos (D-040). Mesuré le 16/10/2026 : 3 à 8 s par photo, avec des 503 passagers
+    # (forte demande chez Google). Un seul nouvel essai sur 429 et 503, qui arrivent vite ; au-delà,
+    # la saisie à la main prend le relais.
     http_client:
         scoped_clients:
             reconnaissance.client:
                 base_uri: '%env(RECONNAISSANCE_URL)%'
-                timeout: 10
+                timeout: 15
                 max_duration: 20
+                retry_failed:
+                    http_codes: [429, 503]
+                    max_retries: 1
+                    delay: 500
 
     #esi: true
     #fragments: true

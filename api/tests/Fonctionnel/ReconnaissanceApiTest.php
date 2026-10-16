@@ -125,10 +125,23 @@ final class ReconnaissanceApiTest extends ApiTestCase
     }
 
     #[Test]
+    public function une_surcharge_passagere_est_reessayee_une_fois(): void
+    {
+        ModeleSimule::prevoir(new MockResponse('', ['http_code' => 503]));
+        ModeleSimule::prevoirTexte('{"categorie": "Pull", "marque": null, "couleur": "bleu"}');
+
+        $this->envoyerPhoto();
+
+        self::assertResponseStatusCodeSame(201);
+        self::assertCount(2, ModeleSimule::$requetes, 'Un seul nouvel essai après le 503.');
+        self::assertSame('Pull', $this->reponse()['proposition']['categorie']['nom']);
+    }
+
+    #[Test]
     public function sans_cle_aucun_appel_n_est_fait(): void
     {
         $client = new MockHttpClient(static fn () => self::fail('Aucun appel sans clé.'));
-        $service = new ReconnaissanceArticles($client, static::getContainer()->get(CategorieRepository::class), new NullLogger(), '', 'google/gemma-4-31b-it:free');
+        $service = new ReconnaissanceArticles($client, static::getContainer()->get(CategorieRepository::class), new NullLogger(), '', 'modele-de-test');
 
         self::assertNull($service->proposer('jpeg'));
         self::assertSame(0, $client->getRequestsCount());
