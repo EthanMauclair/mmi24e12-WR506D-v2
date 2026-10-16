@@ -173,14 +173,14 @@ Choix de méthode :
 
 ## Tests de bout en bout (Cypress)
 
-Dossier `e2e/` : un vrai navigateur, contre l'application lancée par Docker (`make front` puis `make fixtures`, puis `make e2e`). 14 tests dans 5 fichiers. Résultats et captures : [ci.md](ci.md).
+Dossier `e2e/` : un vrai navigateur, contre l'application lancée par Docker (`make front` puis `make fixtures`, puis `make e2e`). 15 tests dans 5 fichiers. Résultats et captures : [ci.md](ci.md).
 
 **Parcours métier** (`docs/04-parcours-utilisateurs.md`) :
 
 | Parcours | Écrans existants | Test Cypress | Couvert |
 |---|---|---|---|
 | P1 Découvrir l'application et ranger ses premiers articles | ✅ | `inscription-et-logement.cy.js` (inscription, logement, pièce, rangement, pseudo refusé), `connexion.cy.js` (pages protégées, mauvais mot de passe, profil) | ✅ |
-| P2 Ajouter un article en le prenant en photo | ✅ | `ajout-article.cy.js` (photo, fiche, catégorie et rangement obligatoires) | ✅ |
+| P2 Ajouter un article en le prenant en photo | ✅ | `ajout-article.cy.js` (photo, fiche, fiche préremplie par la proposition du modèle, catégorie et rangement obligatoires ; proposition interceptée, sans appel à Google) | ✅ |
 | P3 Retrouver un article | ✅ recherche (F-26) et fiche d'un article (F-09, F-10) | `recherche-article.cy.js` (« veste », puis couleur noire, emplacement de chaque résultat ; ouverture de la fiche, déplacement, retour à la recherche avec ses critères ; aucun résultat), `ajout-article.cy.js` (l'article est retrouvé dans sa pièce) | ✅ |
 | P4 Composer une tenue et la publier | ❌ lot 4 | – | hors périmètre actuel |
 | P5 Découvrir un compte et s'abonner | ❌ API faite, écrans non faits | – | hors périmètre actuel (API testée : `RelationApiTest`) |

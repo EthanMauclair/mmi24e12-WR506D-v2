@@ -18,7 +18,7 @@ Chaque ligne se rejoue avec une commande du [Makefile](Makefile). Les captures s
 | Snyk (dépendances, image Docker, code) | app.snyk.io | ✅ 0 critique. Code : 0 ; PHP : 0 ; image : 1 haute, dans l'image de base, corrigée à la construction par `apk upgrade` (D-034) ; front : 3 hautes acceptées, héritées de Nuxt et sans correctif (D-033, D-034) | [snyk.png](docs/captures/snyk.png) |
 | Tests PHPUnit (unitaires, intégration, fonctionnels) | `make tests` | ✅ 202 tests, 800 assertions | [tests.png](docs/captures/tests.png) |
 | Couverture du code | `make couverture` | ✅ 100 % des lignes (940 / 940), des méthodes (237 / 237) et des classes (59 / 59) | [couverture.png](docs/captures/couverture.png) |
-| Tests de bout en bout (Cypress) | `make e2e` | ✅ 14 tests, 5 fichiers, en 1 min 37 | [cypress.png](docs/captures/cypress.png) |
+| Tests de bout en bout (Cypress) | `make e2e` | ✅ 15 tests, 5 fichiers, en 2 min 45 | [cypress.png](docs/captures/cypress.png) |
 | Intégration continue (GitHub Actions) | `make qualite`, à chaque push et à chaque PR | ✅ verte sur `develop` et `feature/test` | [onglet Actions](https://github.com/EthanMauclair/mmi24e12-WR506D-v2/actions) |
 | Jeu de démonstration | `make fixtures` | ✅ 1 000 articles, 25 comptes, 24 logements, 92 relations (comptés en base après le chargement) | [fixtures.png](docs/captures/fixtures.png) |
 
@@ -30,7 +30,7 @@ Chaque ligne se rejoue avec une commande du [Makefile](Makefile). Les captures s
 |---|---|---|
 | `connexion.cy.js` | P1 : page protégée → connexion → retour à la page demandée ; mauvais mot de passe ; mot de passe affiché en clair ; connexion qui mène au profil sans afficher l'e-mail | 4 |
 | `inscription-et-logement.cy.js` | P1 : inscription → création guidée du logement, d'une pièce et d'un rangement ; pseudo invalide refusé | 2 |
-| `ajout-article.cy.js` | P2 et P3 : photo → fiche → article retrouvé en tête de sa pièce et de son rangement ; catégorie et rangement exigés | 2 |
+| `ajout-article.cy.js` | P2 et P3 : photo → fiche → article retrouvé en tête de sa pièce et de son rangement ; fiche préremplie par la proposition du modèle (D-040) ; catégorie et rangement exigés. La réponse de `/api/reconnaissances` est interceptée : le résultat ne dépend pas de Google | 3 |
 | `recherche-article.cy.js` | P3 : « veste », puis couleur noire, emplacement de chaque résultat ; ouverture de la fiche, déplacement, retour à la recherche avec ses critères ; aucun résultat | 3 |
 | `securite-et-mobile.cy.js` | Logement d'un autre introuvable (404) même en changeant l'adresse ; profil d'un autre sans e-mail ; barre du bas mobile et bouton photo | 3 |
 
