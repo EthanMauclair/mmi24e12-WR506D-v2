@@ -13,7 +13,7 @@ Chaque choix est justifié par une contrainte du projet, pas par la nouveauté.
 Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API Platform ──► MySQL
                                                      │
                                                      ├──► Stockage des photos (Flysystem : disque, puis S3)
-                                                     └──► OpenRouter (reconnaissance des articles)
+                                                     └──► Google AI Studio (reconnaissance des articles, D-040)
 ```
 
 | Couche | Choix |
@@ -23,7 +23,7 @@ Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API
 | Front | Application **découplée** en **Nuxt** (Vue), rendu côté serveur |
 | Base de données | **MySQL** |
 | Photos | **Flysystem** : disque (volume Docker) en V1, stockage objet S3 ensuite |
-| Reconnaissance | **OpenRouter** (modèle de vision) |
+| Reconnaissance | **Google AI Studio**, modèle de vision Gemini (D-040) ; OpenRouter possible par configuration |
 | Environnement | **Docker** (imposé), tests d'API avec **Postman** (imposé) |
 
 ---
@@ -114,7 +114,7 @@ Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API
 
 **Sécurité** : les photos ne sont **pas** servies directement depuis un dossier public. Elles passent par l'API, qui applique les règles de visibilité : sinon, l'URL d'une photo d'article personnel suffirait à la voir.
 
-## 7. Reconnaissance des articles : OpenRouter
+## 7. Reconnaissance des articles : modèle de vision
 
 **Justification** : déjà testé lors de la preuve de concept (séance 5).
 
@@ -126,7 +126,7 @@ Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API
 
 **Précautions** : la clé d'API reste côté serveur, jamais dans le front ni dans le dépôt. Les photos envoyées à un service tiers devront être mentionnées dans la politique de confidentialité.
 
-**V1** (D-023) : le remplissage automatique est **reporté**. Le modèle gratuit essayé (`google/gemma-4-31b-it:free`) était saturé chez son fournisseur (erreur 429) : la photo est enregistrée et la saisie se fait à la main. Le branchement est conservé sur la branche `feature/reconnaissance-ia`.
+**V1** (D-040, qui remplace D-023) : **Google AI Studio en direct**, modèle `gemini-3.5-flash-lite`, niveau sans frais. Le modèle gratuit d'OpenRouter, prévu au départ, était saturé (erreur 429). Adresse, clé et modèle se règlent par `RECONNAISSANCE_URL`, `RECONNAISSANCE_CLE` et `RECONNAISSANCE_MODELE`. La fiche arrive préremplie, à vérifier ; si Google ne répond pas (503 aux heures chargées), la saisie se fait à la main.
 
 ## 8. Encore à décider
 
@@ -134,4 +134,4 @@ Téléphone ──► Front Nuxt (rendu serveur) ──► API Symfony 7.4 + API
 |---|---|
 | Envoi d'e-mails (invitation d'un co-propriétaire, mot de passe oublié) : Symfony Mailer avec Mailpit en développement ; prestataire en production à choisir | Avant le lot 6 |
 | Hébergement de production | Avant le pitch 2 |
-| Remplissage automatique par photo : modèle OpenRouter fiable (payant, clé Google personnelle ou autre modèle gratuit), D-023 | Après la V1 |
+| Remplissage automatique par photo : niveau payant de Google ou politique de confidentialité avant de vraies utilisatrices (D-040) | Avant la mise en production |

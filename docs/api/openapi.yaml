@@ -617,7 +617,7 @@ paths:
       summary: Envoyer une photo et obtenir une proposition (F-07)
       description: |
         Étape 1 de l'ajout par photo (P2). L'image est réduite, convertie en JPG, débarrassée de ses
-        métadonnées, stockée, puis envoyée à OpenRouter. La catégorie proposée est toujours prise
+        métadonnées, stockée, puis envoyée à un modèle de vision (Google AI Studio). La catégorie proposée est toujours prise
         dans la liste fixe. Si la reconnaissance échoue, `proposition` est vide : la saisie se fait à la main.
       requestBody:
         required: true

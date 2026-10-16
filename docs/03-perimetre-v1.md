@@ -90,7 +90,7 @@ La V1 est construite autour des **trois priorités de la cliente** (Q-01) : **l'
 | H7 | La **date de naissance** est demandée à la création d'un compte mineur. | Nécessaire au passage automatique en majeur (F-13). |
 | H9 | Un **ami** a au minimum les mêmes droits de lecture qu'un abonné accepté, même si le compte est privé. | « Les deux statuts voient la même chose » (tour 2, Q-01). |
 | H10 | Les **visiteurs** (amis, abonnés, non-inscrits) voient le **logement** et ses **articles**, mais pas les pièces ni les stockages. | CR § 5. |
-| H11 | La reconnaissance de l'article par photo passe par un **modèle d'IA externe** (OpenRouter), avec une image réduite, convertie en JPG puis en base64. | Preuve de concept de la séance 5. |
+| H11 | La reconnaissance de l'article par photo passe par un **modèle d'IA externe** (OpenRouter au départ, Google AI Studio depuis D-040), avec une image réduite, convertie en JPG puis en base64. | Preuve de concept de la séance 5. |
 | H18 | Un compte **mineur** ne peut être invité que dans un logement dont son **référent** est membre. | Le compte rendu dit qu'il est « obligatoirement rattaché à un compte majeur pour le logement ». À confirmer avec la cliente. |
 
 ---

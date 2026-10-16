@@ -36,7 +36,7 @@ C'est la réponse au défaut n°5 de la séance 8-9 (« il y a dans la réponse 
 
 ## 3. L'ajout par photo en deux temps
 
-1. `POST /api/reconnaissances` : envoi de la photo. Le serveur la réduit, la convertit en JPG, retire ses métadonnées, la stocke, puis demande une proposition à OpenRouter. Réponse : l'identifiant de la photo et une proposition (catégorie, marque, couleur), éventuellement vide. **En V1, la proposition est toujours vide** : le remplissage automatique est reporté (D-023).
+1. `POST /api/reconnaissances` : envoi de la photo. Le serveur la réduit, la convertit en JPG, retire ses métadonnées, la stocke, puis demande une proposition à un modèle de vision (Google AI Studio, D-040). Réponse : l'identifiant de la photo et une proposition (catégorie, marque, couleur), **vide** si le modèle ne répond pas : la saisie se fait alors à la main.
 2. `POST /api/articles` : l'utilisateur a vérifié et corrigé la proposition, et choisi le rangement. L'article est créé.
 
 **Pourquoi deux temps** : c'est le parcours P2 (photo d'abord, rangement ensuite, D-010), et la proposition de l'IA n'est jamais enregistrée sans validation humaine (H6).

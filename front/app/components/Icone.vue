@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** Icônes au trait, reprises des maquettes (aucune bibliothèque chargée pour quelques pictogrammes). */
 export type NomIcone = 'cintre' | 'logement' | 'recherche' | 'photo' | 'tenue' | 'profil' | 'retour' | 'deconnexion'
-  | 'oeil' | 'oeil-barre' | 'reglages' | 'crayon' | 'croix'
+  | 'oeil' | 'oeil-barre' | 'reglages' | 'crayon' | 'croix' | 'etincelle'
 
 withDefaults(defineProps<{ nom: NomIcone, taille?: number, epaisseur?: number }>(), {
   taille: 24,
@@ -19,6 +19,7 @@ const traces: Record<NomIcone, string[]> = {
   deconnexion: ['M10 5H5v14h5', 'M14 8l4 4-4 4', 'M18 12H9'],
   crayon: ['M4 20h4L19 9l-4-4L4 16Z'],
   croix: ['M6 6l12 12', 'M18 6 6 18'],
+  etincelle: ['M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1'],
   oeil: ['M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z', 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z'],
   'oeil-barre': ['M10.7 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.2 3.2', 'M6.6 6.6A17.4 17.4 0 0 0 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6', 'M9.9 9.9a3 3 0 0 0 4.2 4.2', 'm2 2 20 20'],
   reglages: ['M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z', 'M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z'],
