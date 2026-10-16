@@ -112,9 +112,11 @@ const onglet = ref<Onglet>('articles')
     </section>
 
     <section v-show="onglet === 'articles'" id="panneau-articles" role="tabpanel" aria-labelledby="onglet-articles">
-      <ul v-if="articles?.length" class="grille">
+      <ul v-if="articles?.length" class="grille" data-cy="articles">
         <li v-for="article in articles" :key="article.id">
-          <img :src="photo(article)" :alt="libelle(article)" loading="lazy">
+          <NuxtLink :to="`/articles/${article.id}`" class="lien-article">
+            <img :src="photo(article)" :alt="libelle(article)" loading="lazy">
+          </NuxtLink>
         </li>
       </ul>
       <div v-else class="vide">
@@ -250,6 +252,10 @@ h1 {
   margin: 3px -17px 0;
   padding: 0;
   list-style: none;
+}
+
+.lien-article {
+  display: block;
 }
 
 .grille img {
