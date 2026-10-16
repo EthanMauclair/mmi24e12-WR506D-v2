@@ -3,7 +3,8 @@
  * Écrans 5 et 6 – Ajouter un article (F-07, F-08, F-10, P2), en deux étapes sur la même page :
  * 1. la photo (caméra, galerie, glisser-déposer ou webcam), envoyée à POST /api/reconnaissances ;
  * 2. la fiche (catégorie, marque, couleur, rangement, note, personnel), envoyée à POST /api/articles.
- * En V1, la photo ne remplit rien (D-023) : la fiche est toujours saisie à la main.
+ * La photo est lue par un modèle d'OpenRouter, qui propose catégorie, marque et couleur (D-040) :
+ * la fiche arrive préremplie, à vérifier (H6). Si le modèle ne répond pas, elle reste à remplir à la main.
  */
 useHead({ title: 'Ajouter un article – Penderie' })
 
@@ -23,6 +24,8 @@ const etape = ref<'photo' | 'fiche'>('photo')
 const envoiPhoto = ref(false)
 const erreurPhoto = ref<string | null>(null)
 const photo = ref<string | null>(null)
+/** La fiche a été préremplie à partir de la photo : le bandeau invite à la vérifier. */
+const proposee = ref(false)
 const apercu = ref<string | null>(null)
 
 const video = ref<HTMLVideoElement | null>(null)
@@ -107,8 +110,9 @@ async function envoyer(fichier: File) {
     const corps = new FormData()
     corps.append('photo', fichier)
     // L'API réduit la photo, la redresse et retire ses métadonnées (position GPS comprise).
-    const reponse = await api<{ photo: string }>('/api/reconnaissances', { method: 'POST', body: corps })
+    const reponse = await api<{ photo: string, proposition: Proposition | null }>('/api/reconnaissances', { method: 'POST', body: corps })
     photo.value = reponse.photo
+    preremplir(reponse.proposition)
     if (apercu.value) {
       URL.revokeObjectURL(apercu.value)
     }
@@ -122,6 +126,22 @@ async function envoyer(fichier: File) {
   }
   finally {
     envoiPhoto.value = false
+  }
+}
+
+interface Proposition {
+  categorie: { id: number, nom: string }
+  marque: string | null
+  couleur: string | null
+}
+
+/** Reprend la proposition du modèle ; sans proposition, ce que la personne a déjà saisi reste en place. */
+function preremplir(proposition: Proposition | null) {
+  proposee.value = proposition !== null
+  if (proposition) {
+    fiche.categorie = proposition.categorie.id
+    fiche.marque = proposition.marque ?? ''
+    fiche.couleur = proposition.couleur ?? ''
   }
 }
 
@@ -299,12 +319,12 @@ async function enregistrer() {
             <li>Cadrez-le en entier, en pleine lumière.</li>
             <li>Une photo par article.</li>
           </ol>
-          <p class="note-gps">La position GPS de la photo est supprimée avant l'enregistrement.</p>
+          <p class="note-gps">La position GPS de la photo est supprimée avant l'enregistrement. La photo est ensuite lue par un service d'IA (OpenRouter) pour préremplir la fiche, que vous vérifiez.</p>
         </aside>
       </div>
 
       <p v-if="erreurPhoto" class="alerte" role="alert">{{ erreurPhoto }}</p>
-      <p v-if="envoiPhoto" class="envoi" role="status">Envoi de la photo…</p>
+      <p v-if="envoiPhoto" class="envoi" role="status">Envoi et lecture de la photo…</p>
 
       <div class="commandes">
         <button type="button" class="bouton-galerie" aria-label="Choisir une photo dans la galerie" :disabled="envoiPhoto" @click="champGalerie?.click()">
@@ -337,8 +357,10 @@ async function enregistrer() {
         </div>
 
         <form class="formulaire colonne-formulaire" novalidate @submit.prevent="enregistrer">
-          <div class="bandeau">
-            <strong>Fiche de l'article.</strong> Indiquez la catégorie, la marque et la couleur.
+          <div class="bandeau" data-cy="bandeau-fiche">
+            <Icone nom="etincelle" :taille="18" :epaisseur="2" class="bandeau-icone" />
+            <span v-if="proposee"><strong>Remplie à partir de la photo.</strong> Vérifiez la catégorie, la marque et la couleur, et corrigez-les si besoin.</span>
+            <span v-else><strong>Fiche de l'article.</strong> Indiquez la catégorie, la marque et la couleur.</span>
           </div>
 
           <p v-if="erreurFiche" class="alerte" role="alert">{{ erreurFiche }}</p>
@@ -657,9 +679,8 @@ async function enregistrer() {
 
 .bandeau {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
   padding: 12px;
   border-radius: var(--rayon-bouton);
   background: var(--bordeaux-clair);
@@ -669,6 +690,11 @@ async function enregistrer() {
 }
 
 .bandeau strong {
+  color: var(--bordeaux);
+}
+
+.bandeau-icone {
+  flex-shrink: 0;
   color: var(--bordeaux);
 }
 
@@ -1009,7 +1035,7 @@ async function enregistrer() {
   }
 
   .bandeau {
-    display: block;
+    gap: 10px;
     padding: 14px 16px;
     font-size: 14px;
   }
