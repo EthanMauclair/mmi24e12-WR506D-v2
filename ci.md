@@ -18,7 +18,7 @@ Chaque ligne se rejoue avec une commande du [Makefile](Makefile). Les captures s
 | Snyk (dépendances, image Docker, code) | app.snyk.io | ✅ code : 0 ; PHP : 0 ; image : 0 critique ; front : 0 critique | [snyk.png](docs/captures/snyk.png) |
 | Tests PHPUnit (unitaires, intégration, fonctionnels) | `make tests` | ✅ 132 tests, 508 assertions | [tests.png](docs/captures/tests.png) |
 | Couverture du code | `make couverture` | ✅ 100 % des lignes (883 / 883), des méthodes et des classes | [couverture.png](docs/captures/couverture.png) |
-| Tests de bout en bout (Cypress) | `make e2e` | ✅ 11 tests, 4 fichiers, en 2 min 05 | [cypress.png](docs/captures/cypress.png) |
+| Tests de bout en bout (Cypress) | `make e2e` | ✅ 14 tests, 5 fichiers, en 2 min 33 | [cypress.png](docs/captures/cypress.png) |
 | Jeu de démonstration | `make fixtures` | ✅ 1 000 articles, 25 comptes, 24 logements, 92 relations, en 17 s | [fixtures.png](docs/captures/fixtures.png) |
 
 `make qualite` enchaîne lint, PHPStan, style, audit et tests : c'est la commande que lancera la CI.

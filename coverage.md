@@ -171,7 +171,7 @@ Choix de méthode :
 
 ## Tests de bout en bout (Cypress)
 
-Dossier `e2e/` : un vrai navigateur, contre l'application lancée par Docker (`make front` puis `make fixtures`, puis `make e2e`). 11 tests dans 4 fichiers. Résultats et captures : [ci.md](ci.md).
+Dossier `e2e/` : un vrai navigateur, contre l'application lancée par Docker (`make front` puis `make fixtures`, puis `make e2e`). 14 tests dans 5 fichiers. Résultats et captures : [ci.md](ci.md).
 
 **Parcours métier** (`docs/04-parcours-utilisateurs.md`) :
 
@@ -179,7 +179,7 @@ Dossier `e2e/` : un vrai navigateur, contre l'application lancée par Docker (`m
 |---|---|---|---|
 | P1 Découvrir l'application et ranger ses premiers articles | ✅ | `inscription-et-logement.cy.js` (inscription, logement, pièce, rangement, pseudo refusé), `connexion.cy.js` (pages protégées, mauvais mot de passe, profil) | ✅ |
 | P2 Ajouter un article en le prenant en photo | ✅ | `ajout-article.cy.js` (photo, fiche, catégorie et rangement obligatoires) | ✅ |
-| P3 Retrouver un article | 🟡 par la pièce et le rangement ; écran de recherche (F-26) pas encore fait | `ajout-article.cy.js` (l'article est retrouvé dans sa pièce) | 🟡 en partie : la recherche est testée côté API (`f26_…`, 8 tests) |
+| P3 Retrouver un article | ✅ recherche (F-26) et fiche d'un article (F-09, F-10) | `recherche-article.cy.js` (« veste », puis couleur noire, emplacement de chaque résultat ; ouverture de la fiche, déplacement, retour à la recherche avec ses critères ; aucun résultat), `ajout-article.cy.js` (l'article est retrouvé dans sa pièce) | ✅ |
 | P4 Composer une tenue et la publier | ❌ lot 4 | – | hors périmètre actuel |
 | P5 Découvrir un compte et s'abonner | ❌ API faite, écrans non faits | – | hors périmètre actuel (API testée : `RelationApiTest`) |
 | P6 Commenter une tenue, retirer un ami | ❌ lot 5 | – | hors périmètre actuel |
@@ -189,10 +189,10 @@ Dossier `e2e/` : un vrai navigateur, contre l'application lancée par Docker (`m
 
 Plus deux scénarios transversaux : **sécurité** (le logement d'une autre personne reste introuvable même en changeant l'adresse ; aucun e-mail dans un profil, S-05) et **mobile** (barre du bas, bouton photo).
 
-**Bilan** : 100 % des parcours dont les écrans existent sont couverts. P3 le sera entièrement avec l'écran de recherche. Un parcours sans écran ne peut pas avoir de test de bout en bout : chacun recevra le sien avec ses écrans. En attendant, ses règles sont testées côté API.
+**Bilan** : 100 % des parcours dont les écrans existent sont couverts, P1 à P3 entièrement. Un parcours sans écran ne peut pas avoir de test de bout en bout : chacun recevra le sien avec ses écrans. En attendant, ses règles sont testées côté API.
 
-**Écarts connus aux bonnes pratiques Cypress** :
-- quelques sélecteurs utilisent encore des classes CSS (`.grille`, `.barre-bas`, `.menu-lateral`) au lieu d'attributs `data-cy` ;
-- les tests tournent sur la base de développement chargée par les fixtures, et non sur une base dédiée.
+**Sélecteurs** : les tests visent des attributs `data-cy` (barre du bas, menu latéral, grilles, recherche, fiche d'un article, D-037), à défaut un rôle ou un texte visible (`cy.contains('button', …)`), jamais une classe CSS : un changement de style ne casse plus les tests.
+
+**Écart connu aux bonnes pratiques Cypress** : les tests tournent sur la base de développement chargée par les fixtures, et non sur une base dédiée. Ils en tiennent compte : quand ils ajoutent des données, elles sont uniques (pseudo et marque horodatés) ; quand ils en modifient, ils ne supposent rien de l'état de départ (le déplacement de P3 choisit un rangement différent de l'actuel).
 
 Ces tests ont révélé un défaut que les tests PHP ne pouvaient pas voir : un clic sur « Se connecter » avant que Vue prenne la main envoyait le **mot de passe dans l'adresse** (D-035). Corrigé.
