@@ -47,7 +47,7 @@ class ArticleRepository extends ServiceEntityRepository
             ->setParameter('accepte', StatutMembre::Accepte);
 
         if (null !== $texte) {
-            $requete->andWhere('a.marque LIKE :texte OR a.couleur LIKE :texte OR a.note LIKE :texte')
+            $requete->andWhere('c.nom LIKE :texte OR a.marque LIKE :texte OR a.couleur LIKE :texte OR a.note LIKE :texte')
                 ->setParameter('texte', self::contient($texte));
         }
         if (null !== $logement) {

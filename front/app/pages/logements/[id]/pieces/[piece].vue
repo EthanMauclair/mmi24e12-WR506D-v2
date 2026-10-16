@@ -128,15 +128,17 @@ function details(article: ArticleMembre): string {
     </div>
     <p v-if="erreurRangement" class="alerte" role="alert">{{ erreurRangement }}</p>
 
-    <ul v-if="articles.length" class="grille">
-      <li v-for="article in articles" :key="article.id" class="article">
-        <div class="vignette">
-          <img :src="photo(article)" :alt="[article.categorie.nom, details(article)].filter(Boolean).join(', ')" loading="lazy">
-          <span v-if="article.estPersonnel" class="personnel">Personnel</span>
-        </div>
-        <p class="categorie">{{ article.categorie.nom }}</p>
-        <p v-if="details(article)" class="details">{{ details(article) }}</p>
-        <p v-if="filtre === null && article.emplacement" class="rangement">{{ article.emplacement.stockage.nom }}</p>
+    <ul v-if="articles.length" class="grille" data-cy="articles">
+      <li v-for="article in articles" :key="article.id">
+        <NuxtLink :to="`/articles/${article.id}`" class="article">
+          <div class="vignette">
+            <img :src="photo(article)" alt="" loading="lazy">
+            <span v-if="article.estPersonnel" class="personnel">Personnel</span>
+          </div>
+          <span class="categorie">{{ article.categorie.nom }}</span>
+          <span v-if="details(article)" class="details">{{ details(article) }}</span>
+          <span v-if="filtre === null && article.emplacement" class="rangement">{{ article.emplacement.stockage.nom }}</span>
+        </NuxtLink>
       </li>
     </ul>
 
@@ -254,12 +256,18 @@ h1 {
   font-weight: 700;
 }
 
-.article p {
-  margin: 0;
+.article {
+  display: grid;
+  color: var(--texte);
+  text-decoration: none;
+}
+
+.article:hover .categorie {
+  color: var(--bordeaux);
 }
 
 .categorie {
-  margin-top: 8px !important;
+  margin-top: 8px;
   font-weight: 700;
 }
 
