@@ -5,6 +5,22 @@
 - **Branche** : `feature/test` (non fusionnée dans `develop`, comme le demande la séance 16)
 - **Rejouer** : `make couverture` (rapport HTML : `api/coverage/index.html`) ; `make tests` pour les tests seuls
 
+## Où trouver les tests
+
+Le dépôt contient deux applications : l'API Symfony dans `api/` et le front Nuxt dans `front/`. Les tests de l'API sont donc dans `api/`, et les tests de bout en bout dans `e2e/`, à la racine.
+
+| Demandé | Emplacement |
+|---|---|
+| Fixtures | `api/src/DataFixtures/AppFixtures.php` (avec `Fournisseur/PenderieFournisseur.php` et `PhotoFactice.php`) |
+| Tests unitaires | `api/tests/Unit/` (`Entity/`, `EventListener/`, `Security/`) |
+| Tests d'intégration | `api/tests/Integration/` |
+| Tests fonctionnels | `api/tests/Fonctionnel/` |
+| Configuration PHPUnit | `api/phpunit.dist.xml` |
+| Configuration Cypress | `e2e/cypress.config.js` |
+| Tests Cypress (bout en bout) | `e2e/cypress/e2e/*.cy.js` |
+| Audit qualité et sécurité | `audit.md` (racine) |
+| Captures des résultats | `ci.md` (racine) |
+
 ## Résultat
 
 | Mesure | Avant (séance 15) | Après |
