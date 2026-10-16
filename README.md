@@ -60,7 +60,7 @@ docker compose run --rm --no-deps php composer install
 #      JWT_PASSPHRASE=<une phrase secrète>
 #    (fichier : api/.env.local)
 
-#    Facultatif : OPENROUTER_API_KEY=<clé OpenRouter> pour préremplir la fiche à partir de la photo (D-040).
+#    Facultatif : RECONNAISSANCE_CLE=<clé Google AI Studio> pour préremplir la fiche à partir de la photo (D-040).
 #    Sans clé, la fiche se remplit à la main.
 
 #    Copier aussi APP_SECRET et JWT_PASSPHRASE dans api/.env.test.local (pour les tests)
